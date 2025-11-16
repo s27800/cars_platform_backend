@@ -1,0 +1,42 @@
+package com.carsplatform.backend.api.models;
+
+import com.carsplatform.backend.api.brands.Brand;
+import com.carsplatform.backend.api.generations.Generation;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "model")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Model {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "brand_id", nullable = false)
+    private Brand brand;
+
+    @Column(name = "name", nullable = false)
+    @NotBlank(message = "Model name cannot be blank")
+    @Size(max = 100)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Generation> generations = new ArrayList<>();
+}
