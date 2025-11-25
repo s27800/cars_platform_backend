@@ -1,4 +1,4 @@
-package com.carsplatform.backend.common.configs;
+package com.carsplatform.backend.common.security;
 
 // import com.carsplatform.backend.common.security.JwtAuthenticationFilter;
 // import com.carsplatform.backend.api.users.UserService;
