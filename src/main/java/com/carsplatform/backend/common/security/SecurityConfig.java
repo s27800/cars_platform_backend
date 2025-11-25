@@ -1,6 +1,6 @@
 package com.carsplatform.backend.common.security;
 
-// import com.carsplatform.backend.common.security.JwtAuthenticationFilter;
+import com.carsplatform.backend.common.security.jwt.JwtAuthenticationFilter;
 // import com.carsplatform.backend.api.users.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     // private final UserService userService;
-    // private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             );
 
-        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
