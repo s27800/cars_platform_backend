@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public User getCurrentUser() {
+    public User getCurrentUser() throws ResourceNotFoundException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return userRepository.findByUsername(username)
@@ -54,7 +54,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void updateUserProfile(UserModifyRequest userModifyRequest) {
+    public void updateUserProfile(UserModifyRequest userModifyRequest) throws ResourceAlreadyExistsException {
         User currentUser = getCurrentUser();
 
         if (!currentUser.getEmail().equals(userModifyRequest.getEmail())
