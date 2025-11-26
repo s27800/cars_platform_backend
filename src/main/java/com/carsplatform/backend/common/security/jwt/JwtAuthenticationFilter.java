@@ -1,6 +1,5 @@
 package com.carsplatform.backend.common.security.jwt;
 
-import com.carsplatform.backend.common.security.jwt.JwtTokenProvider;
 import com.carsplatform.backend.api.users.UserService;
 
 import lombok.RequiredArgsConstructor;
