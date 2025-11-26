@@ -47,7 +47,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(manager -> manager
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // .requestMatchers(HttpMethod.GET, "/api/brands/**", "/api/models/**", "/api/cars/**").permitAll()
                 // .requestMatchers(HttpMethod.POST, "/api/reviews/**", "/api/fuel-reports/**").authenticated()
                 // .requestMatchers("/api/admin/**").hasRole("ADMIN")
