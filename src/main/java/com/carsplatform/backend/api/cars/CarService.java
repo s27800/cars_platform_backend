@@ -30,8 +30,8 @@ public class CarService {
         Car car = carRepository.findByIdWithDetails(id).orElseThrow(
                 () -> new ResourceNotFoundException("Car", "id", id));
 
-        List<Review> approvedReviews = reviewRepository.findApprovedReviewsForCarId(id, true);
-        List<FuelReport> approvedReports = fuelReportRepository.findApprovedFuelReportsForCarId(id, true);
+        List<Review> approvedReviews = reviewRepository.findByCarIdAndIsApproved(id, true);
+        List<FuelReport> approvedReports = fuelReportRepository.findByCarIdAndIsApproved(id, true);
 
         car.setReviews(approvedReviews);
         car.setFuelReports(approvedReports);
@@ -44,11 +44,11 @@ public class CarService {
         Car car = carRepository.findByIdWithDetails(id).orElseThrow(
                 () -> new ResourceNotFoundException("Car", "id", id));
 
-        Page<Review> approvedReviews = reviewRepository.findApprovedReviewsForCarId(id, true, pageable);
-        Page<FuelReport> approvedReports = fuelReportRepository.findApprovedFuelReportsForCarId(id, true, pageable);
+        Page<Review> approvedReviews = reviewRepository.findByCarIdAndIsApproved(id, true, pageable);
+        Page<FuelReport> approvedReports = fuelReportRepository.findByCarIdAndIsApproved(id, true, pageable);
 
-        car.setReviews((List<Review>) approvedReviews);
-        car.setFuelReports((List<FuelReport>) approvedReports);
+        car.setReviews(approvedReviews.stream().toList());
+        car.setFuelReports(approvedReports.stream().toList());
 
         return carDetailsMapper.toDto(car);
     }

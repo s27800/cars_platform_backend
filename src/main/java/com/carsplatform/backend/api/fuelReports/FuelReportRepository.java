@@ -12,9 +12,9 @@ import java.util.List;
 
 @Repository
 public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
-    List<FuelReport> findApprovedFuelReportsForCarId(Integer carId, boolean isApproved);
+    List<FuelReport> findByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
-    Page<FuelReport> findApprovedFuelReportsForCarId(Integer carId, boolean isApproved, Pageable pageable);
+    Page<FuelReport> findByCarIdAndIsApproved(Integer carId, boolean isApproved, Pageable pageable);
 
     @Query("SELECT AVG(fr.fuelConsumption) " +
             "FROM FuelReport fr " +

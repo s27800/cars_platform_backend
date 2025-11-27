@@ -11,11 +11,11 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findApprovedReviewsForCarId(Integer carId, boolean isApproved);
+    List<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
-    Page<Review> findApprovedReviewsForCarId(Integer carId, boolean isApproved, Pageable pageable);
+    Page<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved, Pageable pageable);
 
-    long countApprovedReviewsForCarId(Integer carId, boolean isApproved);
+    long countByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
     @Query("SELECT AVG((" +
             "r.engineRating + r.transmissionRating + r.steeringRating " +
