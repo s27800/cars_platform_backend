@@ -3,6 +3,7 @@ package com.carsplatform.backend.api.carImages;
 import com.carsplatform.backend.api.carImages.dtos.CarImageResponse;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public interface CarImageMapper {
 
     CarImageResponse toDto(CarImage carImage);
 
+    @Named("toDtoList")
     default List<CarImageResponse> toDtoList(List<CarImage> images) {
         if (images == null)
             return null;

@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CarDetailsResponse {
@@ -41,7 +42,7 @@ public class CarDetailsResponse {
     private CarInsideDimensionsResponse insideDimensions;
     private CarOutsideDimensionsResponse outsideDimensions;
     private List<CarImageResponse> images;
-    private List<CarTagResponse> tags;
+    private Set<CarTagResponse> tags;
     private List<CarFuelReportResponse> fuelReports;
     private List<CarReviewResponse> reviews;
 }

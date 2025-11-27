@@ -5,6 +5,7 @@ import com.carsplatform.backend.api.users.UsernameMapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public interface ReviewMapper {
     @Mapping(target = "usernameResponse", source = "user")
     CarReviewResponse toDto(Review review);
 
+    @Named("toDtoList")
     default List<CarReviewResponse> toDtoList(List<Review> reviews) {
         if (reviews == null)
             return null;

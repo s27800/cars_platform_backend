@@ -3,9 +3,10 @@ package com.carsplatform.backend.api.tags;
 import com.carsplatform.backend.api.tags.dtos.CarTagResponse;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -14,10 +15,11 @@ public interface TagMapper {
 
     CarTagResponse toDto(Tag tag);
 
-    default List<CarTagResponse> toDtoList(List<Tag> tags) {
+    @Named("toDtoList")
+    default Set<CarTagResponse> toDtoList(Set<Tag> tags) {
         if (tags == null)
             return null;
 
-        return tags.stream().map(this::toDto).collect(Collectors.toList());
+        return tags.stream().map(this::toDto).collect(Collectors.toSet());
     }
 }

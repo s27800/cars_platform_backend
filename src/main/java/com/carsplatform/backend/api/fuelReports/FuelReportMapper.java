@@ -4,6 +4,7 @@ import com.carsplatform.backend.api.fuelReports.dtos.CarFuelReportResponse;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public interface FuelReportMapper {
     @Mapping(target = "usernameResponse", source = "user")
     CarFuelReportResponse toDto(FuelReport fuelReport);
 
+    @Named("toDtoList")
     default List<CarFuelReportResponse> toDtoList(List<FuelReport> reports) {
         if (reports == null)
             return null;
