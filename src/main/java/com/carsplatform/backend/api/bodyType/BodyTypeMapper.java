@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface BodyTypeMapper {
     BodyTypeMapper INSTANCE = Mappers.getMapper(BodyTypeMapper.class);
-    CarBodyTypeResponse toBodyTypeDto(BodyType bodyType);
+    CarBodyTypeResponse toDto(BodyType bodyType);
 }

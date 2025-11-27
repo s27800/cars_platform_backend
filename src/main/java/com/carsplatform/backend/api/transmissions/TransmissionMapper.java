@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface TransmissionMapper {
     TransmissionMapper INSTANCE = Mappers.getMapper(TransmissionMapper.class);
-    CarTransmissionResponse toTransmissionDto(Transmission transmission);
+    CarTransmissionResponse toDto(Transmission transmission);
 }

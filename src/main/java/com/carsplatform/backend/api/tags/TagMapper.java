@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface TagMapper {
     TagMapper INSTANCE = Mappers.getMapper(TagMapper.class);
-    CarTagResponse toTagDto(Tag tag);
+    CarTagResponse toDto(Tag tag);
 }

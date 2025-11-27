@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface GenerationMapper {
     GenerationMapper INSTANCE = Mappers.getMapper(GenerationMapper.class);
-    CarGenerationResponse toGenerationDto(Generation generation);
+    CarGenerationResponse toDto(Generation generation);
 }

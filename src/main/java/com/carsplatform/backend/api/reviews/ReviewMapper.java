@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
     ReviewMapper INSTANCE = Mappers.getMapper(ReviewMapper.class);
-    CarReviewResponse toReviewDto(Review review);
+    CarReviewResponse toDto(Review review);
 }

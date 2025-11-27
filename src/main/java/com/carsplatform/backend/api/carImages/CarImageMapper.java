@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface CarImageMapper {
     CarImageMapper INSTANCE = Mappers.getMapper(CarImageMapper.class);
-    CarImageResponse toCarImageDto(CarImage carImage);
+    CarImageResponse toDto(CarImage carImage);
 }

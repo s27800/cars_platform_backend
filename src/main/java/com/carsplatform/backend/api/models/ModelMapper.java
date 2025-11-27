@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface ModelMapper {
     ModelMapper INSTANCE = Mappers.getMapper(ModelMapper.class);
-    CarModelResponse toModelDto(Model model);
+    CarModelResponse toDto(Model model);
 }

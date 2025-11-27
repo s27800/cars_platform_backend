@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface BrandMapper {
     BrandMapper INSTANCE = Mappers.getMapper(BrandMapper.class);
-    CarBrandResponse toBrandDto(Brand brand);
+    CarBrandResponse toDto(Brand brand);
 }
