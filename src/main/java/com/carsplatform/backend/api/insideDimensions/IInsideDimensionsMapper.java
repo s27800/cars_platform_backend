@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface InsideDimensionsMapper {
-    InsideDimensionsMapper INSTANCE = Mappers.getMapper(InsideDimensionsMapper.class);
+public interface IInsideDimensionsMapper {
+    IInsideDimensionsMapper INSTANCE = Mappers.getMapper(IInsideDimensionsMapper.class);
 
     @Named("toDto")
     CarInsideDimensionsResponse toDto(InsideDimensions insideDimensions);

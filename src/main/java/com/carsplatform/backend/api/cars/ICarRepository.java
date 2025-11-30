@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CarRepository extends JpaRepository<Car, Integer> {
+public interface ICarRepository extends JpaRepository<Car, Integer> {
     @Query("SELECT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
             "LEFT JOIN FETCH c.chassis " +

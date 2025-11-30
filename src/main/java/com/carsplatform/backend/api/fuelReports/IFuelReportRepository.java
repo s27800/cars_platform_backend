@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
+public interface IFuelReportRepository extends JpaRepository<FuelReport, Long> {
     List<FuelReport> findByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
     Page<FuelReport> findByCarIdAndIsApproved(Integer carId, boolean isApproved, Pageable pageable);

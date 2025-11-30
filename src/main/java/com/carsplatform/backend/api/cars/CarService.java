@@ -2,9 +2,9 @@ package com.carsplatform.backend.api.cars;
 
 import com.carsplatform.backend.api.cars.dtos.CarDetailsResponse;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
-import com.carsplatform.backend.api.fuelReports.FuelReportRepository;
+import com.carsplatform.backend.api.fuelReports.IFuelReportRepository;
 import com.carsplatform.backend.api.reviews.Review;
-import com.carsplatform.backend.api.reviews.ReviewRepository;
+import com.carsplatform.backend.api.reviews.IReviewRepository;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CarService {
-    private final CarRepository carRepository;
-    private final CarDetailsMapper carDetailsMapper;
-    private final ReviewRepository reviewRepository;
-    private final FuelReportRepository fuelReportRepository;
+    private final ICarRepository carRepository;
+    private final ICarDetailsMapper carDetailsMapper;
+    private final IReviewRepository reviewRepository;
+    private final IFuelReportRepository fuelReportRepository;
 
     @Transactional(readOnly = true)
     public CarDetailsResponse getCarDetailsForCarId(Integer id) throws ResourceNotFoundException {

@@ -15,8 +15,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class FuelReportService {
-    private final FuelReportRepository fuelReportRepository;
-    private final AverageFuelConsumptionMapper averageFuelConsumptionMapper;
+    private final IFuelReportRepository fuelReportRepository;
+    private final IAverageFuelConsumptionMapper averageFuelConsumptionMapper;
 
     @Transactional(readOnly = true)
     public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(Integer carId) {

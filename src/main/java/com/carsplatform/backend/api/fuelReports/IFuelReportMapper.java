@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface FuelReportMapper {
-    FuelReportMapper INSTANCE = Mappers.getMapper(FuelReportMapper.class);
+public interface IFuelReportMapper {
+    IFuelReportMapper INSTANCE = Mappers.getMapper(IFuelReportMapper.class);
 
     @Mapping(target = "usernameResponse", source = "user")
     CarFuelReportResponse toDto(FuelReport fuelReport);

@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface PerformanceMapper {
-    PerformanceMapper INSTANCE = Mappers.getMapper(PerformanceMapper.class);
+public interface IPerformanceMapper {
+    IPerformanceMapper INSTANCE = Mappers.getMapper(IPerformanceMapper.class);
 
     @Named("toDto")
     CarPerformanceResponse toDto(Performance performance);

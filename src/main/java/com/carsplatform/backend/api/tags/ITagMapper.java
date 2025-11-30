@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface TagMapper {
-    TagMapper INSTANCE = Mappers.getMapper(TagMapper.class);
+public interface ITagMapper {
+    ITagMapper INSTANCE = Mappers.getMapper(ITagMapper.class);
 
     CarTagResponse toDto(Tag tag);
 

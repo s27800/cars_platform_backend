@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
+    private final IUserMapper userMapper;
 
     @GetMapping("/me")
     @Operation(summary = "Get current user's profile information")

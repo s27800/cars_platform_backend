@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface UsernameMapper {
-    UsernameMapper INSTANCE = Mappers.getMapper(UsernameMapper.class);
+public interface IUsernameMapper {
+    IUsernameMapper INSTANCE = Mappers.getMapper(IUsernameMapper.class);
     UsernameResponse toDto(User user);
 }

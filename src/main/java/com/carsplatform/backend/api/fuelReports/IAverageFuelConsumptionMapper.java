@@ -9,8 +9,8 @@ import org.mapstruct.factory.Mappers;
 import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring")
-public interface AverageFuelConsumptionMapper {
-    AverageFuelConsumptionMapper INSTANCE = Mappers.getMapper(AverageFuelConsumptionMapper.class);
+public interface IAverageFuelConsumptionMapper {
+    IAverageFuelConsumptionMapper INSTANCE = Mappers.getMapper(IAverageFuelConsumptionMapper.class);
 
     @Mapping(target = "averageFuelConsumption", source = "avgConsumption")
     AverageFuelConsumptionResponse toDto(BigDecimal avgConsumption);

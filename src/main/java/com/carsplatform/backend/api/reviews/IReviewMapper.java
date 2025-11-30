@@ -1,7 +1,7 @@
 package com.carsplatform.backend.api.reviews;
 
 import com.carsplatform.backend.api.reviews.dtos.CarReviewResponse;
-import com.carsplatform.backend.api.users.UsernameMapper;
+import com.carsplatform.backend.api.users.IUsernameMapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,9 +11,9 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {UsernameMapper.class})
-public interface ReviewMapper {
-    ReviewMapper INSTANCE = Mappers.getMapper(ReviewMapper.class);
+@Mapper(componentModel = "spring", uses = {IUsernameMapper.class})
+public interface IReviewMapper {
+    IReviewMapper INSTANCE = Mappers.getMapper(IReviewMapper.class);
 
     @Mapping(target = "usernameResponse", source = "user")
     CarReviewResponse toDto(Review review);
