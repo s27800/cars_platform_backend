@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface BodyTypeMapper {
-    BodyTypeMapper INSTANCE = Mappers.getMapper(BodyTypeMapper.class);
+public interface IBodyTypeMapper {
+    IBodyTypeMapper INSTANCE = Mappers.getMapper(IBodyTypeMapper.class);
 
     @Named("toDto")
     CarBodyTypeResponse toDto(BodyType bodyType);

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface IReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
     Page<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved, Pageable pageable);

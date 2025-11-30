@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface TransmissionMapper {
-    TransmissionMapper INSTANCE = Mappers.getMapper(TransmissionMapper.class);
+public interface ITransmissionMapper {
+    ITransmissionMapper INSTANCE = Mappers.getMapper(ITransmissionMapper.class);
 
     @Named("toDto")
     CarTransmissionResponse toDto(Transmission transmission);

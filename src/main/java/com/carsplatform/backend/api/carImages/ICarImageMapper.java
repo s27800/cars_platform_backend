@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface CarImageMapper {
-    CarImageMapper INSTANCE = Mappers.getMapper(CarImageMapper.class);
+public interface ICarImageMapper {
+    ICarImageMapper INSTANCE = Mappers.getMapper(ICarImageMapper.class);
 
     CarImageResponse toDto(CarImage carImage);
 
