@@ -18,18 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/fuel-reports")
 @RequiredArgsConstructor
-@Tag(name = "Fuel-Reports", description = "API for managing fuel reports")
+@Tag(name = "Fuel Reports", description = "API for managing fuel reports")
 @SecurityRequirement(name = "bearerAuth")
 public class FuelReportController {
     private final FuelReportService fuelReportService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{carId}/average-consumption")
     @Operation(summary = "Get average fuel consumption for car")
     public ResponseEntity<AverageFuelConsumptionResponse> getAverageFuelConsumptionByCarId(
             @Parameter(description = "ID of the car to retrieve average duel consumption")
-            @PathVariable Integer id) {
+            @PathVariable Integer carId) {
 
-        AverageFuelConsumptionResponse response = fuelReportService.getAverageFuelConsumptionForCar(id);
+        AverageFuelConsumptionResponse response = fuelReportService.getAverageFuelConsumptionForCar(carId);
         return ResponseEntity.ok(response);
     }
 }

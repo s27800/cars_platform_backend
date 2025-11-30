@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface IReviewRepository extends JpaRepository<Review, Long> {
@@ -17,11 +18,11 @@ public interface IReviewRepository extends JpaRepository<Review, Long> {
 
     long countByCarIdAndIsApproved(Integer carId, boolean isApproved);
 
-    @Query("SELECT AVG((" +
-            "r.engineRating + r.transmissionRating + r.steeringRating " +
-            "+ r.suspensionRating + r.visibilityRating + r.ergonomicsRating " +
-            "+ r.soundProofingRating + r.interiorSpaceRating + r.maintenanceRating " +
-            "+ r.priceQualityRating + r.failureFreeRating) / 11.0) " +
+    @Query("SELECT " +
+            "AVG(r.engineRating), AVG(r.transmissionRating), AVG(r.steeringRating), " +
+            "AVG(r.suspensionRating), AVG(r.visibilityRating), AVG(r.ergonomicsRating), " +
+            "AVG(r.soundProofingRating), AVG(r.interiorSpaceRating), AVG(r.maintenanceRating), " +
+            "AVG(r.priceQualityRating), AVG(r.failureFreeRating) " +
             "FROM Review r WHERE r.car.id = :carId AND r.isApproved = true")
-    Double findAverageRatingForCarId(@Param("carId") Integer carId);
+    Map<String, Double> findAverageRatingsForCarId(@Param("carId") Integer carId);
 }
