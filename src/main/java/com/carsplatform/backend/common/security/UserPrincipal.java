@@ -36,6 +36,10 @@ public class UserPrincipal implements UserDetails {
         );
     }
 
+    public boolean isAdmin(){
+        return getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
