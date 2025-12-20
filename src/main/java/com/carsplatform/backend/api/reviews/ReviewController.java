@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.reviews;
 
 import com.carsplatform.backend.api.reviews.dtos.AverageRatingsResponse;
+import com.carsplatform.backend.api.reviews.dtos.ReviewResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +31,13 @@ public class ReviewController {
         AverageRatingsResponse averageRatings = reviewService.getAverageRatingsForCar(carId);
 
         return ResponseEntity.ok(averageRatings);
+    }
+
+    @GetMapping("/{carId}")
+    public ResponseEntity<Page<ReviewResponse>> getReviews(
+            @PathVariable Integer carId,
+            Pageable pageable) {
+
+        return ResponseEntity.ok(reviewService.getReviewsForCarId(carId, pageable));
     }
 }

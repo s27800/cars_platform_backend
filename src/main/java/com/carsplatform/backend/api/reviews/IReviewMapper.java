@@ -1,28 +1,26 @@
 package com.carsplatform.backend.api.reviews;
 
-import com.carsplatform.backend.api.reviews.dtos.CarReviewResponse;
+import com.carsplatform.backend.api.reviews.dtos.ReviewResponse;
 import com.carsplatform.backend.api.users.IUsernameMapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring", uses = {IUsernameMapper.class})
 public interface IReviewMapper {
     IReviewMapper INSTANCE = Mappers.getMapper(IReviewMapper.class);
 
     @Mapping(target = "usernameResponse", source = "user")
-    CarReviewResponse toDto(Review review);
+    ReviewResponse toDto(Review review);
 
     @Named("toDtoList")
-    default List<CarReviewResponse> toDtoList(List<Review> reviews) {
+    default Page<ReviewResponse> toDtoList(Page<Review> reviews) {
         if (reviews == null)
             return null;
 
-        return reviews.stream().map(this::toDto).collect(Collectors.toList());
+        return reviews.map(this::toDto);
     }
 }

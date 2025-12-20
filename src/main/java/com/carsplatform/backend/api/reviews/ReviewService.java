@@ -1,11 +1,14 @@
 package com.carsplatform.backend.api.reviews;
 
 import com.carsplatform.backend.api.cars.ICarRepository;
+import com.carsplatform.backend.api.reviews.dtos.ReviewResponse;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 import com.carsplatform.backend.api.reviews.dtos.AverageRatingsResponse;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReviewService {
     private final IReviewRepository reviewRepository;
-    public final ICarRepository carRepository;
-    public final IAverageRatingsMapper averageRatingsMapper;
+    private final ICarRepository carRepository;
+    private final IAverageRatingsMapper averageRatingsMapper;
+    private final IReviewMapper reviewMapper;
 
     @Transactional(readOnly = true)
     public AverageRatingsResponse getAverageRatingsForCar(Integer carId) {
@@ -23,5 +27,12 @@ public class ReviewService {
 
         return averageRatingsMapper.toDto(
                 reviewRepository.findAverageRatingsForCarId(carId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewResponse> getReviewsForCarId(Integer carId, Pageable pageable) {
+        return reviewMapper.toDtoList(
+                reviewRepository.findAllApprovedByCarId(carId, pageable)
+        );
     }
 }
