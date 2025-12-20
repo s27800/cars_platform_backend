@@ -7,16 +7,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface IReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved);
-
-    Page<Review> findByCarIdAndIsApproved(Integer carId, boolean isApproved, Pageable pageable);
-
-    long countByCarIdAndIsApproved(Integer carId, boolean isApproved);
+    @Query(
+            value =
+                    "SELECT r FROM Review r " +
+                    "LEFT JOIN FETCH r.user " +
+                    "WHERE r.car.id = :carId AND r.isApproved = true",
+            countQuery =
+                    "SELECT count(r) FROM Review r " +
+                    "WHERE r.car.id = :carId AND r.isApproved = true")
+    Page<Review> findAllApprovedByCarId(@Param("carId") Integer carId, Pageable pageable);
 
     @Query("SELECT " +
             "AVG(r.engineRating), AVG(r.transmissionRating), AVG(r.steeringRating), " +

@@ -5,13 +5,11 @@ import com.carsplatform.backend.api.brands.dtos.CarBrandResponse;
 import com.carsplatform.backend.api.carImages.dtos.CarImageResponse;
 import com.carsplatform.backend.api.chassis.dtos.CarChassisResponse;
 import com.carsplatform.backend.api.engines.dtos.CarEngineResponse;
-import com.carsplatform.backend.api.fuelReports.dtos.CarFuelReportResponse;
 import com.carsplatform.backend.api.generations.dtos.CarGenerationResponse;
 import com.carsplatform.backend.api.insideDimensions.dtos.CarInsideDimensionsResponse;
 import com.carsplatform.backend.api.models.dtos.CarModelResponse;
 import com.carsplatform.backend.api.outsideDimensions.dtos.CarOutsideDimensionsResponse;
 import com.carsplatform.backend.api.performances.dtos.CarPerformanceResponse;
-import com.carsplatform.backend.api.reviews.dtos.CarReviewResponse;
 import com.carsplatform.backend.api.tags.dtos.CarTagResponse;
 import com.carsplatform.backend.api.transmissions.dtos.CarTransmissionResponse;
 
@@ -43,6 +41,4 @@ public class CarDetailsResponse {
     private CarOutsideDimensionsResponse outsideDimensions;
     private List<CarImageResponse> images;
     private Set<CarTagResponse> tags;
-    private List<CarFuelReportResponse> fuelReports;
-    private List<CarReviewResponse> reviews;
 }

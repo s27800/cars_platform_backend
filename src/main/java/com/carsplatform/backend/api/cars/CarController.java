@@ -27,8 +27,8 @@ public class CarController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get detailed information about a car")
-    public ResponseEntity<CarDetailsResponse> getCarDetailsById(@Parameter(description = "ID of the car to retrieve") @PathVariable Integer id, Pageable pageable) {
-        CarDetailsResponse carDetailsResponse = carService.getCarDetailsForCarId(id, pageable);
+    public ResponseEntity<CarDetailsResponse> getCarDetailsById(@Parameter(description = "ID of the car to retrieve") @PathVariable Integer id) {
+        CarDetailsResponse carDetailsResponse = carService.getCarDetailsForCarId(id);
         return ResponseEntity.ok(carDetailsResponse);
     }
 

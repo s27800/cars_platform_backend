@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CarFuelReportResponse {
+public class FuelReportResponse {
     private Long id;
     private BigDecimal fuelConsumption;
     private String comment;

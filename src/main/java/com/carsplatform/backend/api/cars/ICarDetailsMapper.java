@@ -7,13 +7,11 @@ import com.carsplatform.backend.api.brands.IBrandMapper;
 import com.carsplatform.backend.api.carImages.ICarImageMapper;
 import com.carsplatform.backend.api.chassis.IChassisMapper;
 import com.carsplatform.backend.api.engines.IEngineMapper;
-import com.carsplatform.backend.api.fuelReports.IFuelReportMapper;
 import com.carsplatform.backend.api.generations.IGenerationMapper;
 import com.carsplatform.backend.api.insideDimensions.IInsideDimensionsMapper;
 import com.carsplatform.backend.api.models.IModelMapper;
 import com.carsplatform.backend.api.outsideDimensions.IOutsideDimensionsMapper;
 import com.carsplatform.backend.api.performances.IPerformanceMapper;
-import com.carsplatform.backend.api.reviews.IReviewMapper;
 import com.carsplatform.backend.api.tags.ITagMapper;
 import com.carsplatform.backend.api.transmissions.ITransmissionMapper;
 import com.carsplatform.backend.api.users.IUsernameMapper;
@@ -34,9 +32,7 @@ import org.mapstruct.Mapping;
         IInsideDimensionsMapper.class,
         IOutsideDimensionsMapper.class,
         ICarImageMapper.class,
-        ITagMapper.class,
-        IReviewMapper.class,
-        IFuelReportMapper.class
+        ITagMapper.class
 })
 public interface ICarDetailsMapper {
     @Mapping(target = "brand", qualifiedByName = "map", source = "car")
@@ -51,7 +47,5 @@ public interface ICarDetailsMapper {
     @Mapping(target = "outsideDimensions", qualifiedByName = "toDto")
     @Mapping(target = "images", qualifiedByName = "toDtoList")
     @Mapping(target = "tags", qualifiedByName = "toDtoList")
-    @Mapping(target = "reviews", qualifiedByName = "toDtoList")
-    @Mapping(target = "fuelReports", qualifiedByName = "toDtoList")
     CarDetailsResponse toDto(Car car);
 }
