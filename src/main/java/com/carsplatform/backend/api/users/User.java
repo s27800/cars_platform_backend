@@ -1,5 +1,6 @@
 package com.carsplatform.backend.api.users;
 
+import com.carsplatform.backend.api.dataProposal.DataProposal;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.likes.Like;
 import com.carsplatform.backend.api.reviews.Review;
@@ -71,6 +72,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DataProposal> proposals = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
