@@ -3,6 +3,7 @@ package com.carsplatform.backend.api.cars;
 import com.carsplatform.backend.api.bodyType.BodyType;
 import com.carsplatform.backend.api.carImages.CarImage;
 import com.carsplatform.backend.api.chassis.Chassis;
+import com.carsplatform.backend.api.dataProposal.DataProposal;
 import com.carsplatform.backend.api.engines.Engine;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.generations.Generation;
@@ -106,4 +107,7 @@ public class Car {
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FuelReport> fuelReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DataProposal> proposals = new ArrayList<>();
 }
