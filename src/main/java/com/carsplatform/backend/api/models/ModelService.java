@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ModelService {
-    private final IModelRepository repository;
-    private final IModelDetailsMapper mapper;
+    private final ModelRepository repository;
+    private final ModelDetailsMapper mapper;
 
     @Transactional(readOnly = true)
     public ModelDetailsResponse getModelDetailsById(Integer modelId) {

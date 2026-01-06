@@ -5,7 +5,7 @@ import com.carsplatform.backend.api.authentication.dtos.RegisterRequest;
 import com.carsplatform.backend.api.authentication.dtos.LoginRequest;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.api.users.User;
-import com.carsplatform.backend.api.users.IUserRepository;
+import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.security.jwt.JwtTokenProvider;
 import com.carsplatform.backend.common.security.UserPrincipal;
 
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
