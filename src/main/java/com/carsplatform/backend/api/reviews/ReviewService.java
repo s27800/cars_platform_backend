@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final CarRepository carRepository;
-    private final AverageRatingsMapper averageRatingsMapper;
     private final ReviewMapper reviewMapper;
 
     @Transactional(readOnly = true)
@@ -25,8 +24,7 @@ public class ReviewService {
         if (!carRepository.existsById(carId))
             throw new ResourceNotFoundException("Car", "id", carId);
 
-        return averageRatingsMapper.toDto(
-                reviewRepository.findAverageRatingsForCarId(carId));
+        return reviewRepository.findAverageRatingsForCarId(carId);
     }
 
     @Transactional(readOnly = true)
