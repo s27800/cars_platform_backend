@@ -6,10 +6,7 @@ import com.carsplatform.backend.api.models.Model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,5 +32,7 @@ public class Generation {
     private Model model;
 
     @OneToMany(mappedBy = "generation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Car> cars = new ArrayList<>();
 }

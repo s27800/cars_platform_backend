@@ -9,10 +9,7 @@ import com.carsplatform.backend.api.userSettings.UserSettings;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,7 +39,7 @@ public class User {
 
     @Column(name = "password", nullable = false)
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 60, max = 60) // BCrypt hash length
+    @Size(min = 60, max = 60)
     private String password;
 
     @Column(name = "first_name", nullable = false)
@@ -65,15 +62,23 @@ public class User {
     private UserSettings userSettings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<FuelReport> fuelReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<DataProposal> proposals = new ArrayList<>();
 
     @PrePersist
