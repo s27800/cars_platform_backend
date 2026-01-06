@@ -16,9 +16,9 @@ public class ModelService {
 
     @Transactional(readOnly = true)
     public ModelDetailsResponse getModelDetailsById(Integer modelId) {
-        if (repository.findById(modelId).isPresent())
-            throw new ResourceNotFoundException("Model", "id", modelId);
+        Model model = repository.findById(modelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Model", "id", modelId));
 
-        return mapper.toDto(repository.findById(modelId).get());
+        return mapper.toDto(model);
     }
 }

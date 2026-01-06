@@ -29,9 +29,9 @@ public class BrandService {
 
     @Transactional(readOnly = true)
     public BrandDetailsResponse getBrandDetailsById(Integer brandId) {
-        if (brandRepository.findById(brandId).isPresent())
-            throw new ResourceNotFoundException("Brand", "id", brandId);
+        Brand brand = brandRepository.findById(brandId)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandId));
 
-        return brandDetailsMapper.toDto(brandRepository.findById(brandId).get());
+        return brandDetailsMapper.toDto(brand);
     }
 }
