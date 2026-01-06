@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AverageRatingsResponse {
-    private Integer avgEngineRating;
-    private Integer avgTransmissionRating;
-    private Integer avgSteeringRating;
-    private Integer avgSuspensionRating;
-    private Integer avgVisibilityRating;
-    private Integer avgErgonomicsRating;
-    private Integer avgSoundProofingRating;
-    private Integer avgInteriorSpaceRating;
-    private Integer avgMaintenanceRating;
-    private Integer avgPriceQualityRating;
-    private Integer avgFailureFreeRating;
+    private Double avgEngineRating;
+    private Double avgTransmissionRating;
+    private Double avgSteeringRating;
+    private Double avgSuspensionRating;
+    private Double avgVisibilityRating;
+    private Double avgErgonomicsRating;
+    private Double avgSoundProofingRating;
+    private Double avgInteriorSpaceRating;
+    private Double avgMaintenanceRating;
+    private Double avgPriceQualityRating;
+    private Double avgFailureFreeRating;
 }
