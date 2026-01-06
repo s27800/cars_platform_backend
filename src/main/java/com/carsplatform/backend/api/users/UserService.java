@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final IUserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)

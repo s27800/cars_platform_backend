@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final IUserMapper userMapper;
+    private final UserMapper userMapper;
 
     @GetMapping("/me")
     @Operation(summary = "Get current user's profile information")

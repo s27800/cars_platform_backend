@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BrandService {
 
-    private final IBrandRepository brandRepository;
-    private final IBrandsListMapper brandsListMapper;
-    private final IBrandDetailsMapper brandDetailsMapper;
+    private final BrandRepository brandRepository;
+    private final BrandsListMapper brandsListMapper;
+    private final BrandDetailsMapper brandDetailsMapper;
 
     @Transactional(readOnly = true)
     public List<BrandsListResponse> getAllBrands() {

@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class GenerationService {
-    private final IGenerationRepository repository;
-    private final IGenerationDetailsMapper mapper;
+    private final GenerationRepository repository;
+    private final GenerationDetailsMapper mapper;
 
     @Transactional(readOnly = true)
     public GenerationDetailsResponse getGenerationDetailsById(Integer generationId) {

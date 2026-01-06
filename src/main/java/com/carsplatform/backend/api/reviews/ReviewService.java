@@ -1,6 +1,6 @@
 package com.carsplatform.backend.api.reviews;
 
-import com.carsplatform.backend.api.cars.ICarRepository;
+import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.reviews.dtos.ReviewResponse;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 import com.carsplatform.backend.api.reviews.dtos.AverageRatingsResponse;
@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-    private final IReviewRepository reviewRepository;
-    private final ICarRepository carRepository;
-    private final IAverageRatingsMapper averageRatingsMapper;
-    private final IReviewMapper reviewMapper;
+    private final ReviewRepository reviewRepository;
+    private final CarRepository carRepository;
+    private final AverageRatingsMapper averageRatingsMapper;
+    private final ReviewMapper reviewMapper;
 
     @Transactional(readOnly = true)
     public AverageRatingsResponse getAverageRatingsForCar(Integer carId) {

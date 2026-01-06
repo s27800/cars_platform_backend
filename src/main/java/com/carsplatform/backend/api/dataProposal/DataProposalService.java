@@ -1,11 +1,11 @@
 package com.carsplatform.backend.api.dataProposal;
 
 import com.carsplatform.backend.api.cars.Car;
-import com.carsplatform.backend.api.cars.ICarRepository;
+import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.dataProposal.dtos.CreateDataProposalRequest;
 import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
 import com.carsplatform.backend.api.users.User;
-import com.carsplatform.backend.api.users.IUserRepository;
+import com.carsplatform.backend.api.users.UserRepository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,11 +26,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class DataProposalService {
-    private final IDataProposalRepository dataProposalRepository;
-    private final ICarRepository carRepository;
-    private final IUserRepository userRepository;
+    private final DataProposalRepository dataProposalRepository;
+    private final CarRepository carRepository;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-    private final IGetDataProposalsMapper dataProposalsMapper;
+    private final GetDataProposalsMapper dataProposalsMapper;
 
     @Transactional
     public void createDataProposal(Integer carId, String username, CreateDataProposalRequest dto) {

@@ -16,9 +16,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CarService {
-    private final ICarRepository carRepository;
-    private final ICarDetailsMapper carDetailsMapper;
-    private final ICarsListMapper carsListMapper;
+    private final CarRepository carRepository;
+    private final CarDetailsMapper carDetailsMapper;
+    private final CarsListMapper carsListMapper;
 
     @Transactional(readOnly = true)
     public CarDetailsResponse getCarDetailsForCarId(Integer id) throws ResourceNotFoundException {
