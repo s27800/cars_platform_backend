@@ -16,9 +16,9 @@ public class GenerationService {
 
     @Transactional(readOnly = true)
     public GenerationDetailsResponse getGenerationDetailsById(Integer generationId) {
-        if (repository.findById(generationId).isPresent())
-            throw new ResourceNotFoundException("Generation", "id", generationId);
+        Generation generation = repository.findById(generationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));
 
-        return mapper.toDto(repository.findById(generationId).get());
+        return mapper.toDto(generation);
     }
 }
