@@ -63,6 +63,6 @@ public class Chassis {
     @Size(max = 100)
     private String drive;
 
-    @OneToOne(mappedBy = "chassis", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "chassis")
     private Car car;
 }
