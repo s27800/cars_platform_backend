@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.cars;
 
 import com.carsplatform.backend.api.bodyType.CarsListBodyTypeMapper;
+import com.carsplatform.backend.api.carImages.CarImage;
 import com.carsplatform.backend.api.cars.dtos.CarsListResponse;
 import com.carsplatform.backend.api.engines.CarsListEngineMapper;
 import com.carsplatform.backend.api.generations.Generation;
@@ -26,6 +27,7 @@ public interface CarsListMapper {
     @Mapping(target = "engine", qualifiedByName = "toDto")
     @Mapping(target = "bodyType", qualifiedByName = "toDto")
     @Mapping(target = "transmission", qualifiedByName = "toDto")
+    @Mapping(target = "imageUrl", source = "car", qualifiedByName = "extractMainImage")
     CarsListResponse toDto(Car car);
 
     @Named("map")
@@ -39,5 +41,15 @@ public interface CarsListMapper {
     @Named("map")
     default Page<CarsListResponse> map(Page<Car> cars) {
         return cars.map(this::toDto);
+    }
+
+    @Named("extractMainImage")
+    default String extractMainImage(Car car) {
+        if (car.getImages() == null || car.getImages().isEmpty()) return null;
+        return car.getImages().stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
+                .findFirst()
+                .map(CarImage::getImageUrl)
+                .orElse(car.getImages().get(0).getImageUrl());
     }
 }
