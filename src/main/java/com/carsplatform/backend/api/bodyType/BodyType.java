@@ -5,10 +5,7 @@ import com.carsplatform.backend.api.cars.Car;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +27,7 @@ public class BodyType {
     private String name;
 
     @OneToMany(mappedBy = "bodyType")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Car> cars = new ArrayList<>();
 }
