@@ -44,6 +44,6 @@ public class InsideDimensions {
     @Column(name = "trunk_height")
     private Integer trunkHeight;
 
-    @OneToOne(mappedBy = "insideDimensions", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "insideDimensions")
     private Car car;
 }

@@ -65,6 +65,6 @@ public class Performance {
     @Size(max = 50)
     private String fuelEmissionNorm;
 
-    @OneToOne(mappedBy = "performance", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "performance")
     private Car car;
 }

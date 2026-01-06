@@ -36,6 +36,6 @@ public class Transmission {
     @Size(max = 50)
     private String clutchType;
 
-    @OneToOne(mappedBy = "transmission", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "transmission")
     private Car car;
 }

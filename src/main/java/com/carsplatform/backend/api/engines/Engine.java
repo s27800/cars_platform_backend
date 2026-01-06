@@ -67,6 +67,6 @@ public class Engine {
     @Column(name = "max_torque_rotation_speed")
     private Integer maxTorqueRotationSpeed;
 
-    @OneToOne(mappedBy = "engine", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "engine")
     private Car car;
 }

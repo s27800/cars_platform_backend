@@ -50,6 +50,6 @@ public class OutsideDimensions {
     @Column(name = "max_roof_load")
     private Integer maxRoofLoad;
 
-    @OneToOne(mappedBy = "outsideDimensions", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "outsideDimensions")
     private Car car;
 }
