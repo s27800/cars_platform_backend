@@ -3,6 +3,7 @@ package com.carsplatform.backend.api.authentication;
 import com.carsplatform.backend.api.authentication.dtos.AuthenticationResponse;
 import com.carsplatform.backend.api.authentication.dtos.RegisterRequest;
 import com.carsplatform.backend.api.authentication.dtos.LoginRequest;
+import com.carsplatform.backend.api.userSettings.UserSettings;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
@@ -63,6 +64,13 @@ public class AuthenticationService {
                 .lastName(registerRequest.getLastName())
                 .isAdmin(false)
                 .build();
+
+        UserSettings settings = UserSettings.builder()
+                .theme("light")
+                .user(user)
+                .build();
+
+        user.setUserSettings(settings);
 
         userRepository.save(user);
 
