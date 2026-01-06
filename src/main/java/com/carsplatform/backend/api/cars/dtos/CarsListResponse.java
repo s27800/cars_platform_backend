@@ -19,4 +19,5 @@ public class CarsListResponse {
     private CarsListEngineResponse engine;
     private CarsListBodyTypeResponse bodyType;
     private CarsListTransmissionResponse transmission;
+    private String imageUrl;
 }
