@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.Formula;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -96,6 +98,9 @@ public class Review {
 
     @Column(name = "is_approved")
     private Boolean isApproved = false;
+
+    @Formula("(SELECT COUNT(*) FROM likes l WHERE l.review_id = id)")
+    private Long likesCount;
 
     @PrePersist
     protected void onCreate() {

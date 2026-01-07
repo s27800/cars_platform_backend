@@ -14,6 +14,7 @@ public interface ReviewMapper {
     ReviewMapper INSTANCE = Mappers.getMapper(ReviewMapper.class);
 
     @Mapping(target = "usernameResponse", source = "user")
+    @Mapping(target = "likesCount", source = "likesCount")
     ReviewResponse toDto(Review review);
 
     @Named("toDtoList")
