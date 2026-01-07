@@ -29,5 +29,6 @@ public class ReviewResponse {
     private Double failureFreeRating;
     private LocalDateTime reviewDate;
     private Boolean isApproved;
+    private Long likesCount;
     private UsernameResponse usernameResponse;
 }
