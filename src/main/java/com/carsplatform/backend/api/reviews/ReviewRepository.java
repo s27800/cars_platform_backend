@@ -27,4 +27,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AVG(r.priceQualityRating), AVG(r.failureFreeRating) " +
             "FROM Review r WHERE r.car.id = :carId AND r.isApproved = true")
     AverageRatingsResponse findAverageRatingsForCarId(@Param("carId") Integer carId);
+
+    boolean existsByCarIdAndUserId(Integer carId, Long userId);
 }
