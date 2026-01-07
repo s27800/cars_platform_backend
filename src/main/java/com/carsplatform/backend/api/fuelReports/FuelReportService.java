@@ -1,7 +1,13 @@
 package com.carsplatform.backend.api.fuelReports;
 
+import com.carsplatform.backend.api.cars.Car;
+import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.fuelReports.dtos.AverageFuelConsumptionResponse;
+import com.carsplatform.backend.api.fuelReports.dtos.CreateFuelReportRequest;
 import com.carsplatform.backend.api.fuelReports.dtos.FuelReportResponse;
+import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.api.users.UserRepository;
+import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +27,9 @@ public class FuelReportService {
     private final FuelReportRepository fuelReportRepository;
     private final AverageFuelConsumptionMapper averageFuelConsumptionMapper;
     private final FuelReportMapper fuelReportMapper;
+    private final CreateFuelReportMapper createFuelReportMapper;
+    private final CarRepository carRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(Integer carId) {
@@ -36,5 +45,21 @@ public class FuelReportService {
         return fuelReportMapper.toDtoList(
                 fuelReportRepository.findByCarIdAndIsApprovedTrue(carId, pageable)
         );
+    }
+
+    @Transactional
+    public void createFuelReport(Integer carId, CreateFuelReportRequest request, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new ResourceNotFoundException("Car", "id", carId));
+
+        FuelReport report = createFuelReportMapper.toDto(request);
+
+        report.setCar(car);
+        report.setUser(user);
+
+        fuelReportRepository.save(report);
     }
 }
