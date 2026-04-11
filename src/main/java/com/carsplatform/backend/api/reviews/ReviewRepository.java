@@ -20,11 +20,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                     "WHERE r.car.id = :carId AND r.isApproved = true")
     Page<Review> findAllApprovedByCarId(@Param("carId") Integer carId, Pageable pageable);
 
-    @Query("SELECT " +
+    @Query("SELECT new com.carsplatform.backend.api.reviews.dtos.AverageRatingsResponse(" +
             "AVG(r.engineRating), AVG(r.transmissionRating), AVG(r.steeringRating), " +
             "AVG(r.suspensionRating), AVG(r.visibilityRating), AVG(r.ergonomicsRating), " +
             "AVG(r.soundProofingRating), AVG(r.interiorSpaceRating), AVG(r.maintenanceRating), " +
-            "AVG(r.priceQualityRating), AVG(r.failureFreeRating) " +
+            "AVG(r.priceQualityRating), AVG(r.failureFreeRating)) " +
             "FROM Review r WHERE r.car.id = :carId AND r.isApproved = true")
     AverageRatingsResponse findAverageRatingsForCarId(@Param("carId") Integer carId);
 
