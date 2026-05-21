@@ -12,7 +12,10 @@ import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.TestDataFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -243,6 +246,71 @@ class DataProposalServiceTest {
         }
 
         @Test
+        @DisplayName("should approve proposal and apply changes when approve is true")
+        void resolveDataProposal_Approve_SetsApprovedStatusAndAppliesChanges() throws Exception {
+
+            // Prepare test data with ENGINE category and proposed changes
+            testProposal.setCategory("ENGINE");
+            testProposal.setProposedValues(Map.of("maxPower", 250));
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+
+            // Mock ObjectMapper behavior
+            JsonNode engineNode = mock(ObjectNode.class);
+            JsonNode changesNode = mock(ObjectNode.class);
+
+            when(objectMapper.valueToTree(testCar.getEngine())).thenReturn(engineNode);
+            when(objectMapper.valueToTree(testProposal.getProposedValues())).thenReturn(changesNode);
+            when(objectMapper.readerForUpdating(testCar.getEngine())).thenReturn(mock(ObjectReader.class));
+
+            // Send resolve proposal request with approve=true
+            dataProposalService.resolveDataProposal(1L, true, "Changes approved");
+
+            // Verify results -> proposal is approved and changes applied
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            assertThat(testProposal.getAdminComment()).isEqualTo("Changes approved");
+
+            verify(dataProposalRepository).save(testProposal);
+            verify(carRepository).save(testCar);
+        }
+
+        @Test
+        @DisplayName("should throw IllegalStateException when approving ENGINE proposal but car has no engine")
+        void resolveDataProposal_ApproveEngineNoEngine_ThrowsException() {
+
+            // Set up proposal with ENGINE category
+            testProposal.setCategory("ENGINE");
+
+            // Remove engine from car
+            testCar.setEngine(null);
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+
+            // Verify IllegalStateException is thrown
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(1L, true, "OK"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Car has no engine defined");
+        }
+
+        @Test
+        @DisplayName("should throw IllegalArgumentException for unknown category")
+        void resolveDataProposal_UnknownCategory_ThrowsException() {
+
+            // Set up proposal with unknown category
+            testProposal.setCategory("UNKNOWN_CATEGORY");
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+
+            // Verify IllegalArgumentException is thrown
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(1L, true, "OK"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Unknown category");
+        }
+
+        @Test
         @DisplayName("should throw EntityNotFoundException when proposal not found")
         void resolveDataProposal_ProposalNotFound_ThrowsException() {
 
@@ -269,6 +337,60 @@ class DataProposalServiceTest {
                     .hasMessageContaining("already resolved");
 
             verify(dataProposalRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("should handle CHASSIS category when approving")
+        void resolveDataProposal_ApproveChassisCategory_AppliesChanges() throws Exception {
+
+            // Prepare test data with CHASSIS category
+            testProposal.setCategory("CHASSIS");
+            testProposal.setProposedValues(Map.of("frontBrakesRadius", 340));
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+
+            // Mock ObjectMapper behavior
+            JsonNode chassisNode = mock(ObjectNode.class);
+            JsonNode changesNode = mock(ObjectNode.class);
+
+            when(objectMapper.valueToTree(testCar.getChassis())).thenReturn(chassisNode);
+            when(objectMapper.valueToTree(testProposal.getProposedValues())).thenReturn(changesNode);
+            when(objectMapper.readerForUpdating(testCar.getChassis())).thenReturn(mock(ObjectReader.class));
+
+            // Send resolve proposal request
+            dataProposalService.resolveDataProposal(1L, true, "Chassis changes approved");
+
+            // Verify results
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            verify(carRepository).save(testCar);
+        }
+
+        @Test
+        @DisplayName("should handle TRANSMISSION category when approving")
+        void resolveDataProposal_ApproveTransmissionCategory_AppliesChanges() throws Exception {
+
+            // Prepare test data with TRANSMISSION category
+            testProposal.setCategory("TRANSMISSION");
+            testProposal.setProposedValues(Map.of("gearsNumber", 8));
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+
+            // Mock ObjectMapper behavior
+            JsonNode transmissionNode = mock(ObjectNode.class);
+            JsonNode changesNode = mock(ObjectNode.class);
+
+            when(objectMapper.valueToTree(testCar.getTransmission())).thenReturn(transmissionNode);
+            when(objectMapper.valueToTree(testProposal.getProposedValues())).thenReturn(changesNode);
+            when(objectMapper.readerForUpdating(testCar.getTransmission())).thenReturn(mock(ObjectReader.class));
+
+            // Send resolve proposal request
+            dataProposalService.resolveDataProposal(1L, true, "Transmission changes approved");
+
+            // Verify results
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            verify(carRepository).save(testCar);
         }
     }
 
