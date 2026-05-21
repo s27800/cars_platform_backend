@@ -57,7 +57,7 @@ class BodyTypeControllerTest extends MockMvcTestBase {
         void getAllBodyTypes_ReturnsAllBodyTypes() throws Exception {
 
             // Perform GET request and verify response is 200 OK with list of body types
-            performGet(BODY_TYPE_BASE_URL)
+            performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(2))));
@@ -68,7 +68,7 @@ class BodyTypeControllerTest extends MockMvcTestBase {
         void getAllBodyTypes_ReturnsBodyTypesWithCorrectFields() throws Exception {
 
             // Perform GET request and verify response is 200 OK with body types having correct fields
-            performGet(BODY_TYPE_BASE_URL)
+            performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'Sedan')]").exists())
                     .andExpect(jsonPath("$[?(@.name == 'SUV')]").exists())
@@ -86,7 +86,7 @@ class BodyTypeControllerTest extends MockMvcTestBase {
             entityManager.flush();
 
             // Perform GET request and verify response is 200 OK with empty list
-            performGet(BODY_TYPE_BASE_URL)
+            performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(0)));

@@ -101,7 +101,7 @@ class DataProposalControllerTest extends MockMvcTestBase {
                 .lastName("User")
                 .build();
 
-        String response = performPost(AUTH_BASE_URL + "/register", registerRequest)
+        String response = performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -158,7 +158,7 @@ class DataProposalControllerTest extends MockMvcTestBase {
             request.setProposedValues(Map.of("maxPower", 225));
 
             // Perform POST request without authentication and verify results -> 403 Forbidden is returned
-            performPost(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request)
+            performPostNoAuth(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request)
                     .andExpect(status().isForbidden());
         }
 
@@ -198,7 +198,7 @@ class DataProposalControllerTest extends MockMvcTestBase {
         void getMyProposals_NotAuthenticated_Returns403() throws Exception {
 
             // Perform GET request without authentication and verify results -> 403 Forbidden is returned
-            performGet(DATA_PROPOSAL_BASE_URL + "/me")
+            performGetNoAuth(DATA_PROPOSAL_BASE_URL + "/me")
                     .andExpect(status().isForbidden());
         }
 
@@ -224,7 +224,7 @@ class DataProposalControllerTest extends MockMvcTestBase {
         void getPendingProposals_NotAuthenticated_Returns403() throws Exception {
 
             // Perform GET request without authentication and verify results -> 403 Forbidden is returned
-            performGet(DATA_PROPOSAL_BASE_URL + "/pending")
+            performGetNoAuth(DATA_PROPOSAL_BASE_URL + "/pending")
                     .andExpect(status().isForbidden());
         }
 

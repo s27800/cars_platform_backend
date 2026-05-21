@@ -23,7 +23,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getBrands_NoAuth_Returns200() throws Exception {
 
             // Perform get request and verify response status is 200 OK
-            performGet("/api/brands")
+            performGetNoAuth("/api/brands")
                     .andExpect(status().isOk());
         }
 
@@ -32,7 +32,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void searchCars_NoAuth_Returns200() throws Exception {
 
             // Perform get request and verify response status is 200 OK
-            performGet("/api/cars/search")
+            performGetNoAuth("/api/cars/search")
                     .andExpect(status().isOk());
         }
 
@@ -41,7 +41,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getBodyTypes_NoAuth_Returns200() throws Exception {
 
             // Perform get request and verify response status is 200 OK
-            performGet("/api/body-types")
+            performGetNoAuth("/api/body-types")
                     .andExpect(status().isOk());
         }
 
@@ -50,7 +50,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getTags_NoAuth_Returns200() throws Exception {
 
             // Perform get request and verify response status is 200 OK
-            performGet("/api/tags")
+            performGetNoAuth("/api/tags")
                     .andExpect(status().isOk());
         }
 
@@ -78,7 +78,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getUserProfile_NoAuth_Returns403() throws Exception {
 
             // Perform get request without authentication and verify response status is 403 Forbidden
-            performGet("/api/users/me")
+            performGetNoAuth("/api/users/me")
                     .andExpect(status().isForbidden());
         }
 
@@ -125,7 +125,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getLikeStatus_NoAuth_Returns403() throws Exception {
 
             // Perform get request without authentication and verify response status is 403 Forbidden
-            performGet("/api/likes/1/status")
+            performGetNoAuth("/api/likes/1/status")
                     .andExpect(status().isForbidden());
         }
 
@@ -134,7 +134,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void getMyProposals_NoAuth_Returns403() throws Exception {
 
             // Perform get request without authentication and verify response status is 403 Forbidden
-            performGet("/api/data-proposals/me")
+            performGetNoAuth("/api/data-proposals/me")
                     .andExpect(status().isForbidden());
         }
     }
@@ -260,7 +260,7 @@ class SecurityConfigTest extends MockMvcTestBase {
                         .lastName("User")
                         .build();
 
-        String response = performPost("/api/auth/register", request)
+        String response = performPostNoAuth("/api/auth/register", request)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()

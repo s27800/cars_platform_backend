@@ -80,14 +80,14 @@ class ModelsListMapperTest {
     class MapFromBrandTests {
 
         @Test
-        @DisplayName("should return null when brand is null")
-        void map_NullBrand_ReturnsNull() {
+        @DisplayName("should return empty list when brand is null")
+        void map_NullBrand_ReturnsEmptyList() {
 
             // Map null brand
             List<ModelsListResponse> result = mapper.map(null);
 
-            // Verify result is null
-            assertThat(result).isNull();
+            // Verify result is empty
+            assertThat(result).isEmpty();
         }
 
         @Test

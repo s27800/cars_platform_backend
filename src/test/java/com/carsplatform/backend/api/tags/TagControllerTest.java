@@ -53,9 +53,9 @@ class TagControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns list of all tags (public endpoint)")
         void getAllTags_ReturnsAllTags() throws Exception {
-            
+
             // Perform GET request and verify results -> list of all tags is returned
-            performGet(TAG_BASE_URL)
+            performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(2))));
@@ -66,7 +66,7 @@ class TagControllerTest extends MockMvcTestBase {
         void getAllTags_ReturnsTagsWithCorrectFields() throws Exception {
 
             // Perform GET request and verify results -> tags with correct fields are returned
-            performGet(TAG_BASE_URL)
+            performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'Sport')]").exists())
                     .andExpect(jsonPath("$[?(@.name == 'Luxury')]").exists())
@@ -83,7 +83,7 @@ class TagControllerTest extends MockMvcTestBase {
             entityManager.flush();
 
             // Perform GET request and verify results -> empty list is returned
-            performGet(TAG_BASE_URL)
+            performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(0)));

@@ -99,7 +99,7 @@ class GenerationControllerTest extends MockMvcTestBase {
         void getGenerationById_ExistingGeneration_ReturnsDetails() throws Exception {
 
             // Perform GET request and verify results -> 200 OK with correct generation details
-            performGet(GENERATION_BASE_URL + "/" + testGeneration.getId())
+            performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("E90"))
                     .andExpect(jsonPath("$.cars").isArray());
@@ -110,7 +110,7 @@ class GenerationControllerTest extends MockMvcTestBase {
         void getGenerationById_ExistingGeneration_IncludesCars() throws Exception {
 
             // Perform GET request and verify results -> correct cars included
-            performGet(GENERATION_BASE_URL + "/" + testGeneration.getId())
+            performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.cars", hasSize(greaterThanOrEqualTo(1))))
                     .andExpect(jsonPath("$.cars[?(@.name == '320i')]").exists());
@@ -121,7 +121,7 @@ class GenerationControllerTest extends MockMvcTestBase {
         void getGenerationById_ExistingGeneration_IncludesIdField() throws Exception {
 
             // Perform GET request and verify results -> correct id field
-            performGet(GENERATION_BASE_URL + "/" + testGeneration.getId())
+            performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(testGeneration.getId()))
                     .andExpect(jsonPath("$.name").value("E90"));
@@ -132,7 +132,7 @@ class GenerationControllerTest extends MockMvcTestBase {
         void getGenerationById_NonExistingGeneration_Returns404() throws Exception {
 
             // Perform GET request for non-existing ID and verify results -> 404 Not Found
-            performGet(GENERATION_BASE_URL + "/999999")
+            performGetNoAuth(GENERATION_BASE_URL + "/999999")
                     .andExpect(status().isNotFound());
         }
     }

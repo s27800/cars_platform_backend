@@ -79,7 +79,7 @@ class LikeControllerTest extends MockMvcTestBase {
                 .build();
 
         // Register user and get token
-        String response = performPost(AUTH_BASE_URL + "/register", registerRequest)
+        String response = performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -123,7 +123,7 @@ class LikeControllerTest extends MockMvcTestBase {
         void toggleLike_Authenticated_Returns200() throws Exception {
 
             // Perform post request to toggle like and verify results -> like status is toggled
-            performPostWithAuth(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
+            performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.liked").isBoolean())
                     .andExpect(jsonPath("$.likesCount").isNumber());
@@ -146,7 +146,7 @@ class LikeControllerTest extends MockMvcTestBase {
         void toggleLike_RepeatedCalls_TogglesStatus() throws Exception {
 
             // Toggle like (like)
-            String firstResponse = performPostWithAuth(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
+            String firstResponse = performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -155,7 +155,7 @@ class LikeControllerTest extends MockMvcTestBase {
             boolean firstLiked = objectMapper.readTree(firstResponse).get("liked").asBoolean();
 
             // Toggle like again (dislike)
-            String secondResponse = performPostWithAuth(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
+            String secondResponse = performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -189,7 +189,7 @@ class LikeControllerTest extends MockMvcTestBase {
         void getLikeStatus_NotAuthenticated_Returns403() throws Exception {
 
             // Perform get request to retrieve like status without authentication and verify results -> 403 is returned
-            performGet(LIKE_BASE_URL + "/" + testReview.getId() + "/status")
+            performGetNoAuth(LIKE_BASE_URL + "/" + testReview.getId() + "/status")
                     .andExpect(status().isForbidden());
         }
 
@@ -198,7 +198,7 @@ class LikeControllerTest extends MockMvcTestBase {
         void getLikeStatus_WithLikes_ReturnsCorrectCount() throws Exception {
 
             // Like the review
-            performPostWithAuth(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
+            performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk());
 
             // Perform get request to retrieve like status and verify results -> correct like count is returned

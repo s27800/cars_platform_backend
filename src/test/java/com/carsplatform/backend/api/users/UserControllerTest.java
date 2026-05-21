@@ -43,7 +43,7 @@ class UserControllerTest extends MockMvcTestBase {
                 .lastName("User")
                 .build();
 
-        String response = performPost(AUTH_BASE_URL + "/register", registerRequest)
+        String response = performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -79,7 +79,7 @@ class UserControllerTest extends MockMvcTestBase {
         void getCurrentUserProfile_NotAuthenticated_Returns403() throws Exception {
 
             // Perform request without authentication -> verify response is 403
-            performGet(USER_BASE_URL + "/me")
+            performGetNoAuth(USER_BASE_URL + "/me")
                     .andExpect(status().isForbidden());
         }
 
@@ -138,7 +138,7 @@ class UserControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform request without authentication -> verify response is 403
-            performPut(USER_BASE_URL + "/me", request)
+            performPutNoAuth(USER_BASE_URL + "/me", request)
                     .andExpect(status().isForbidden());
         }
 
@@ -171,7 +171,7 @@ class UserControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 201 Created
-            performPost(AUTH_BASE_URL + "/register", otherUser)
+            performPostNoAuth(AUTH_BASE_URL + "/register", otherUser)
                     .andExpect(status().isCreated());
 
             // Create request with email that already exists
@@ -218,7 +218,7 @@ class UserControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform request without authentication -> verify response is 403
-            performPost(USER_BASE_URL + "/me/change-password", request)
+            performPostNoAuth(USER_BASE_URL + "/me/change-password", request)
                     .andExpect(status().isForbidden());
         }
 

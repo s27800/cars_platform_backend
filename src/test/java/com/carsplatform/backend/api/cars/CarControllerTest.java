@@ -96,7 +96,7 @@ class CarControllerTest extends MockMvcTestBase {
         void getCarById_ExistingCar_Returns200() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and returns car details
-            performGet(CAR_BASE_URL + "/" + testCar.getId())
+            performGetNoAuth(CAR_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("320i"))
                     .andExpect(jsonPath("$.engine").exists())
@@ -110,7 +110,7 @@ class CarControllerTest extends MockMvcTestBase {
         void getCarById_NonExistingCar_Returns404() throws Exception {
 
             // Perform GET request and verify results -> status 404 Not Found when car does not exist
-            performGet(CAR_BASE_URL + "/999999")
+            performGetNoAuth(CAR_BASE_URL + "/999999")
                     .andExpect(status().isNotFound());
         }
 
@@ -119,7 +119,7 @@ class CarControllerTest extends MockMvcTestBase {
         void getCarById_ExistingCar_IncludesBrandInfo() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and includes brand info
-            performGet(CAR_BASE_URL + "/" + testCar.getId())
+            performGetNoAuth(CAR_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.brand.name").value("BMW"));
         }
@@ -135,7 +135,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_NoFilters_ReturnsAllCars() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and returns all cars
-            performGet(CAR_BASE_URL + "/search")
+            performGetNoAuth(CAR_BASE_URL + "/search")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
@@ -146,7 +146,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_WithPagination_ReturnsPaginatedResults() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and returns paginated results
-            performGet(CAR_BASE_URL + "/search?page=0&size=5")
+            performGetNoAuth(CAR_BASE_URL + "/search?page=0&size=5")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                     .andExpect(jsonPath("$.pageable.pageSize").value(5));
@@ -157,7 +157,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_ByBrandId_ReturnsFilteredCars() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and filters by brand ID
-            performGet(CAR_BASE_URL + "/search?brandIds=" + testBrand.getId())
+            performGetNoAuth(CAR_BASE_URL + "/search?brandIds=" + testBrand.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content[*].generation.model.brand.name",
@@ -169,7 +169,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_ByBodyTypeId_ReturnsFilteredCars() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and filters by body type ID
-            performGet(CAR_BASE_URL + "/search?bodyTypeIds=" + testBodyType.getId())
+            performGetNoAuth(CAR_BASE_URL + "/search?bodyTypeIds=" + testBodyType.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray());
         }
@@ -179,7 +179,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_ByEngineType_ReturnsFilteredCars() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and filters by engine type
-            performGet(CAR_BASE_URL + "/search?engineTypes=" + testCar.getEngine().getEngineType())
+            performGetNoAuth(CAR_BASE_URL + "/search?engineTypes=" + testCar.getEngine().getEngineType())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray());
         }
@@ -193,7 +193,7 @@ class CarControllerTest extends MockMvcTestBase {
             int maxPower = testCar.getEngine().getMaxPower() + 50;
 
             // Perform GET request and verify results -> status 200 OK and filters by power range
-            performGet(CAR_BASE_URL + "/search?minPower=" + minPower + "&maxPower=" + maxPower)
+            performGetNoAuth(CAR_BASE_URL + "/search?minPower=" + minPower + "&maxPower=" + maxPower)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray());
         }
@@ -203,7 +203,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_NoMatches_ReturnsEmptyContent() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and returns empty content
-            performGet(CAR_BASE_URL + "/search?brandIds=999999")
+            performGetNoAuth(CAR_BASE_URL + "/search?brandIds=999999")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isEmpty());
         }
@@ -213,7 +213,7 @@ class CarControllerTest extends MockMvcTestBase {
         void searchCars_MultipleFilters_ReturnsFilteredCars() throws Exception {
 
             // Perform GET request and verify results -> status 200 OK and filters by multiple criteria
-            performGet(CAR_BASE_URL + "/search?brandIds=" + testBrand.getId() +
+            performGetNoAuth(CAR_BASE_URL + "/search?brandIds=" + testBrand.getId() +
                       "&bodyTypeIds=" + testBodyType.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray());

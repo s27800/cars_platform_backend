@@ -99,7 +99,7 @@ class ReviewControllerTest extends MockMvcTestBase {
                 .lastName("User")
                 .build();
 
-        String response = performPost(AUTH_BASE_URL + "/register", registerRequest)
+        String response = performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -144,7 +144,7 @@ class ReviewControllerTest extends MockMvcTestBase {
         void getReviews_ExistingCar_Returns200() throws Exception {
 
             // Perform GET request and verify response -> returns 200 OK with reviews for the car
-            performGet(REVIEW_BASE_URL + "/" + testCar.getId())
+            performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
@@ -155,7 +155,7 @@ class ReviewControllerTest extends MockMvcTestBase {
         void getReviews_ExistingCar_IncludesUserInfo() throws Exception {
 
             // Perform GET request and verify response -> reviews include user info
-            performGet(REVIEW_BASE_URL + "/" + testCar.getId())
+            performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].usernameResponse.username").exists());
         }
@@ -165,7 +165,7 @@ class ReviewControllerTest extends MockMvcTestBase {
         void getReviews_WithPagination_ReturnsPaginated() throws Exception {
 
             // Perform GET request and verify response -> returns paginated results
-            performGet(REVIEW_BASE_URL + "/" + testCar.getId() + "?page=0&size=5")
+            performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId() + "?page=0&size=5")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                     .andExpect(jsonPath("$.pageable.pageSize").value(5));
@@ -201,7 +201,7 @@ class ReviewControllerTest extends MockMvcTestBase {
             entityManager.flush();
 
             // Perform GET request and verify response -> returns empty for car with no reviews
-            performGet(REVIEW_BASE_URL + "/" + carWithoutReviews.getId())
+            performGetNoAuth(REVIEW_BASE_URL + "/" + carWithoutReviews.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isEmpty());
         }
@@ -217,7 +217,7 @@ class ReviewControllerTest extends MockMvcTestBase {
         void getAverageRatings_ExistingCar_Returns200() throws Exception {
 
             // Perform GET request and verify response -> returns average ratings for car
-            performGet(REVIEW_BASE_URL + "/" + testCar.getId() + "/average-ratings")
+            performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId() + "/average-ratings")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.avgEngineRating").isNumber())
                     .andExpect(jsonPath("$.avgTransmissionRating").isNumber());
@@ -244,7 +244,7 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .lastName("Reviewer")
                     .build();
 
-            String response = performPost(AUTH_BASE_URL + "/register", newUserRequest)
+            String response = performPostNoAuth(AUTH_BASE_URL + "/register", newUserRequest)
                     .andExpect(status().isCreated())
                     .andReturn()
                     .getResponse()
@@ -294,7 +294,7 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response -> returns 403 Forbidden
-            performPost(REVIEW_BASE_URL + "/" + testCar.getId(), request)
+            performPostNoAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request)
                     .andExpect(status().isForbidden());
         }
 

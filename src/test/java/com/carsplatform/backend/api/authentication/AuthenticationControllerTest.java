@@ -36,7 +36,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 201 Created with access token
-            performPost(AUTH_BASE_URL + "/register", request)
+            performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.accessToken").isNotEmpty())
                     .andExpect(jsonPath("$.accessToken").isString());
@@ -56,7 +56,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 201 Created
-            performPost(AUTH_BASE_URL + "/register", firstRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", firstRequest)
                     .andExpect(status().isCreated());
 
             // Create register request with same username but different email
@@ -69,7 +69,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 409 Conflict
-            performPost(AUTH_BASE_URL + "/register", secondRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", secondRequest)
                     .andExpect(status().isConflict());
         }
 
@@ -87,7 +87,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 201 Created
-            performPost(AUTH_BASE_URL + "/register", firstRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", firstRequest)
                     .andExpect(status().isCreated());
 
             // Create register request with different username but same email
@@ -100,7 +100,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 409 Conflict
-            performPost(AUTH_BASE_URL + "/register", secondRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", secondRequest)
                     .andExpect(status().isConflict());
         }
 
@@ -116,7 +116,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 400 Bad Request
-            performPost(AUTH_BASE_URL + "/register", request)
+            performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isBadRequest());
         }
 
@@ -134,7 +134,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 400 Bad Request
-            performPost(AUTH_BASE_URL + "/register", request)
+            performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isBadRequest());
         }
     }
@@ -157,7 +157,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            performPost(AUTH_BASE_URL + "/register", registerRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                     .andExpect(status().isCreated());
 
             // Create login request with same credentials
@@ -167,7 +167,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 200 OK with access token
-            performPost(AUTH_BASE_URL + "/login", loginRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/login", loginRequest)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.accessToken").isNotEmpty())
                     .andExpect(jsonPath("$.accessToken").isString());
@@ -184,7 +184,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 401 Unauthorized
-            performPost(AUTH_BASE_URL + "/login", request)
+            performPostNoAuth(AUTH_BASE_URL + "/login", request)
                     .andExpect(status().isUnauthorized());
         }
 
@@ -201,7 +201,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("Password")
                     .build();
 
-            performPost(AUTH_BASE_URL + "/register", registerRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                     .andExpect(status().isCreated());
 
             // Create login request with incorrect password
@@ -211,7 +211,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 401 Unauthorized
-            performPost(AUTH_BASE_URL + "/login", loginRequest)
+            performPostNoAuth(AUTH_BASE_URL + "/login", loginRequest)
                     .andExpect(status().isUnauthorized());
         }
 
@@ -226,7 +226,7 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .build();
 
             // Perform POST request and verify response is 400 Bad Request
-            performPost(AUTH_BASE_URL + "/login", request)
+            performPostNoAuth(AUTH_BASE_URL + "/login", request)
                     .andExpect(status().isBadRequest());
         }
     }

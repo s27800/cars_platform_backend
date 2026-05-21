@@ -33,7 +33,7 @@ class DtoValidationTest extends MockMvcTestBase {
                 .build();
 
         // Perform registration and extract token
-        String response = performPost("/api/auth/register", registerRequest)
+        String response = performPostNoAuth("/api/auth/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -61,7 +61,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error for username
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.username").exists());
         }
@@ -80,7 +80,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error for email
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.email").exists());
         }
@@ -99,7 +99,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error for password
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.password").exists());
         }
@@ -116,7 +116,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert multiple validation errors
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").isMap())
                     .andExpect(jsonPath("$.errors", aMapWithSize(greaterThanOrEqualTo(3))));
@@ -130,7 +130,7 @@ class DtoValidationTest extends MockMvcTestBase {
             RegisterRequest request = RegisterRequest.builder().build();
 
             // Perform request and assert validation error
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").exists());
         }
@@ -152,7 +152,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error for username
-            performPost("/api/auth/login", request)
+            performPostNoAuth("/api/auth/login", request)
                     .andExpect(status().isBadRequest());
         }
 
@@ -167,7 +167,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error for password
-            performPost("/api/auth/login", request)
+            performPostNoAuth("/api/auth/login", request)
                     .andExpect(status().isBadRequest());
         }
 
@@ -182,7 +182,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error
-            performPost("/api/auth/login", request)
+            performPostNoAuth("/api/auth/login", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").exists());
         }
@@ -262,7 +262,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.status").value(400))
                     .andExpect(jsonPath("$.message").isString())
@@ -282,7 +282,7 @@ class DtoValidationTest extends MockMvcTestBase {
                     .build();
 
             // Perform request and assert validation error messages
-            performPost("/api/auth/register", request)
+            performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.email", containsString("valid")))
                     .andExpect(jsonPath("$.errors.username").isString());

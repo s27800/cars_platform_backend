@@ -61,7 +61,7 @@ class BrandControllerTest extends MockMvcTestBase {
         void getAllBrands_ReturnsAllBrands() throws Exception {
 
             // Perform GET request and verify results -> correct status and returns list of brands
-            performGet(BRAND_BASE_URL)
+            performGetNoAuth(BRAND_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))));
@@ -72,7 +72,7 @@ class BrandControllerTest extends MockMvcTestBase {
         void getAllBrands_ReturnsBrandWithCorrectFields() throws Exception {
 
             // Perform GET request and verify results -> correct status and brands contain correct fields
-            performGet(BRAND_BASE_URL)
+            performGetNoAuth(BRAND_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'BMW')]").exists())
                     .andExpect(jsonPath("$[?(@.name == 'BMW')].id").exists());
@@ -89,7 +89,7 @@ class BrandControllerTest extends MockMvcTestBase {
         void getBrandById_ExistingBrand_Returns200() throws Exception {
 
             // Perform GET request and verify results -> correct status and returns brand details
-            performGet(BRAND_BASE_URL + "/" + testBrand.getId())
+            performGetNoAuth(BRAND_BASE_URL + "/" + testBrand.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("BMW"))
                     .andExpect(jsonPath("$.models").isArray());
@@ -100,7 +100,7 @@ class BrandControllerTest extends MockMvcTestBase {
         void getBrandById_ExistingBrand_IncludesModels() throws Exception {
 
             // Perform GET request and verify results -> correct status and brand includes models
-            performGet(BRAND_BASE_URL + "/" + testBrand.getId())
+            performGetNoAuth(BRAND_BASE_URL + "/" + testBrand.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.models", hasSize(greaterThanOrEqualTo(1))))
                     .andExpect(jsonPath("$.models[?(@.name == '3 Series')]").exists());
@@ -111,7 +111,7 @@ class BrandControllerTest extends MockMvcTestBase {
         void getBrandById_NonExistingBrand_Returns404() throws Exception {
 
             // Perform GET request and verify results -> 404 brand does not exist
-            performGet(BRAND_BASE_URL + "/999999")
+            performGetNoAuth(BRAND_BASE_URL + "/999999")
                     .andExpect(status().isNotFound());
         }
     }

@@ -71,7 +71,7 @@ class ModelControllerTest extends MockMvcTestBase {
         void getModelById_ExistingModel_Returns200() throws Exception {
 
             // Perform GET request and verify response -> 200 OK with correct model details
-            performGet(MODEL_BASE_URL + "/" + testModel.getId())
+            performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("3 Series"))
                     .andExpect(jsonPath("$.description").value("Compact executive car"))
@@ -83,7 +83,7 @@ class ModelControllerTest extends MockMvcTestBase {
         void getModelById_ExistingModel_IncludesGenerations() throws Exception {
 
             // Perform GET request and verify response -> 200 OK with generations included
-            performGet(MODEL_BASE_URL + "/" + testModel.getId())
+            performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.generations", hasSize(greaterThanOrEqualTo(1))))
                     .andExpect(jsonPath("$.generations[?(@.name == 'E90')]").exists());
@@ -94,7 +94,7 @@ class ModelControllerTest extends MockMvcTestBase {
         void getModelById_ExistingModel_IncludesIdField() throws Exception {
 
             // Perform GET request and verify response -> 200 OK with id field included
-            performGet(MODEL_BASE_URL + "/" + testModel.getId())
+            performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(testModel.getId()))
                     .andExpect(jsonPath("$.name").value("3 Series"));
@@ -105,7 +105,7 @@ class ModelControllerTest extends MockMvcTestBase {
         void getModelById_NonExistingModel_Returns404() throws Exception {
 
             // Perform GET request and verify response -> 404 Not Found
-            performGet(MODEL_BASE_URL + "/999999")
+            performGetNoAuth(MODEL_BASE_URL + "/999999")
                     .andExpect(status().isNotFound());
         }
     }

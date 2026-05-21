@@ -108,39 +108,45 @@ class JwtAuthenticationFilterTest {
         }
 
         @Test
-        @DisplayName("continues filter chain without authentication when invalid token")
-        void doFilter_InvalidToken_ContinuesWithoutAuth() throws Exception {
+        @DisplayName("returns 403 Forbidden when invalid token")
+        void doFilter_InvalidToken_Returns403() throws Exception {
 
             // Mock dependencies
             String invalidToken = "invalid.jwt.token";
+            java.io.PrintWriter writer = mock(java.io.PrintWriter.class);
 
             when(request.getHeader("Authorization")).thenReturn("Bearer " + invalidToken);
             when(tokenProvider.validateToken(invalidToken)).thenReturn(false);
+            when(response.getWriter()).thenReturn(writer);
 
             // Execute filter
             jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
-            // Verify no authentication is set and filter chain continues
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-            verify(filterChain).doFilter(request, response);
-            verify(userService, never()).loadUserById(anyLong());
+            // Verify 403 is returned and filter chain does NOT continue
+            verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+            verify(response).setContentType("application/json");
+            verify(filterChain, never()).doFilter(request, response);
         }
 
         @Test
-        @DisplayName("continues filter chain without authentication when token validation throws exception")
-        void doFilter_ExceptionDuringValidation_ContinuesWithoutAuth() throws Exception {
+        @DisplayName("returns 403 Forbidden when token validation throws exception")
+        void doFilter_ExceptionDuringValidation_Returns403() throws Exception {
 
             // Mock dependencies
             String token = "some.jwt.token";
+            java.io.PrintWriter writer = mock(java.io.PrintWriter.class);
+
             when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
             when(tokenProvider.validateToken(token)).thenThrow(new RuntimeException("Validation error"));
+            when(response.getWriter()).thenReturn(writer);
 
             // Execute filter
             jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
-            // Verify no authentication is set and filter chain continues
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-            verify(filterChain).doFilter(request, response);
+            // Verify 403 is returned and filter chain does NOT continue
+            verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+            verify(response).setContentType("application/json");
+            verify(filterChain, never()).doFilter(request, response);
         }
 
         @Test
