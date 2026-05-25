@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +19,8 @@ public interface ModelsListMapper {
 
     @Named("map")
     default List<ModelsListResponse> map(Brand brand) {
-        if (brand == null)
-            return null;
+        if (brand == null || brand.getModels() == null)
+            return Collections.emptyList();
 
         return brand.getModels().stream().map(this::toDto).collect(Collectors.toList());
     }
