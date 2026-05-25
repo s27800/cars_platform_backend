@@ -6,6 +6,7 @@ import com.carsplatform.backend.api.carImages.CarImage;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.chassis.Chassis;
 import com.carsplatform.backend.api.engines.Engine;
+import com.carsplatform.backend.api.fuelReportLikes.FuelReportLike;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.insideDimensions.InsideDimensions;
@@ -297,6 +298,15 @@ public final class TestDataFactory {
         return Like.builder()
                 .user(user)
                 .review(review);
+    }
+
+
+    // ===== FUEL REPORT LIKE =====
+
+    public static FuelReportLike.FuelReportLikeBuilder defaultFuelReportLike(User user, FuelReport fuelReport) {
+        return FuelReportLike.builder()
+                .user(user)
+                .fuelReport(fuelReport);
     }
 
 
