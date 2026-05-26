@@ -16,6 +16,20 @@ public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
     @EntityGraph(attributePaths = {"user"})
     Page<FuelReport> findByCarIdAndIsApprovedTrue(Integer carId, Pageable pageable);
 
+    @Query(
+            value =
+                    "SELECT fr FROM FuelReport fr " +
+                    "LEFT JOIN FETCH fr.user " +
+                    "LEFT JOIN FETCH fr.car c " +
+                    "LEFT JOIN FETCH c.generation g " +
+                    "LEFT JOIN FETCH g.model m " +
+                    "LEFT JOIN FETCH m.brand " +
+                    "WHERE fr.isApproved = false",
+            countQuery =
+                    "SELECT count(fr) FROM FuelReport fr " +
+                    "WHERE fr.isApproved = false")
+    Page<FuelReport> findAllPending(Pageable pageable);
+
     @Query("SELECT AVG(fr.fuelConsumption) " +
             "FROM FuelReport fr " +
             "WHERE fr.car.id = :carId AND fr.isApproved = true")

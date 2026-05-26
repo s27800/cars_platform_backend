@@ -100,6 +100,17 @@ public abstract class MockMvcTestBase {
                 .content(objectMapper.writeValueAsString(body)));
     }
 
+    protected ResultActions performPatchWithAuthNoBody(String url, String token) throws Exception {
+        return mockMvc.perform(patch(url)
+                .header("Authorization", TestSecurityUtils.bearerToken(token))
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    protected ResultActions performPatchNoAuthNoBody(String url) throws Exception {
+        return mockMvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
 
     // ===== DELETE Requests =====
 
