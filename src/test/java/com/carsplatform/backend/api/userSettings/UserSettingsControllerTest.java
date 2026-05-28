@@ -8,7 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
+import java.util.UUID;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -24,9 +29,11 @@ class UserSettingsControllerTest extends MockMvcTestBase {
     void setUp() throws Exception {
 
         // Register user and get token
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+
         RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("settingsuser" + System.currentTimeMillis())
-                .email("settingsuser" + System.currentTimeMillis() + "@example.com")
+                .username("settingsuser" + uniqueId)
+                .email("settingsuser" + uniqueId + "@example.com")
                 .password("TestPassword123!")
                 .firstName("Test")
                 .lastName("User")
@@ -113,6 +120,7 @@ class UserSettingsControllerTest extends MockMvcTestBase {
 
         @Test
         @DisplayName("returns 400 for invalid theme")
+        @WithMockUser(username = "testuser")
         void updateSettings_InvalidTheme_Returns400() throws Exception {
 
             // Create invalid request
@@ -120,13 +128,16 @@ class UserSettingsControllerTest extends MockMvcTestBase {
                     .theme("invalid")
                     .build();
 
-            // Perform PUT request with authentication and verify response -> returns 400 Bad Request
-            performPutWithAuth(SETTINGS_URL, request, userToken)
+            // Perform PUT request and verify response -> returns 400 Bad Request
+            mockMvc.perform(put(SETTINGS_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         @DisplayName("returns 400 for blank theme")
+        @WithMockUser(username = "testuser")
         void updateSettings_BlankTheme_Returns400() throws Exception {
 
             // Create request with blank theme
@@ -134,15 +145,17 @@ class UserSettingsControllerTest extends MockMvcTestBase {
                     .theme("")
                     .build();
 
-            // Perform PUT request with authentication and verify response -> returns 400 Bad Request
-            performPutWithAuth(SETTINGS_URL, request, userToken)
+            // Perform PUT request and verify response -> returns 400 Bad Request
+            mockMvc.perform(put(SETTINGS_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         @DisplayName("returns 403 when not authenticated")
         void updateSettings_NotAuthenticated_Returns403() throws Exception {
-            
+
             // Create request with dark theme
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("dark")
