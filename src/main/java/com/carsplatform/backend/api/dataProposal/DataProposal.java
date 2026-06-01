@@ -2,12 +2,14 @@ package com.carsplatform.backend.api.dataProposal;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
-import com.carsplatform.backend.common.json.JsonAttributeConverter;
 
 import jakarta.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,8 +38,8 @@ public class DataProposal {
 
     private String adminComment;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    @Convert(converter = JsonAttributeConverter.class)
     private Map<String, Object> proposedValues;
 
     @Enumerated(EnumType.STRING)
