@@ -43,4 +43,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     AverageRatingsResponse findAverageRatingsForCarId(@Param("carId") Integer carId);
 
     boolean existsByCarIdAndUserId(Integer carId, Long userId);
+
+    @Query(
+            value =
+                    "SELECT r FROM Review r " +
+                    "LEFT JOIN FETCH r.user " +
+                    "LEFT JOIN FETCH r.car c " +
+                    "LEFT JOIN FETCH c.generation g " +
+                    "LEFT JOIN FETCH g.model m " +
+                    "LEFT JOIN FETCH m.brand " +
+                    "WHERE r.user.id = :userId",
+            countQuery =
+                    "SELECT count(r) FROM Review r " +
+                    "WHERE r.user.id = :userId")
+    Page<Review> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }

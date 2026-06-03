@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.Formula;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -46,6 +48,9 @@ public class FuelReport {
 
     @Column(name = "is_approved")
     private Boolean isApproved = false;
+
+    @Formula("(SELECT COUNT(*) FROM fuel_report_likes frl WHERE frl.fuel_report_id = id)")
+    private Long likesCount;
 
     @PrePersist
     protected void onCreate() {

@@ -1,5 +1,7 @@
 package com.carsplatform.backend.api.fuelReports;
 
+import com.carsplatform.backend.api.admin.AdminFuelReportMapper;
+import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.fuelReports.dtos.AverageFuelConsumptionResponse;
@@ -30,6 +32,7 @@ public class FuelReportService {
     private final CreateFuelReportMapper createFuelReportMapper;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final AdminFuelReportMapper adminFuelReportMapper;
 
     @Transactional(readOnly = true)
     public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(Integer carId) {
@@ -44,6 +47,16 @@ public class FuelReportService {
     public Page<FuelReportResponse> getFuelReportsForCarId(Integer carId, Pageable pageable) {
         return fuelReportMapper.toDtoList(
                 fuelReportRepository.findByCarIdAndIsApprovedTrue(carId, pageable)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdminFuelReportResponse> getFuelReportsForUser(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        return adminFuelReportMapper.toDtoList(
+                fuelReportRepository.findAllByUserId(user.getId(), pageable)
         );
     }
 

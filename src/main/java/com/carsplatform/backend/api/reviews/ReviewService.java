@@ -1,5 +1,7 @@
 package com.carsplatform.backend.api.reviews;
 
+import com.carsplatform.backend.api.admin.AdminReviewMapper;
+import com.carsplatform.backend.api.admin.dtos.AdminReviewResponse;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.reviews.dtos.CreateReviewRequest;
@@ -25,6 +27,7 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final CreateReviewMapper createReviewMapper;
     private final UserRepository userRepository;
+    private final AdminReviewMapper adminReviewMapper;
 
     @Transactional(readOnly = true)
     public AverageRatingsResponse getAverageRatingsForCar(Integer carId) {
@@ -38,6 +41,16 @@ public class ReviewService {
     public Page<ReviewResponse> getReviewsForCarId(Integer carId, Pageable pageable) {
         return reviewMapper.toDtoList(
                 reviewRepository.findAllApprovedByCarId(carId, pageable)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdminReviewResponse> getReviewsForUser(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        return adminReviewMapper.toDtoList(
+                reviewRepository.findAllByUserId(user.getId(), pageable)
         );
     }
 
