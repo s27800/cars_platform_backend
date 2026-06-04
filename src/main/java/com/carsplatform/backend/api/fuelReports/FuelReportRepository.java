@@ -34,4 +34,18 @@ public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
             "FROM FuelReport fr " +
             "WHERE fr.car.id = :carId AND fr.isApproved = true")
     Optional<BigDecimal> findAverageFuelConsumptionForCarId(@Param("carId") Integer carId);
+
+    @Query(
+            value =
+                    "SELECT fr FROM FuelReport fr " +
+                    "LEFT JOIN FETCH fr.user " +
+                    "LEFT JOIN FETCH fr.car c " +
+                    "LEFT JOIN FETCH c.generation g " +
+                    "LEFT JOIN FETCH g.model m " +
+                    "LEFT JOIN FETCH m.brand " +
+                    "WHERE fr.user.id = :userId",
+            countQuery =
+                    "SELECT count(fr) FROM FuelReport fr " +
+                    "WHERE fr.user.id = :userId")
+    Page<FuelReport> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }

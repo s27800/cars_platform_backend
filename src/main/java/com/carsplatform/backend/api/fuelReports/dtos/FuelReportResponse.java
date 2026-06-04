@@ -20,5 +20,6 @@ public class FuelReportResponse {
     private String comment;
     private LocalDateTime reportDate;
     private Boolean isApproved;
+    private Long likesCount;
     private UsernameResponse usernameResponse;
 }
