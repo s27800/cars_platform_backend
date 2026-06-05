@@ -108,24 +108,35 @@ class GetDataProposalsMapperTest {
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(1L);
-            assertThat(result.getCarName()).isEqualTo("BMW 320i");
+            assertThat(result.getCarInfo()).isNotNull();
+            assertThat(result.getCarInfo().getCarId()).isEqualTo(1);
+            assertThat(result.getCarInfo().getCarName()).isEqualTo("BMW 320i");
+            assertThat(result.getCarInfo().getBrandName()).isEqualTo("Test Brand");
+            assertThat(result.getCarInfo().getModelName()).isEqualTo("Test Model");
+            assertThat(result.getCarInfo().getGenerationName()).isEqualTo("Gen I");
             assertThat(result.getCategory()).isEqualTo("engine");
             assertThat(result.getComment()).isEqualTo("Proposed change");
             assertThat(result.getProposedValues()).containsEntry("maxPower", 200);
             assertThat(result.getStatus()).isEqualTo(DataProposalStatus.PENDING);
             assertThat(result.getAdminComment()).isNull();
             assertThat(result.getCreatedAt()).isEqualTo(LocalDateTime.of(2024, 1, 15, 10, 30));
+            assertThat(result.getResolvedAt()).isNull();
         }
 
         @Test
-        @DisplayName("should map car name from car entity")
-        void validInput_MapsCarName() {
+        @DisplayName("should map carInfo from car entity")
+        void validInput_MapsCarInfo() {
 
             // Map valid input
             GetDataProposalsResponse result = mapper.toDto(testProposal);
 
-            // Verify car name is mapped correctly
-            assertThat(result.getCarName()).isEqualTo("BMW 320i");
+            // Verify carInfo is mapped correctly
+            assertThat(result.getCarInfo()).isNotNull();
+            assertThat(result.getCarInfo().getCarId()).isEqualTo(1);
+            assertThat(result.getCarInfo().getCarName()).isEqualTo("BMW 320i");
+            assertThat(result.getCarInfo().getBrandName()).isEqualTo("Test Brand");
+            assertThat(result.getCarInfo().getModelName()).isEqualTo("Test Model");
+            assertThat(result.getCarInfo().getGenerationName()).isEqualTo("Gen I");
         }
 
         @Test
@@ -135,6 +146,7 @@ class GetDataProposalsMapperTest {
             // Set proposal fields
             testProposal.setStatus(DataProposalStatus.APPROVED);
             testProposal.setAdminComment("Approved by admin");
+            testProposal.setResolvedAt(LocalDateTime.of(2024, 1, 16, 14, 0));
 
             // Map valid input
             GetDataProposalsResponse result = mapper.toDto(testProposal);
@@ -142,6 +154,7 @@ class GetDataProposalsMapperTest {
             // Verify status and admin comment are mapped correctly
             assertThat(result.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
             assertThat(result.getAdminComment()).isEqualTo("Approved by admin");
+            assertThat(result.getResolvedAt()).isEqualTo(LocalDateTime.of(2024, 1, 16, 14, 0));
         }
 
         @Test
@@ -151,6 +164,7 @@ class GetDataProposalsMapperTest {
             // Set proposal fields
             testProposal.setStatus(DataProposalStatus.REJECTED);
             testProposal.setAdminComment("Invalid data");
+            testProposal.setResolvedAt(LocalDateTime.of(2024, 1, 16, 15, 30));
 
             // Map valid input
             GetDataProposalsResponse result = mapper.toDto(testProposal);
@@ -158,6 +172,7 @@ class GetDataProposalsMapperTest {
             // Verify results -> status and admin comment are mapped correctly
             assertThat(result.getStatus()).isEqualTo(DataProposalStatus.REJECTED);
             assertThat(result.getAdminComment()).isEqualTo("Invalid data");
+            assertThat(result.getResolvedAt()).isEqualTo(LocalDateTime.of(2024, 1, 16, 15, 30));
         }
     }
 }
