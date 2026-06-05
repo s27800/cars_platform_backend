@@ -59,15 +59,4 @@ public class DataProposalController {
 
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/me")
-    @Operation(summary = "Get all data proposals for user")
-    public ResponseEntity<Page<GetDataProposalsResponse>> getMyProposals(
-            @AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-
-        return ResponseEntity.ok(
-                dataProposalService.getUserDataProposals(userDetails.getUsername(), pageable)
-        );
-    }
 }
