@@ -14,6 +14,8 @@ public interface GetDataProposalsMapper {
     GetDataProposalsMapper INSTANCE = Mappers.getMapper(GetDataProposalsMapper.class);
 
     @Mapping(target = "carInfo", source = "car", qualifiedByName = "toCarInfo")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "username", source = "user.username")
     GetDataProposalsResponse toDto(DataProposal proposal);
 
     @Named("toCarInfo")

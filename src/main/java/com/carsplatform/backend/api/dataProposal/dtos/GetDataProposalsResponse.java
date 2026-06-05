@@ -17,6 +17,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class GetDataProposalsResponse {
     private Long id;
+    private Long userId;
+    private String username;
     private AdminCarInfoResponse carInfo;
     private String category;
     private String comment;
