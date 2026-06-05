@@ -47,4 +47,6 @@ public class DataProposal {
     private DataProposalStatus status = DataProposalStatus.PENDING;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime resolvedAt;
 }

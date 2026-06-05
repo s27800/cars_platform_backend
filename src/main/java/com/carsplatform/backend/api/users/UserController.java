@@ -2,6 +2,8 @@ package com.carsplatform.backend.api.users;
 
 import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
 import com.carsplatform.backend.api.admin.dtos.AdminReviewResponse;
+import com.carsplatform.backend.api.dataProposal.DataProposalService;
+import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
 import com.carsplatform.backend.api.fuelReports.FuelReportService;
 import com.carsplatform.backend.api.reviews.ReviewService;
 import com.carsplatform.backend.api.users.dtos.UserChangePasswordRequest;
@@ -35,6 +37,7 @@ public class UserController {
     private final UserMapper userMapper;
     private final ReviewService reviewService;
     private final FuelReportService fuelReportService;
+    private final DataProposalService dataProposalService;
 
     @GetMapping("/me")
     @Operation(summary = "Get current user's profile information")
@@ -80,5 +83,14 @@ public class UserController {
             Pageable pageable) {
 
         return ResponseEntity.ok(fuelReportService.getFuelReportsForUser(userDetails.getUsername(), pageable));
+    }
+
+    @GetMapping("/me/data-proposals")
+    @Operation(summary = "Get current user's data proposals")
+    public ResponseEntity<Page<GetDataProposalsResponse>> getUserDataProposals(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+
+        return ResponseEntity.ok(dataProposalService.getUserDataProposals(userDetails.getUsername(), pageable));
     }
 }
