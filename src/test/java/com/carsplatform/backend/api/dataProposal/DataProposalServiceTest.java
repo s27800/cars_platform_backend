@@ -241,6 +241,7 @@ class DataProposalServiceTest {
             // Verify results -> proposal is updated with rejected status and admin comment
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.REJECTED);
             assertThat(testProposal.getAdminComment()).isEqualTo("Not valid data");
+            assertThat(testProposal.getResolvedAt()).isNotNull();
 
             verify(dataProposalRepository).save(testProposal);
         }
@@ -270,6 +271,7 @@ class DataProposalServiceTest {
             // Verify results -> proposal is approved and changes applied
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
             assertThat(testProposal.getAdminComment()).isEqualTo("Changes approved");
+            assertThat(testProposal.getResolvedAt()).isNotNull();
 
             verify(dataProposalRepository).save(testProposal);
             verify(carRepository).save(testCar);

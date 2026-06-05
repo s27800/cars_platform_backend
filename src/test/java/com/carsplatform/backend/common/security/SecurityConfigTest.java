@@ -130,11 +130,11 @@ class SecurityConfigTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("GET /api/data-proposals/me requires authentication")
-        void getMyProposals_NoAuth_Returns403() throws Exception {
+        @DisplayName("GET /api/users/me/data-proposals requires authentication")
+        void getUserDataProposals_NoAuth_Returns403() throws Exception {
 
             // Perform get request without authentication and verify response status is 403 Forbidden
-            performGetNoAuth("/api/data-proposals/me")
+            performGetNoAuth("/api/users/me/data-proposals")
                     .andExpect(status().isForbidden());
         }
     }

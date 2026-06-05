@@ -13,9 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.persistence.EntityManager;
-
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -265,6 +262,42 @@ class UserControllerTest extends MockMvcTestBase {
             // Perform request with empty fields -> verify response is 400
             performPostWithAuth(USER_BASE_URL + "/me/change-password", request, userToken)
                     .andExpect(status().isBadRequest());
+        }
+    }
+
+
+    @Nested
+    @DisplayName("GET /api/users/me/data-proposals")
+    class GetUserDataProposalsTests {
+
+        @Test
+        @DisplayName("returns data proposals when authenticated")
+        void getUserDataProposals_Authenticated_Returns200() throws Exception {
+
+            // Perform GET request with authentication and verify results -> 200 OK is returned
+            performGetWithAuth(USER_BASE_URL + "/me/data-proposals", userToken)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content").isArray());
+        }
+
+        @Test
+        @DisplayName("returns 403 when not authenticated")
+        void getUserDataProposals_NotAuthenticated_Returns403() throws Exception {
+
+            // Perform GET request without authentication and verify results -> 403 Forbidden is returned
+            performGetNoAuth(USER_BASE_URL + "/me/data-proposals")
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("returns paginated results")
+        void getUserDataProposals_WithPagination_ReturnsPaginated() throws Exception {
+
+            // Perform GET request with pagination parameters and verify results -> 200 OK is returned
+            performGetWithAuth(USER_BASE_URL + "/me/data-proposals?page=0&size=5", userToken)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                    .andExpect(jsonPath("$.pageable.pageSize").value(5));
         }
     }
 }

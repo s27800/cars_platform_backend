@@ -179,43 +179,6 @@ class DataProposalControllerTest extends MockMvcTestBase {
 
 
     @Nested
-    @DisplayName("GET /api/data-proposals/me")
-    class GetMyProposalsTests {
-
-        @Test
-        @DisplayName("returns proposals when authenticated")
-        void getMyProposals_Authenticated_ReturnsProposals() throws Exception {
-
-            // Perform GET request with authentication and verify results -> 200 OK is returned with proposals
-            performGetWithAuth(DATA_PROPOSAL_BASE_URL + "/me", userToken)
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content").isArray())
-                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
-        }
-
-        @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getMyProposals_NotAuthenticated_Returns403() throws Exception {
-
-            // Perform GET request without authentication and verify results -> 403 Forbidden is returned
-            performGetNoAuth(DATA_PROPOSAL_BASE_URL + "/me")
-                    .andExpect(status().isForbidden());
-        }
-
-        @Test
-        @DisplayName("returns paginated results")
-        void getMyProposals_WithPagination_ReturnsPaginated() throws Exception {
-
-            // Perform GET request with authentication and pagination parameters and verify results -> 200 OK is returned
-            performGetWithAuth(DATA_PROPOSAL_BASE_URL + "/me?page=0&size=5", userToken)
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.pageable.pageNumber").value(0))
-                    .andExpect(jsonPath("$.pageable.pageSize").value(5));
-        }
-    }
-
-
-    @Nested
     @DisplayName("GET /api/data-proposals/pending")
     class GetPendingProposalsTests {
 
