@@ -43,7 +43,7 @@ public class DataProposalController {
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get pending data proposals waiting to be resolved")
-    public ResponseEntity<Page<DataProposal>> getPendingProposals(Pageable pageable) {
+    public ResponseEntity<Page<GetDataProposalsResponse>> getPendingProposals(Pageable pageable) {
         return ResponseEntity.ok(dataProposalService.getPendingDataProposals(pageable));
     }
 

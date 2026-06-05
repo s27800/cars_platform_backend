@@ -54,8 +54,9 @@ public class DataProposalService {
     }
 
     @Transactional(readOnly = true)
-    public Page<DataProposal> getPendingDataProposals(Pageable pageable) {
-        return dataProposalRepository.findByStatus(DataProposalStatus.PENDING, pageable);
+    public Page<GetDataProposalsResponse> getPendingDataProposals(Pageable pageable) {
+        Page<DataProposal> proposals = dataProposalRepository.findByStatus(DataProposalStatus.PENDING, pageable);
+        return proposals.map(dataProposalsMapper::toDto);
     }
 
     @Transactional
