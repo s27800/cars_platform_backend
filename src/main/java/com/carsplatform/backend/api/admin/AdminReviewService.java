@@ -31,7 +31,11 @@ public class AdminReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
 
-        review.setIsApproved(approve);
-        reviewRepository.save(review);
+        if (approve) {
+            review.setIsApproved(true);
+            reviewRepository.save(review);
+        } else {
+            reviewRepository.delete(review);
+        }
     }
 }
