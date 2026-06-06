@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.carImages;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -23,6 +24,7 @@ public class CarImage {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
+    @JsonIgnore
     private Car car;
 
     @Column(name = "image_url", nullable = false)

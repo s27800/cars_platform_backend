@@ -207,12 +207,19 @@ class DataProposalServiceTest {
 
             Page<DataProposal> proposalPage = new PageImpl<>(List.of(testProposal), pageable, 1);
 
+            // Create expected response DTO
+            GetDataProposalsResponse responseDto = GetDataProposalsResponse.builder()
+                    .id(testProposal.getId())
+                    .status(DataProposalStatus.PENDING)
+                    .build();
+
             // Mock repositories to return pending proposals
             when(dataProposalRepository.findByStatus(DataProposalStatus.PENDING, pageable))
                     .thenReturn(proposalPage);
+            when(dataProposalsMapper.toDto(testProposal)).thenReturn(responseDto);
 
             // Send get pending proposals request
-            Page<DataProposal> result = dataProposalService.getPendingDataProposals(pageable);
+            Page<GetDataProposalsResponse> result = dataProposalService.getPendingDataProposals(pageable);
 
             // Verify results -> pending proposals are returned
             assertThat(result).isNotNull();

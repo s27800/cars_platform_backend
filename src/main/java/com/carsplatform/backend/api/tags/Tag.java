@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.tags;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -29,5 +30,6 @@ public class Tag {
     @ManyToMany(mappedBy = "tags")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private Set<Car> cars = new HashSet<>();
 }

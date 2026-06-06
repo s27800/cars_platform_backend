@@ -5,6 +5,7 @@ import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.likes.Like;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.userSettings.UserSettings;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -40,6 +41,7 @@ public class User {
     @Column(name = "password", nullable = false)
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 60, max = 60)
+    @JsonIgnore
     private String password;
 
     @Column(name = "first_name", nullable = false)
@@ -59,26 +61,31 @@ public class User {
     private Boolean isAdmin = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private UserSettings userSettings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<FuelReport> fuelReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<DataProposal> proposals = new ArrayList<>();
 
     @PrePersist

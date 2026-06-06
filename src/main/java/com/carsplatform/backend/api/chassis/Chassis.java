@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.chassis;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -64,5 +65,6 @@ public class Chassis {
     private String drive;
 
     @OneToOne(mappedBy = "chassis")
+    @JsonIgnore
     private Car car;
 }

@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.dataProposal;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -25,10 +26,12 @@ public class DataProposal {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id", nullable = false)
+    @JsonIgnore
     private Car car;
 
     @Column(nullable = false)

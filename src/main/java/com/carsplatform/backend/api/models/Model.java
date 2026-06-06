@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.models;
 
 import com.carsplatform.backend.api.brands.Brand;
 import com.carsplatform.backend.api.generations.Generation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -24,6 +25,7 @@ public class Model {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "brand_id", nullable = false)
+    @JsonIgnore
     private Brand brand;
 
     @Column(name = "name", nullable = false)
@@ -37,5 +39,6 @@ public class Model {
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Generation> generations = new ArrayList<>();
 }

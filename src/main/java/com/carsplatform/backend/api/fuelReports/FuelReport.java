@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.fuelReports;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -29,10 +30,12 @@ public class FuelReport {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
+    @JsonIgnore
     private Car car;
 
     @Column(name = "fuel_consumption", nullable = false, precision = 3, scale = 1)

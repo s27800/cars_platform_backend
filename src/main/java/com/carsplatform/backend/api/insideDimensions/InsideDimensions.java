@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.insideDimensions;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -45,5 +46,6 @@ public class InsideDimensions {
     private Integer trunkHeight;
 
     @OneToOne(mappedBy = "insideDimensions")
+    @JsonIgnore
     private Car car;
 }
