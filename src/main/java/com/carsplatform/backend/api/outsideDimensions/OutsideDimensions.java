@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.outsideDimensions;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -51,5 +52,6 @@ public class OutsideDimensions {
     private Integer maxRoofLoad;
 
     @OneToOne(mappedBy = "outsideDimensions")
+    @JsonIgnore
     private Car car;
 }

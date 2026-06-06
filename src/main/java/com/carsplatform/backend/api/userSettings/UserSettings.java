@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.userSettings;
 
 import com.carsplatform.backend.api.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -23,6 +24,7 @@ public class UserSettings {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
     private User user;
 
     @Size(max = 20)

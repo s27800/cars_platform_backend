@@ -13,6 +13,7 @@ import com.carsplatform.backend.api.performances.Performance;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.tags.Tag;
 import com.carsplatform.backend.api.transmissions.Transmission;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -106,15 +107,18 @@ public class Car {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<FuelReport> fuelReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<DataProposal> proposals = new ArrayList<>();
 }

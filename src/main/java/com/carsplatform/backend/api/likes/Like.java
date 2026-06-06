@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.likes;
 
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -26,9 +27,11 @@ public class Like {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "review_id", nullable = false)
+    @JsonIgnore
     private Review review;
 }

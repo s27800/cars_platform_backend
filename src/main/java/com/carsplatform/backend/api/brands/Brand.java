@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.brands;
 
 import com.carsplatform.backend.api.models.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -40,5 +41,6 @@ public class Brand {
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Model> models = new ArrayList<>();
 }

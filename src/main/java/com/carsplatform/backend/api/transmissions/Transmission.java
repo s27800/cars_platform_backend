@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.transmissions;
 
 import com.carsplatform.backend.api.cars.Car;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -37,5 +38,6 @@ public class Transmission {
     private String clutchType;
 
     @OneToOne(mappedBy = "transmission")
+    @JsonIgnore
     private Car car;
 }
