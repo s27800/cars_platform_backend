@@ -31,7 +31,11 @@ public class AdminFuelReportService {
         FuelReport fuelReport = fuelReportRepository.findById(fuelReportId)
                 .orElseThrow(() -> new ResourceNotFoundException("FuelReport", "id", fuelReportId));
 
-        fuelReport.setIsApproved(approve);
-        fuelReportRepository.save(fuelReport);
+        if (approve) {
+            fuelReport.setIsApproved(true);
+            fuelReportRepository.save(fuelReport);
+        } else {
+            fuelReportRepository.delete(fuelReport);
+        }
     }
 }
