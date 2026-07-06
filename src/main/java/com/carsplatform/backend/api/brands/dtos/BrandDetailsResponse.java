@@ -18,5 +18,6 @@ public class BrandDetailsResponse {
     private String country;
     private Integer foundedYear;
     private String description;
+    private String logoUrl;
     private List<ModelsListResponse> models;
 }
