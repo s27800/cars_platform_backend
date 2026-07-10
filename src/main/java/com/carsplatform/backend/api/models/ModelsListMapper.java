@@ -15,7 +15,16 @@ import java.util.stream.Collectors;
 public interface ModelsListMapper {
     ModelsListMapper INSTANCE = Mappers.getMapper(ModelsListMapper.class);
 
-    ModelsListResponse toDto(Model model);
+    default ModelsListResponse toDto(Model model) {
+        if (model == null)
+            return null;
+
+        return ModelsListResponse.builder()
+                .id(model.getId())
+                .name(model.getName())
+                .generationsCount(model.getGenerations() != null ? model.getGenerations().size() : 0)
+                .build();
+    }
 
     @Named("map")
     default List<ModelsListResponse> map(Brand brand) {

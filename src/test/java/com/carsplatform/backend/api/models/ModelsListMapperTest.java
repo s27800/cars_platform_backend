@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.models;
 
 import com.carsplatform.backend.api.brands.Brand;
+import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.dtos.ModelsListResponse;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,7 @@ class ModelsListMapperTest {
                 .name("3 Series")
                 .description("Compact executive car")
                 .brand(testBrand)
+                .generations(new ArrayList<>())
                 .build();
     }
 
@@ -61,8 +63,14 @@ class ModelsListMapperTest {
         }
 
         @Test
-        @DisplayName("should map id and name only")
-        void toDto_ValidModel_MapsIdAndName() {
+        @DisplayName("should map id, name and generationsCount")
+        void toDto_ValidModel_MapsIdNameAndGenerationsCount() {
+
+            // Add generations to test model
+            Generation gen1 = Generation.builder().id(1).name("E90").model(testModel).build();
+            Generation gen2 = Generation.builder().id(2).name("F30").model(testModel).build();
+
+            testModel.setGenerations(List.of(gen1, gen2));
 
             // Map valid model
             ModelsListResponse result = mapper.toDto(testModel);
@@ -71,6 +79,19 @@ class ModelsListMapperTest {
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(1);
             assertThat(result.getName()).isEqualTo("3 Series");
+            assertThat(result.getGenerationsCount()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("should return 0 generations count when model has no generations")
+        void toDto_ModelWithNoGenerations_ReturnsZeroCount() {
+
+            // Map model with empty generations
+            ModelsListResponse result = mapper.toDto(testModel);
+
+            // Verify generationsCount is 0
+            assertThat(result).isNotNull();
+            assertThat(result.getGenerationsCount()).isEqualTo(0);
         }
     }
 
@@ -105,13 +126,17 @@ class ModelsListMapperTest {
         }
 
         @Test
-        @DisplayName("should map all models from brand")
+        @DisplayName("should map all models from brand with generationsCount")
         void map_BrandWithModels_MapsAllModels() {
 
-            // Create test models
-            Model model1 = Model.builder().id(1).name("3 Series").build();
-            Model model2 = Model.builder().id(2).name("5 Series").build();
-            Model model3 = Model.builder().id(3).name("X5").build();
+            // Create test models with generations
+            Model model1 = Model.builder().id(1).name("3 Series").generations(new ArrayList<>()).build();
+            Model model2 = Model.builder().id(2).name("5 Series").generations(new ArrayList<>()).build();
+            Model model3 = Model.builder().id(3).name("X5").generations(new ArrayList<>()).build();
+
+            // Add generations to model1
+            model1.getGenerations().add(Generation.builder().id(1).name("E90").build());
+            model1.getGenerations().add(Generation.builder().id(2).name("F30").build());
 
             testBrand.setModels(List.of(model1, model2, model3));
 
@@ -122,6 +147,9 @@ class ModelsListMapperTest {
             assertThat(result).hasSize(3);
             assertThat(result).extracting(ModelsListResponse::getName)
                     .containsExactly("3 Series", "5 Series", "X5");
+            assertThat(result.get(0).getGenerationsCount()).isEqualTo(2);
+            assertThat(result.get(1).getGenerationsCount()).isEqualTo(0);
+            assertThat(result.get(2).getGenerationsCount()).isEqualTo(0);
         }
     }
 }

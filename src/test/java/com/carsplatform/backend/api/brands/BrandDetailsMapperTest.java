@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.brands;
 
 import com.carsplatform.backend.api.brands.dtos.BrandDetailsResponse;
+import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -89,33 +90,43 @@ class BrandDetailsMapperTest {
         }
 
         @Test
-        @DisplayName("should map models list with items")
+        @DisplayName("should map models list with items and generationsCount")
         void toDto_BrandWithModels_MapsModelsList() {
 
-            // Create test models for brand
+            // Create test models and generations for brand
             Model model1 = Model.builder()
                     .id(1)
                     .name("3 Series")
                     .brand(testBrand)
+                    .generations(new ArrayList<>())
                     .build();
 
             Model model2 = Model.builder()
                     .id(2)
                     .name("5 Series")
                     .brand(testBrand)
+                    .generations(new ArrayList<>())
                     .build();
+
+            Generation gen1 = Generation.builder().id(1).name("E90").model(model1).build();
+            Generation gen2 = Generation.builder().id(2).name("F30").model(model1).build();
+
+            model1.getGenerations().add(gen1);
+            model1.getGenerations().add(gen2);
 
             testBrand.setModels(List.of(model1, model2));
 
             // Map brand with models list
             BrandDetailsResponse result = mapper.toDto(testBrand);
 
-            // Verify result -> models list is mapped correctly
+            // Verify result -> models list is mapped correctly with generationsCount
             assertThat(result.getModels()).hasSize(2);
             assertThat(result.getModels().get(0).getId()).isEqualTo(1);
             assertThat(result.getModels().get(0).getName()).isEqualTo("3 Series");
+            assertThat(result.getModels().get(0).getGenerationsCount()).isEqualTo(2);
             assertThat(result.getModels().get(1).getId()).isEqualTo(2);
             assertThat(result.getModels().get(1).getName()).isEqualTo("5 Series");
+            assertThat(result.getModels().get(1).getGenerationsCount()).isEqualTo(0);
         }
 
         @Test
