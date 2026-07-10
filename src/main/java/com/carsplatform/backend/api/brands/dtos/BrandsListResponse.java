@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class BrandsListResponse {
     private Integer id;
     private String name;
+    private String logoUrl;
 }

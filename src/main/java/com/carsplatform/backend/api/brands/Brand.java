@@ -38,6 +38,10 @@ public class Brand {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "logo_url")
+    @Size(max = 500, message = "Logo URL must not exceed 500 characters")
+    private String logoUrl;
+
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

@@ -15,4 +15,5 @@ public class CarBrandResponse {
     private String country;
     private Integer foundedYear;
     private String description;
+    private String logoUrl;
 }
