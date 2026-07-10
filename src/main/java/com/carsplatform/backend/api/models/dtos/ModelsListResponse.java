@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ModelsListResponse {
     private Integer id;
     private String name;
+    private Integer generationsCount;
 }
