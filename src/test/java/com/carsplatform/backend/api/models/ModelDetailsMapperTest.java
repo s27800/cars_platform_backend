@@ -76,6 +76,23 @@ class ModelDetailsMapperTest {
         }
 
         @Test
+        @DisplayName("should map brand information")
+        void toDto_ValidModel_MapsBrandInfo() {
+
+            // Set brand with logo
+            testBrand.setLogoUrl("https://example.com/logo.png");
+
+            // Map model
+            ModelDetailsResponse result = mapper.toDto(testModel);
+
+            // Verify brand is mapped correctly
+            assertThat(result.getBrand()).isNotNull();
+            assertThat(result.getBrand().getId()).isEqualTo(testBrand.getId());
+            assertThat(result.getBrand().getName()).isEqualTo(testBrand.getName());
+            assertThat(result.getBrand().getLogoUrl()).isEqualTo("https://example.com/logo.png");
+        }
+
+        @Test
         @DisplayName("should map empty generations list")
         void toDto_ModelWithEmptyGenerations_MapsEmptyList() {
 
@@ -114,7 +131,9 @@ class ModelDetailsMapperTest {
             // Verify generations list is mapped correctly
             assertThat(result.getGenerations()).hasSize(2);
             assertThat(result.getGenerations().get(0).getName()).isEqualTo("E90");
+            assertThat(result.getGenerations().get(0).getCarsCount()).isEqualTo(0);
             assertThat(result.getGenerations().get(1).getName()).isEqualTo("F30");
+            assertThat(result.getGenerations().get(1).getCarsCount()).isEqualTo(0);
         }
     }
 }
