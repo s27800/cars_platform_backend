@@ -1,6 +1,8 @@
 package com.carsplatform.backend.api.generations.dtos;
 
+import com.carsplatform.backend.api.brands.dtos.BrandsListResponse;
 import com.carsplatform.backend.api.cars.dtos.CarsListResponse;
+import com.carsplatform.backend.api.models.dtos.ModelsListResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +17,7 @@ import java.util.List;
 public class GenerationDetailsResponse {
     private Integer id;
     private String name;
+    private ModelsListResponse model;
+    private BrandsListResponse brand;
     private List<CarsListResponse> cars;
 }
