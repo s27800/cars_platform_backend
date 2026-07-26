@@ -128,6 +128,30 @@ class GenerationControllerTest extends MockMvcTestBase {
         }
 
         @Test
+        @DisplayName("returns generation with model data")
+        void getGenerationById_ExistingGeneration_IncludesModel() throws Exception {
+
+            // Perform GET request and verify results -> model is included
+            performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.model").exists())
+                    .andExpect(jsonPath("$.model.id").value(testModel.getId()))
+                    .andExpect(jsonPath("$.model.name").value("3 Series"));
+        }
+
+        @Test
+        @DisplayName("returns generation with brand data")
+        void getGenerationById_ExistingGeneration_IncludesBrand() throws Exception {
+
+            // Perform GET request and verify results -> brand is included
+            performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.brand").exists())
+                    .andExpect(jsonPath("$.brand.id").value(testBrand.getId()))
+                    .andExpect(jsonPath("$.brand.name").value("BMW"));
+        }
+
+        @Test
         @DisplayName("returns 404 when generation does not exist")
         void getGenerationById_NonExistingGeneration_Returns404() throws Exception {
 
