@@ -35,6 +35,7 @@ public class CarController {
     @GetMapping("/search")
     @Operation(summary = "Search and sort cars by filters")
     public ResponseEntity<Page<CarsListResponse>> searchCars(
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) List<Integer> brandIds,
             @RequestParam(required = false) List<Integer> modelIds,
             @RequestParam(required = false) List<Integer> generationIds,
@@ -57,7 +58,7 @@ public class CarController {
     ) {
 
         Page<CarsListResponse> response = carService.searchCars(
-                brandIds, modelIds, generationIds, bodyTypeIds,
+                search, brandIds, modelIds, generationIds, bodyTypeIds,
                 tagIds, minDisplacement, maxDisplacement, engineTypes,
                 minPower, maxPower, minTorque, maxTorque, drives,
                 transmissionTypes, minSpeed, maxSpeed, minFuelConsumptionMixed,

@@ -264,7 +264,7 @@ class CarRepositoryTest {
 
             // Search all cars without filters
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -279,7 +279,7 @@ class CarRepositoryTest {
 
             // Search cars by brand ID
             Page<Car> result = carRepository.searchCars(
-                    List.of(bmwBrand.getId()), null, null, null, null,
+                    null, List.of(bmwBrand.getId()), null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -296,7 +296,7 @@ class CarRepositoryTest {
 
             // Search cars by model ID
             Page<Car> result = carRepository.searchCars(
-                    null, List.of(audiA4.getId()), null, null, null,
+                    null, null, List.of(audiA4.getId()), null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -312,7 +312,7 @@ class CarRepositoryTest {
 
             // Search cars by generation ID
             Page<Car> result = carRepository.searchCars(
-                    null, null, List.of(bmwE90.getId()), null, null,
+                    null, null, null, List.of(bmwE90.getId()), null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -334,7 +334,7 @@ class CarRepositoryTest {
 
             // Search cars by body type ID
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, List.of(suv.getId()), null,
+                    null, null, null, null, List.of(suv.getId()), null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -350,7 +350,7 @@ class CarRepositoryTest {
 
             // Search cars by tag ID
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, List.of(luxuryTag.getId()),
+                    null, null, null, null, null, List.of(luxuryTag.getId()),
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -367,7 +367,7 @@ class CarRepositoryTest {
 
             // Search cars by displacement range
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     2500, 3500, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -390,7 +390,7 @@ class CarRepositoryTest {
 
             // Search cars by engine type
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, List.of("Diesel"), null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -406,7 +406,7 @@ class CarRepositoryTest {
 
             // Search cars by power range
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, 200, 300,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -423,7 +423,7 @@ class CarRepositoryTest {
 
             // Search cars by drive type
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, List.of("AWD"), null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -439,7 +439,7 @@ class CarRepositoryTest {
 
             // Search cars by transmission type
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, List.of("Manual"), null,
                     null, null, null, PageRequest.of(0, 10));
@@ -455,7 +455,7 @@ class CarRepositoryTest {
 
             // Search cars by max speed range
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, 245,
                     null, null, null, PageRequest.of(0, 10));
@@ -471,7 +471,7 @@ class CarRepositoryTest {
 
             // Search cars by fuel consumption range
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, 7.6, PageRequest.of(0, 10));
@@ -487,7 +487,7 @@ class CarRepositoryTest {
 
             // Search cars with multiple filters
             Page<Car> result = carRepository.searchCars(
-                    List.of(bmwBrand.getId()), null, null, null, null,
+                    null, List.of(bmwBrand.getId()), null, null, null, null,
                     null, null, null, 200, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
@@ -503,7 +503,7 @@ class CarRepositoryTest {
 
             // Search cars with pagination
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 2));
@@ -520,7 +520,7 @@ class CarRepositoryTest {
 
             // Search cars with no matches
             Page<Car> result = carRepository.searchCars(
-                    null, null, null, null, null,
+                    null, null, null, null, null, null,
                     null, null, List.of("Electric"), null, null,
                     null, null, null, null, null,
                     null, null, null, PageRequest.of(0, 10));
