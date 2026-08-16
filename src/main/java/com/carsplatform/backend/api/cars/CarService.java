@@ -30,6 +30,7 @@ public class CarService {
 
     @Transactional(readOnly = true)
     public Page<CarsListResponse> searchCars(
+            String search,
             List<Integer> brandIds,
             List<Integer> modelIds,
             List<Integer> generationIds,
@@ -52,7 +53,7 @@ public class CarService {
     ) throws ResourceNotFoundException {
 
         Page<Car> cars = carRepository.searchCars(
-                brandIds, modelIds, generationIds, bodyTypeIds,
+                search, brandIds, modelIds, generationIds, bodyTypeIds,
                 tagIds, minDisplacement, maxDisplacement, engineTypes,
                 minPower, maxPower, minTorque, maxTorque,
                 drives, transmissionTypes, minSpeed, maxSpeed,

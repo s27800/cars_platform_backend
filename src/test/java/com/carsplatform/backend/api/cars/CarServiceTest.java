@@ -150,7 +150,7 @@ class CarServiceTest {
 
             // Create expected response DTOs and mock data
             Pageable pageable = PageRequest.of(0, 10);
-            
+
             List<Integer> brandIds = List.of(1);
 
             Page<Car> carPage = new PageImpl<>(List.of(testCar), pageable, 1);
@@ -164,7 +164,7 @@ class CarServiceTest {
 
             // Mock repository and mapper behavior
             when(carRepository.searchCars(
-                    eq(brandIds), isNull(), isNull(), isNull(),
+                    isNull(), eq(brandIds), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
@@ -175,7 +175,7 @@ class CarServiceTest {
 
             // Search cars with filters
             Page<CarsListResponse> result = carService.searchCars(
-                    brandIds, null, null, null,
+                    null, brandIds, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
@@ -188,7 +188,7 @@ class CarServiceTest {
             assertThat(result.getContent().get(0).getName()).isEqualTo("BMW 330i");
 
             verify(carRepository).searchCars(
-                    eq(brandIds), isNull(), isNull(), isNull(),
+                    isNull(), eq(brandIds), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
@@ -214,7 +214,7 @@ class CarServiceTest {
 
             // Mock repository and mapper behavior
             when(carRepository.searchCars(
-                    isNull(), isNull(), isNull(), isNull(),
+                    isNull(), isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
@@ -225,7 +225,7 @@ class CarServiceTest {
 
             // Search cars without filters
             Page<CarsListResponse> result = carService.searchCars(
-                    null, null, null, null,
+                    null, null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
@@ -255,7 +255,7 @@ class CarServiceTest {
 
             // Mock repository and mapper behavior
             when(carRepository.searchCars(
-                    eq(brandIds), isNull(), isNull(), isNull(),
+                    isNull(), eq(brandIds), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
@@ -266,7 +266,7 @@ class CarServiceTest {
 
             // Search cars with non-matching filters
             Page<CarsListResponse> result = carService.searchCars(
-                    brandIds, null, null, null,
+                    null, brandIds, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
@@ -302,7 +302,7 @@ class CarServiceTest {
 
             // Mock repository and mapper behavior
             when(carRepository.searchCars(
-                    eq(brandIds), isNull(), isNull(), eq(bodyTypeIds),
+                    isNull(), eq(brandIds), isNull(), isNull(), eq(bodyTypeIds),
                     isNull(), isNull(), isNull(), isNull(),
                     eq(minPower), eq(maxPower), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),
@@ -313,7 +313,7 @@ class CarServiceTest {
 
             // Search cars with multiple filters
             Page<CarsListResponse> result = carService.searchCars(
-                    brandIds, null, null, bodyTypeIds,
+                    null, brandIds, null, null, bodyTypeIds,
                     null, null, null, null,
                     minPower, maxPower, null, null,
                     null, null, null, null,
@@ -324,7 +324,7 @@ class CarServiceTest {
             assertThat(result.getContent()).hasSize(1);
 
             verify(carRepository).searchCars(
-                    eq(brandIds), isNull(), isNull(), eq(bodyTypeIds),
+                    isNull(), eq(brandIds), isNull(), isNull(), eq(bodyTypeIds),
                     isNull(), isNull(), isNull(), isNull(),
                     eq(minPower), eq(maxPower), isNull(), isNull(),
                     isNull(), isNull(), isNull(), isNull(),

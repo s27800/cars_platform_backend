@@ -38,6 +38,12 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "LEFT JOIN FETCH c.generation.model.brand " +
             "LEFT JOIN FETCH c.bodyType " +
             "WHERE " +
+            "(:search IS NULL OR :search = '' OR " +
+            "LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.model.brand.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.model.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.engine.engineCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
             "(:brandIds IS NULL OR c.generation.model.brand.id IN :brandIds) AND " +
             "(:modelIds IS NULL OR c.generation.model.id IN :modelIds) AND " +
             "(:generationIds IS NULL OR c.generation.id IN :generationIds) AND " +
@@ -59,6 +65,12 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
 
             countQuery = "SELECT count(c) FROM Car c " +
             "WHERE " +
+            "(:search IS NULL OR :search = '' OR " +
+            "LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.model.brand.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.model.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.generation.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.engine.engineCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
             "(:brandIds IS NULL OR c.generation.model.brand.id IN :brandIds) AND " +
             "(:modelIds IS NULL OR c.generation.model.id IN :modelIds) AND " +
             "(:generationIds IS NULL OR c.generation.id IN :generationIds) AND " +
@@ -78,6 +90,7 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "(:minFuelConsumptionMixed IS NULL OR c.performance.fuelConsumptionMixed >= :minFuelConsumptionMixed) AND " +
             "(:maxFuelConsumptionMixed IS NULL OR c.performance.fuelConsumptionMixed <= :maxFuelConsumptionMixed)")
     Page<Car> searchCars(
+            @Param("search") String search,
             @Param("brandIds") List<Integer> brandIds,
             @Param("modelIds") List<Integer> modelIds,
             @Param("generationIds") List<Integer> generationIds,
