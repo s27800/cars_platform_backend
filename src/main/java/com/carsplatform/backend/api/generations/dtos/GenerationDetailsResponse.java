@@ -10,12 +10,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GenerationDetailsResponse {
-    private Integer id;
+    private UUID id;
     private String name;
     private ModelsListResponse model;
     private BrandsListResponse brand;

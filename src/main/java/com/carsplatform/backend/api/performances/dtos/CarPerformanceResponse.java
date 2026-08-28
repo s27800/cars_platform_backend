@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarPerformanceResponse {
-    private Integer id;
+    private UUID id;
     private Integer maxSpeed;
     private BigDecimal acceleration0100;
     private BigDecimal acceleration100200;

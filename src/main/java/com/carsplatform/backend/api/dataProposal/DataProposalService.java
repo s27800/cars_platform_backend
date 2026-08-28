@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class DataProposalService {
     private final GetDataProposalsMapper dataProposalsMapper;
 
     @Transactional
-    public void createDataProposal(Integer carId, String username, CreateDataProposalRequest dto) {
+    public void createDataProposal(UUID carId, String username, CreateDataProposalRequest dto) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new EntityNotFoundException("Car not found."));
 
@@ -60,7 +61,7 @@ public class DataProposalService {
     }
 
     @Transactional
-    public void resolveDataProposal(Long proposalId, boolean approve, String adminComment) {
+    public void resolveDataProposal(UUID proposalId, boolean approve, String adminComment) {
         DataProposal proposal = dataProposalRepository.findById(proposalId)
                 .orElseThrow(() -> new EntityNotFoundException("Proposal not found."));
 

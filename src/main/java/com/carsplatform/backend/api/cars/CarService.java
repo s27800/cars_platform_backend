@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +25,7 @@ public class CarService {
     private final CarsListMapper carsListMapper;
 
     @Transactional(readOnly = true)
-    public CarDetailsResponse getCarDetailsForCarId(Integer id) throws ResourceNotFoundException {
+    public CarDetailsResponse getCarDetailsForCarId(UUID id) throws ResourceNotFoundException {
         Car car = carRepository.findByIdWithDetails(id).orElseThrow(
                 () -> new ResourceNotFoundException("Car", "id", id));
 
@@ -34,11 +35,11 @@ public class CarService {
     @Transactional(readOnly = true)
     public Page<CarsListResponse> searchCars(
             String search,
-            List<Integer> brandIds,
-            List<Integer> modelIds,
-            List<Integer> generationIds,
-            List<Integer> bodyTypeIds,
-            List<Integer> tagIds,
+            List<UUID> brandIds,
+            List<UUID> modelIds,
+            List<UUID> generationIds,
+            List<UUID> bodyTypeIds,
+            List<UUID> tagIds,
             Integer minDisplacement,
             Integer maxDisplacement,
             List<String> engineTypes,
@@ -66,14 +67,14 @@ public class CarService {
     }
 
     @Transactional(readOnly = true)
-    public List<CarsListResponse> findSimilarCars(Integer carId, int limit) {
+    public List<CarsListResponse> findSimilarCars(UUID carId, int limit) {
         Car car = carRepository.findByIdWithTagsAndRelations(carId)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", carId));
 
-        Integer brandId = car.getGeneration().getModel().getBrand().getId();
-        Integer bodyTypeId = car.getBodyType().getId();
+        UUID brandId = car.getGeneration().getModel().getBrand().getId();
+        UUID bodyTypeId = car.getBodyType().getId();
 
-        Set<Integer> tagIds = car.getTags().stream()
+        Set<UUID> tagIds = car.getTags().stream()
                 .map(Tag::getId)
                 .collect(Collectors.toSet());
 

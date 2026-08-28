@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ModelService {
@@ -15,7 +17,7 @@ public class ModelService {
     private final ModelDetailsMapper mapper;
 
     @Transactional(readOnly = true)
-    public ModelDetailsResponse getModelDetailsById(Integer modelId) {
+    public ModelDetailsResponse getModelDetailsById(UUID modelId) {
         Model model = repository.findById(modelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Model", "id", modelId));
 

@@ -8,12 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BrandDetailsResponse {
-    private Integer id;
+    private UUID id;
     private String name;
     private String country;
     private Integer foundedYear;

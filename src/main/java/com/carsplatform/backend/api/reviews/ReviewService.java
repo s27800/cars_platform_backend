@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -30,7 +32,7 @@ public class ReviewService {
     private final AdminReviewMapper adminReviewMapper;
 
     @Transactional(readOnly = true)
-    public AverageRatingsResponse getAverageRatingsForCar(Integer carId) {
+    public AverageRatingsResponse getAverageRatingsForCar(UUID carId) {
         if (!carRepository.existsById(carId))
             throw new ResourceNotFoundException("Car", "id", carId);
 
@@ -38,7 +40,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewResponse> getReviewsForCarId(Integer carId, Pageable pageable) {
+    public Page<ReviewResponse> getReviewsForCarId(UUID carId, Pageable pageable) {
         return reviewMapper.toDtoList(
                 reviewRepository.findAllApprovedByCarId(carId, pageable)
         );
@@ -55,7 +57,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void createReview(Integer carId, CreateReviewRequest request, String username) {
+    public void createReview(UUID carId, CreateReviewRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 

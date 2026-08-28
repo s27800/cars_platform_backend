@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
-public interface CarRepository extends JpaRepository<Car, Integer> {
+public interface CarRepository extends JpaRepository<Car, UUID> {
     @Query("SELECT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
             "LEFT JOIN FETCH c.chassis " +
@@ -25,7 +26,7 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "LEFT JOIN FETCH c.generation.model.brand " +
             "LEFT JOIN FETCH c.bodyType " +
             "WHERE c.id = :id")
-    Optional<Car> findByIdWithDetails(@Param("id") Integer id);
+    Optional<Car> findByIdWithDetails(@Param("id") UUID id);
 
     @Query(value = "SELECT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
@@ -92,11 +93,11 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "(:maxFuelConsumptionMixed IS NULL OR c.performance.fuelConsumptionMixed <= :maxFuelConsumptionMixed)")
     Page<Car> searchCars(
             @Param("search") String search,
-            @Param("brandIds") List<Integer> brandIds,
-            @Param("modelIds") List<Integer> modelIds,
-            @Param("generationIds") List<Integer> generationIds,
-            @Param("bodyTypeIds") List<Integer> bodyTypeIds,
-            @Param("tagIds") List<Integer> tagIds,
+            @Param("brandIds") List<UUID> brandIds,
+            @Param("modelIds") List<UUID> modelIds,
+            @Param("generationIds") List<UUID> generationIds,
+            @Param("bodyTypeIds") List<UUID> bodyTypeIds,
+            @Param("tagIds") List<UUID> tagIds,
             @Param("minDisplacement") Integer minDisplacement,
             @Param("maxDisplacement") Integer maxDisplacement,
             @Param("engineTypes") List<String> engineTypes,
@@ -120,7 +121,7 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "LEFT JOIN FETCH m.brand " +
             "LEFT JOIN FETCH c.bodyType " +
             "WHERE c.id = :id")
-    Optional<Car> findByIdWithTagsAndRelations(@Param("id") Integer id);
+    Optional<Car> findByIdWithTagsAndRelations(@Param("id") UUID id);
 
     @Query(value = "SELECT DISTINCT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
@@ -136,9 +137,9 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             "OR b.id = :brandId " +
             "OR c.bodyType.id = :bodyTypeId)")
     List<Car> findSimilarCars(
-            @Param("carId") Integer carId,
-            @Param("tagIds") Set<Integer> tagIds,
-            @Param("brandId") Integer brandId,
-            @Param("bodyTypeId") Integer bodyTypeId
+            @Param("carId") UUID carId,
+            @Param("tagIds") Set<UUID> tagIds,
+            @Param("brandId") UUID brandId,
+            @Param("bodyTypeId") UUID bodyTypeId
     );
 }

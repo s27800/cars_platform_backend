@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class FuelReportLikeService {
@@ -20,7 +22,7 @@ public class FuelReportLikeService {
     private final FuelReportRepository fuelReportRepository;
 
     @Transactional
-    public FuelReportLikeResponse toggleLike(Long fuelReportId, String username) {
+    public FuelReportLikeResponse toggleLike(UUID fuelReportId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
@@ -53,7 +55,7 @@ public class FuelReportLikeService {
     }
 
     @Transactional(readOnly = true)
-    public FuelReportLikeResponse getLikeStatus(Long fuelReportId, String username) {
+    public FuelReportLikeResponse getLikeStatus(UUID fuelReportId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 

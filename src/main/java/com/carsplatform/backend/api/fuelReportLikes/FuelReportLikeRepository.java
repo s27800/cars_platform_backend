@@ -4,12 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface FuelReportLikeRepository extends JpaRepository<FuelReportLike, Long> {
-    Optional<FuelReportLike> findByUserIdAndFuelReportId(Long userId, Long fuelReportId);
+public interface FuelReportLikeRepository extends JpaRepository<FuelReportLike, UUID> {
+    Optional<FuelReportLike> findByUserIdAndFuelReportId(UUID userId, UUID fuelReportId);
 
-    boolean existsByUserIdAndFuelReportId(Long userId, Long fuelReportId);
+    boolean existsByUserIdAndFuelReportId(UUID userId, UUID fuelReportId);
 
-    long countByFuelReportId(Long fuelReportId);
+    long countByFuelReportId(UUID fuelReportId);
 }

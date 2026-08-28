@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -38,7 +40,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetails loadUserById(Long userId) throws UsernameNotFoundException {
+    public UserDetails loadUserById(UUID userId) throws UsernameNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
 

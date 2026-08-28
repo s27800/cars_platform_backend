@@ -3,6 +3,8 @@ package com.carsplatform.backend.api.generations;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface GenerationRepository extends JpaRepository<Generation, Integer> {
+public interface GenerationRepository extends JpaRepository<Generation, UUID> {
 }

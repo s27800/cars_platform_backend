@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class FuelReportService {
     private final AdminFuelReportMapper adminFuelReportMapper;
 
     @Transactional(readOnly = true)
-    public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(Integer carId) {
+    public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(UUID carId) {
         Optional<BigDecimal> avgConsumption = fuelReportRepository.findAverageFuelConsumptionForCarId(carId);
 
         return averageFuelConsumptionMapper.toDto(
@@ -44,7 +45,7 @@ public class FuelReportService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FuelReportResponse> getFuelReportsForCarId(Integer carId, Pageable pageable) {
+    public Page<FuelReportResponse> getFuelReportsForCarId(UUID carId, Pageable pageable) {
         return fuelReportMapper.toDtoList(
                 fuelReportRepository.findByCarIdAndIsApprovedTrue(carId, pageable)
         );
@@ -61,7 +62,7 @@ public class FuelReportService {
     }
 
     @Transactional
-    public void createFuelReport(Integer carId, CreateFuelReportRequest request, String username) {
+    public void createFuelReport(UUID carId, CreateFuelReportRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 

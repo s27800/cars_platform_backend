@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -33,20 +34,20 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-            .setSubject(Long.toString(userPrincipal.getId()))
+            .setSubject(userPrincipal.getId().toString())
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .signWith(getSigningKey(), SignatureAlgorithm.HS512)
             .compact();
     }
 
-    public Long getUserIdFromJWT(String token) {
+    public UUID getUserIdFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
             .build()
             .parseClaimsJws(token)
             .getBody();
-        return Long.parseLong(claims.getSubject());
+        return UUID.fromString(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {

@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/generations")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class GenerationController {
     @GetMapping("/{id}")
     @Operation(summary = "Get generation details with a list of cars")
     public ResponseEntity<GenerationDetailsResponse> getGenerationDetailsById(
-            @Parameter(description = "ID of the generation") @PathVariable Integer id) {
+            @Parameter(description = "ID of the generation") @PathVariable UUID id) {
 
         GenerationDetailsResponse generation = service.getGenerationDetailsById(id);
 

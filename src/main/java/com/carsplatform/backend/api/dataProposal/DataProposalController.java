@@ -19,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/data-proposals")
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class DataProposalController {
     @PostMapping("/{carId}")
     @Operation(summary = "Create new data change proposal")
     public ResponseEntity<Void> createDataProposal(
-            @PathVariable Integer carId,
+            @PathVariable UUID carId,
             @RequestBody @Valid CreateDataProposalRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -51,7 +53,7 @@ public class DataProposalController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Resolve pending data proposal")
     public ResponseEntity<Void> resolveProposal(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestParam boolean approve,
             @RequestParam(required = false) String adminComment) {
 

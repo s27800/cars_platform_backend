@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DataProposalRepository extends JpaRepository<DataProposal, Long> {
+import java.util.UUID;
+
+public interface DataProposalRepository extends JpaRepository<DataProposal, UUID> {
     @EntityGraph(attributePaths = {"car", "car.generation.model.brand", "user"})
     Page<DataProposal> findByStatus(DataProposalStatus status, Pageable pageable);
 

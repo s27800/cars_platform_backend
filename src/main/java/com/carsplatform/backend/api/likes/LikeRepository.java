@@ -4,12 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface LikeRepository extends JpaRepository<Like, Long> {
-    Optional<Like> findByUserIdAndReviewId(Long userId, Long reviewId);
+public interface LikeRepository extends JpaRepository<Like, UUID> {
+    Optional<Like> findByUserIdAndReviewId(UUID userId, UUID reviewId);
 
-    boolean existsByUserIdAndReviewId(Long userId, Long reviewId);
+    boolean existsByUserIdAndReviewId(UUID userId, UUID reviewId);
 
-    long countByReviewId(Long reviewId);
+    long countByReviewId(UUID reviewId);
 }

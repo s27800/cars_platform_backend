@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class LikeService {
@@ -20,7 +22,7 @@ public class LikeService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public LikeResponse toggleLike(Long reviewId, String username) {
+    public LikeResponse toggleLike(UUID reviewId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
@@ -53,7 +55,7 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    public LikeResponse getLikeStatus(Long reviewId, String username) {
+    public LikeResponse getLikeStatus(UUID reviewId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 

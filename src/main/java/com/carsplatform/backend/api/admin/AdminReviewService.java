@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AdminReviewService {
@@ -27,7 +29,7 @@ public class AdminReviewService {
     }
 
     @Transactional
-    public void approveReview(Long reviewId, boolean approve) {
+    public void approveReview(UUID reviewId, boolean approve) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
 

@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "chassis")
 @Data
@@ -19,8 +21,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Chassis {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "UUID")
+    private UUID id;
 
     @Column(name = "basic_rims")
     @Size(max = 50)
