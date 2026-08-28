@@ -38,6 +38,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -75,38 +76,38 @@ class DataProposalServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test proposal
         testProposal = new DataProposal();
 
-        testProposal.setId(1L);
+        testProposal.setId(UUID.randomUUID());
         testProposal.setUser(testUser);
         testProposal.setCar(testCar);
         testProposal.setCategory("ENGINE");
@@ -132,11 +133,11 @@ class DataProposalServiceTest {
             request.setProposedValues(Map.of("maxPower", 220));
 
             // Mock repositories to return existing car and user
-            when(carRepository.findById(1)).thenReturn(Optional.of(testCar));
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
 
             // Send create proposal request
-            dataProposalService.createDataProposal(1, "testuser", request);
+            dataProposalService.createDataProposal(testCar.getId(), "testuser", request);
 
             // Verify results -> proposal is saved with correct data
             ArgumentCaptor<DataProposal> proposalCaptor = ArgumentCaptor.forClass(DataProposal.class);
@@ -162,10 +163,12 @@ class DataProposalServiceTest {
             request.setProposedValues(Map.of("maxPower", 220));
 
             // Mock repositories to return non-existent car
-            when(carRepository.findById(999)).thenReturn(Optional.empty());
+            UUID nonExistentCarId = UUID.randomUUID();
+
+            when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 
             // Send create proposal request and verify results -> EntityNotFoundException is thrown
-            assertThatThrownBy(() -> dataProposalService.createDataProposal(999, "testuser", request))
+            assertThatThrownBy(() -> dataProposalService.createDataProposal(nonExistentCarId, "testuser", request))
                     .isInstanceOf(EntityNotFoundException.class)
                     .hasMessageContaining("Car not found");
         }
@@ -181,11 +184,11 @@ class DataProposalServiceTest {
             request.setProposedValues(Map.of("maxPower", 220));
 
             // Mock repositories to return existing car and non-existent user
-            when(carRepository.findById(1)).thenReturn(Optional.of(testCar));
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Send create proposal request and verify results -> EntityNotFoundException is thrown
-            assertThatThrownBy(() -> dataProposalService.createDataProposal(1, "unknown", request))
+            assertThatThrownBy(() -> dataProposalService.createDataProposal(testCar.getId(), "unknown", request))
                     .isInstanceOf(EntityNotFoundException.class)
                     .hasMessageContaining("User not found");
 
@@ -240,10 +243,10 @@ class DataProposalServiceTest {
         void resolveDataProposal_Reject_SetsRejectedStatus() {
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Send resolve proposal request
-            dataProposalService.resolveDataProposal(1L, false, "Not valid data");
+            dataProposalService.resolveDataProposal(testProposal.getId(), false, "Not valid data");
 
             // Verify results -> proposal is updated with rejected status and admin comment
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.REJECTED);
@@ -262,7 +265,7 @@ class DataProposalServiceTest {
             testProposal.setProposedValues(Map.of("maxPower", 250));
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Mock ObjectMapper behavior
             JsonNode engineNode = mock(ObjectNode.class);
@@ -273,7 +276,7 @@ class DataProposalServiceTest {
             when(objectMapper.readerForUpdating(testCar.getEngine())).thenReturn(mock(ObjectReader.class));
 
             // Send resolve proposal request with approve=true
-            dataProposalService.resolveDataProposal(1L, true, "Changes approved");
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Changes approved");
 
             // Verify results -> proposal is approved and changes applied
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
@@ -295,10 +298,10 @@ class DataProposalServiceTest {
             testCar.setEngine(null);
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Verify IllegalStateException is thrown
-            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(1L, true, "OK"))
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(testProposal.getId(), true, "OK"))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("Car has no engine defined");
         }
@@ -311,10 +314,10 @@ class DataProposalServiceTest {
             testProposal.setCategory("UNKNOWN_CATEGORY");
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Verify IllegalArgumentException is thrown
-            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(1L, true, "OK"))
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(testProposal.getId(), true, "OK"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Unknown category");
         }
@@ -324,10 +327,12 @@ class DataProposalServiceTest {
         void resolveDataProposal_ProposalNotFound_ThrowsException() {
 
             // Mock repositories to return non-existent proposal
-            when(dataProposalRepository.findById(999L)).thenReturn(Optional.empty());
+            UUID nonExistentProposalId = UUID.randomUUID();
+            
+            when(dataProposalRepository.findById(nonExistentProposalId)).thenReturn(Optional.empty());
 
             // Send resolve proposal request and verify results -> EntityNotFoundException is thrown
-            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(999L, true, "OK"))
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(nonExistentProposalId, true, "OK"))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
@@ -338,10 +343,10 @@ class DataProposalServiceTest {
             // Mock repositories to return already resolved proposal
             testProposal.setStatus(DataProposalStatus.APPROVED);
 
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Send resolve proposal request and verify results -> IllegalStateException is thrown
-            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(1L, true, "OK"))
+            assertThatThrownBy(() -> dataProposalService.resolveDataProposal(testProposal.getId(), true, "OK"))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("already resolved");
 
@@ -357,7 +362,7 @@ class DataProposalServiceTest {
             testProposal.setProposedValues(Map.of("frontBrakesRadius", 340));
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Mock ObjectMapper behavior
             JsonNode chassisNode = mock(ObjectNode.class);
@@ -368,7 +373,7 @@ class DataProposalServiceTest {
             when(objectMapper.readerForUpdating(testCar.getChassis())).thenReturn(mock(ObjectReader.class));
 
             // Send resolve proposal request
-            dataProposalService.resolveDataProposal(1L, true, "Chassis changes approved");
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Chassis changes approved");
 
             // Verify results
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
@@ -384,7 +389,7 @@ class DataProposalServiceTest {
             testProposal.setProposedValues(Map.of("gearsNumber", 8));
 
             // Mock repositories to return existing proposal
-            when(dataProposalRepository.findById(1L)).thenReturn(Optional.of(testProposal));
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
 
             // Mock ObjectMapper behavior
             JsonNode transmissionNode = mock(ObjectNode.class);
@@ -395,7 +400,7 @@ class DataProposalServiceTest {
             when(objectMapper.readerForUpdating(testCar.getTransmission())).thenReturn(mock(ObjectReader.class));
 
             // Send resolve proposal request
-            dataProposalService.resolveDataProposal(1L, true, "Transmission changes approved");
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Transmission changes approved");
 
             // Verify results
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
@@ -418,7 +423,7 @@ class DataProposalServiceTest {
             Page<DataProposal> proposalPage = new PageImpl<>(List.of(testProposal), pageable, 1);
 
             GetDataProposalsResponse response = new GetDataProposalsResponse();
-            response.setId(1L);
+            response.setId(UUID.randomUUID());
 
             // Mock repositories to return existing user and proposals
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));

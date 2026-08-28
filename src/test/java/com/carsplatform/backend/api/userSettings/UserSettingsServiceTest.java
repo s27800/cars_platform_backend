@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,14 +44,14 @@ class UserSettingsServiceTest {
 
         // Create test user
         testUser = User.builder()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .username("testuser")
                 .email("testuser@example.com")
                 .build();
 
         // Create test settings
         testSettings = UserSettings.builder()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .user(testUser)
                 .theme("light")
                 .build();

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,12 +42,12 @@ class BodyTypeServiceTest {
 
         // Create test body types
         testBodyType1 = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
 
         testBodyType2 = TestDataFactory.defaultBodyType()
-                .id(2)
+                .id(UUID.randomUUID())
                 .name("SUV")
                 .build();
     }
@@ -62,12 +63,12 @@ class BodyTypeServiceTest {
 
             // Create expected response DTOs
             CarBodyTypeResponse response1 = CarBodyTypeResponse.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("Sedan")
                     .build();
                     
             CarBodyTypeResponse response2 = CarBodyTypeResponse.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("SUV")
                     .build();
 

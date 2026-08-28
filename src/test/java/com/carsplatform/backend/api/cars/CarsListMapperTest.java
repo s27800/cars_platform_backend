@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -43,21 +44,21 @@ class CarsListMapperTest {
     void setUp() {
 
         // Create test brand
-        Brand brand = TestDataFactory.defaultBrand().id(1).build();
+        Brand brand = TestDataFactory.defaultBrand().id(UUID.randomUUID()).build();
 
         // Create test model
-        Model model = TestDataFactory.defaultModel(brand).id(1).build();
+        Model model = TestDataFactory.defaultModel(brand).id(UUID.randomUUID()).build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("E90")
                 .cars(List.of())
                 .build();
 
         // Create test engine
         Engine engine = TestDataFactory.defaultEngine()
-                .id(1)
+                .id(UUID.randomUUID())
                 .engineType("Petrol")
                 .displacement(2000)
                 .maxPower(200)
@@ -65,19 +66,19 @@ class CarsListMapperTest {
 
         // Create test transmission
         Transmission transmission = TestDataFactory.defaultTransmission()
-                .id(1)
+                .id(UUID.randomUUID())
                 .transmissionType("Automatic")
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(testGeneration, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("320i")
                 .engine(engine)
                 .transmission(transmission)
@@ -111,7 +112,7 @@ class CarsListMapperTest {
 
             // Verify results -> all basic fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testCar.getId());
             assertThat(result.getName()).isEqualTo("320i");
         }
 
@@ -160,14 +161,14 @@ class CarsListMapperTest {
             // Create test images
             CarImage mainImage = new CarImage();
 
-            mainImage.setId(1);
+            mainImage.setId(UUID.randomUUID());
             mainImage.setImageUrl("http://example.com/main.jpg");
             mainImage.setIsMain(true);
             mainImage.setCar(testCar);
 
             CarImage secondaryImage = new CarImage();
 
-            secondaryImage.setId(2);
+            secondaryImage.setId(UUID.randomUUID());
             secondaryImage.setImageUrl("http://example.com/secondary.jpg");
             secondaryImage.setIsMain(false);
             secondaryImage.setCar(testCar);

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class ChassisMapperTest {
 
         // Create test chassis
         testChassis = TestDataFactory.defaultChassis()
-                .id(1)
+                .id(UUID.randomUUID())
                 .basicRims("17\"")
                 .optionalRims("18\", 19\"")
                 .basicTires("225/45 R17")
@@ -39,7 +41,7 @@ class ChassisMapperTest {
                 .build();
     }
 
-    
+
     @Nested
     @DisplayName("toDto")
     class ToDtoTests {
@@ -63,7 +65,7 @@ class ChassisMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testChassis.getId());
             assertThat(result.getBasicRims()).isEqualTo("17\"");
             assertThat(result.getOptionalRims()).isEqualTo("18\", 19\"");
             assertThat(result.getBasicTires()).isEqualTo("225/45 R17");
@@ -82,7 +84,7 @@ class ChassisMapperTest {
 
             // Create minimal chassis with null optional fields
             Chassis minimalChassis = Chassis.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .basicRims("17\"")
                     .optionalRims(null)
                     .build();

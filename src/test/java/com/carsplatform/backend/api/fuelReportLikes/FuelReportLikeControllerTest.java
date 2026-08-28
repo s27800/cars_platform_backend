@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -174,8 +176,11 @@ class FuelReportLikeControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when fuel report not found")
         void toggleLike_FuelReportNotFound_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform post request to toggle like for non-existent fuel report and verify results -> 404 is returned
-            performPostWithAuthNoBody(FUEL_REPORT_LIKE_BASE_URL + "/999999", userToken)
+            performPostWithAuthNoBody(FUEL_REPORT_LIKE_BASE_URL + "/" + nonExistentId, userToken)
                     .andExpect(status().isNotFound());
         }
     }

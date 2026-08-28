@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -23,7 +25,7 @@ class UserControllerTest extends MockMvcTestBase {
     private static final String AUTH_BASE_URL = "/api/auth";
 
     private String userToken;
-    private Long userId;
+    private UUID userId;
 
     @Autowired
     private UserRepository userRepository;

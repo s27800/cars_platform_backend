@@ -20,6 +20,7 @@ import javax.crypto.SecretKey;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +51,7 @@ class JwtTokenProviderTest {
 
             // Create authentication
             UserPrincipal userPrincipal = new UserPrincipal(
-                    1L,
+                    UUID.randomUUID(),
                     "testuser",
                     "test@example.com",
                     "password",
@@ -75,7 +76,7 @@ class JwtTokenProviderTest {
         void generateToken_ValidUser_ContainsCorrectUserId() {
 
             // Create authentication
-            Long userId = 42L;
+            UUID userId = UUID.randomUUID();
 
             UserPrincipal userPrincipal = new UserPrincipal(
                     userId,
@@ -93,7 +94,7 @@ class JwtTokenProviderTest {
             String token = jwtTokenProvider.generateToken(authentication);
 
             // Verify token contains correct user ID
-            Long extractedUserId = jwtTokenProvider.getUserIdFromJWT(token);
+            UUID extractedUserId = jwtTokenProvider.getUserIdFromJWT(token);
 
             assertThat(extractedUserId).isEqualTo(userId);
         }
@@ -109,7 +110,7 @@ class JwtTokenProviderTest {
         void getUserIdFromJWT_ValidToken_ReturnsUserId() {
 
             // Generate authentication and token
-            Long expectedUserId = 123L;
+            UUID expectedUserId = UUID.randomUUID();
             UserPrincipal userPrincipal = new UserPrincipal(
                     expectedUserId,
                     "testuser",
@@ -125,7 +126,7 @@ class JwtTokenProviderTest {
             String token = jwtTokenProvider.generateToken(authentication);
 
             // Verify user ID can be extracted from token
-            Long userId = jwtTokenProvider.getUserIdFromJWT(token);
+            UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
 
             assertThat(userId).isEqualTo(expectedUserId);
         }
@@ -142,7 +143,7 @@ class JwtTokenProviderTest {
 
             // Generate authentication and token
             UserPrincipal userPrincipal = new UserPrincipal(
-                    1L,
+                    UUID.randomUUID(),
                     "testuser",
                     "test@example.com",
                     "password",

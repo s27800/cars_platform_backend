@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -96,7 +98,7 @@ class ModelControllerTest extends MockMvcTestBase {
             // Perform GET request and verify response -> 200 OK with id field included
             performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(testModel.getId()))
+                    .andExpect(jsonPath("$.id").value(testModel.getId().toString()))
                     .andExpect(jsonPath("$.name").value("3 Series"));
         }
 
@@ -104,8 +106,11 @@ class ModelControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when model does not exist")
         void getModelById_NonExistingModel_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform GET request and verify response -> 404 Not Found
-            performGetNoAuth(MODEL_BASE_URL + "/999999")
+            performGetNoAuth(MODEL_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }
     }

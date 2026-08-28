@@ -23,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -44,38 +45,38 @@ class ReviewMapperTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .username("reviewer")
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test review
         testReview = TestDataFactory.defaultReview(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .comment("Great car!")
                 .engineRating(5)
                 .transmissionRating(4)
@@ -119,7 +120,7 @@ class ReviewMapperTest {
 
             // Verify results -> fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getId()).isEqualTo(testReview.getId());
             assertThat(result.getComment()).isEqualTo("Great car!");
             assertThat(result.getEngineRating()).isEqualTo(5.0);
             assertThat(result.getTransmissionRating()).isEqualTo(4.0);
@@ -215,12 +216,12 @@ class ReviewMapperTest {
 
             // Create page with multiple reviews
             Review review1 = TestDataFactory.defaultReview(testUser, testCar)
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .comment("Review 1")
                     .build();
 
             Review review2 = TestDataFactory.defaultReview(testUser, testCar)
-                    .id(2L)
+                    .id(UUID.randomUUID())
                     .comment("Review 2")
                     .build();
 
@@ -245,7 +246,7 @@ class ReviewMapperTest {
 
             // Create page with specific pagination
             Review review = TestDataFactory.defaultReview(testUser, testCar)
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .build();
 
             Page<Review> reviewPage = new PageImpl<>(

@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -27,17 +29,17 @@ class GenerationMapperTest {
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("G20")
                 .build();
     }
@@ -67,7 +69,7 @@ class GenerationMapperTest {
 
             // Verify result -> correct id and name are mapped
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testGeneration.getId());
             assertThat(result.getName()).isEqualTo("G20");
         }
 
@@ -80,12 +82,12 @@ class GenerationMapperTest {
             Model model = TestDataFactory.defaultModel(brand).build();
 
             Generation gen1 = TestDataFactory.defaultGeneration(model)
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("First Generation")
                     .build();
 
             Generation gen2 = TestDataFactory.defaultGeneration(model)
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("Second Generation")
                     .build();
 

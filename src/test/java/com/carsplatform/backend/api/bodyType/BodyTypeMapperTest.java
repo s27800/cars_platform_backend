@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -24,7 +26,7 @@ class BodyTypeMapperTest {
     void setUp() {
         // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
     }
@@ -54,7 +56,7 @@ class BodyTypeMapperTest {
 
             // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testBodyType.getId());
             assertThat(result.getName()).isEqualTo("Sedan");
         }
 
@@ -64,12 +66,12 @@ class BodyTypeMapperTest {
 
             // Create different body types
             BodyType suv = TestDataFactory.defaultBodyType()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("SUV")
                     .build();
 
             BodyType hatchback = TestDataFactory.defaultBodyType()
-                    .id(3)
+                    .id(UUID.randomUUID())
                     .name("Hatchback")
                     .build();
 

@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -58,37 +59,37 @@ class AdminReviewServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test review
         testReview = TestDataFactory.defaultReview(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .isApproved(false)
                 .build();
     }
@@ -156,11 +157,11 @@ class AdminReviewServiceTest {
         void approveReview_ReviewExists_ApprovesReview() {
 
             // Mock repository
-            when(reviewRepository.findById(1L)).thenReturn(Optional.of(testReview));
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
             when(reviewRepository.save(any(Review.class))).thenReturn(testReview);
 
             // Approve review
-            adminReviewService.approveReview(1L, true);
+            adminReviewService.approveReview(testReview.getId(), true);
 
             // Verify results -> review is approved
             ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
@@ -173,27 +174,19 @@ class AdminReviewServiceTest {
         }
 
         @Test
-        @DisplayName("should reject review when approve is false")
-        void approveReview_ApproveFalse_RejectsReview() {
-
-            // Set review as approved
-            testReview.setIsApproved(true);
+        @DisplayName("should delete review when approve is false")
+        void approveReview_ApproveFalse_DeletesReview() {
 
             // Mock repository
-            when(reviewRepository.findById(1L)).thenReturn(Optional.of(testReview));
-            when(reviewRepository.save(any(Review.class))).thenReturn(testReview);
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
+            doNothing().when(reviewRepository).delete(any(Review.class));
 
             // Reject review
-            adminReviewService.approveReview(1L, false);
+            adminReviewService.approveReview(testReview.getId(), false);
 
-            // Verify results -> review is rejected
-            ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
-
-            verify(reviewRepository).save(reviewCaptor.capture());
-
-            Review savedReview = reviewCaptor.getValue();
-
-            assertThat(savedReview.getIsApproved()).isFalse();
+            // Verify results -> review is deleted
+            verify(reviewRepository).delete(testReview);
+            verify(reviewRepository, never()).save(any());
         }
 
         @Test
@@ -201,10 +194,11 @@ class AdminReviewServiceTest {
         void approveReview_ReviewNotFound_ThrowsException() {
 
             // Mock repository
-            when(reviewRepository.findById(999L)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            when(reviewRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Approve review and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> adminReviewService.approveReview(999L, true))
+            assertThatThrownBy(() -> adminReviewService.approveReview(nonExistentId, true))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(reviewRepository, never()).save(any());

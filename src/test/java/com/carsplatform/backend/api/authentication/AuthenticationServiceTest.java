@@ -28,6 +28,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.*;
+
+import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -58,7 +60,7 @@ class AuthenticationServiceTest {
     void setUp() {
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
     }
 
@@ -89,7 +91,7 @@ class AuthenticationServiceTest {
             // Verify results -> response is valid
             assertThat(response).isNotNull();
             assertThat(response.getAccessToken()).isEqualTo("jwt-token-123");
-            assertThat(response.getUserId()).isEqualTo(1L);
+            assertThat(response.getUserId()).isEqualTo(testUser.getId());
             assertThat(response.getUsername()).isEqualTo("testuser");
             assertThat(response.getIsAdmin()).isFalse();
 
@@ -119,7 +121,7 @@ class AuthenticationServiceTest {
 
             // Create admin user and valid login request
             User adminUser = TestDataFactory.adminUser()
-                    .id(2L)
+                    .id(UUID.randomUUID())
                     .build();
 
             LoginRequest loginRequest = new LoginRequest("admin", "password123");
@@ -167,7 +169,7 @@ class AuthenticationServiceTest {
 
             // Create user
             User savedUser = User.builder()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .username("newuser")
                     .email("newuser@example.com")
                     .password("encodedPassword")

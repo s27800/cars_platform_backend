@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -24,7 +26,7 @@ class CarsListBodyTypeMapperTest {
     void setUp() {
         // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
     }

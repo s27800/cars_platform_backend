@@ -16,6 +16,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -70,7 +71,7 @@ class TagRepositoryTest {
         void findById_NonExistingTag_ReturnsEmpty() {
 
             // Find non-existing tag
-            Optional<Tag> result = tagRepository.findById(99999);
+            Optional<Tag> result = tagRepository.findById(UUID.randomUUID());
 
             // Verify result -> tag does not exist
             assertThat(result).isEmpty();

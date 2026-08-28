@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -109,8 +111,11 @@ class CarControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when car does not exist")
         void getCarById_NonExistingCar_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform GET request and verify results -> status 404 Not Found when car does not exist
-            performGetNoAuth(CAR_BASE_URL + "/999999")
+            performGetNoAuth(CAR_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }
 
@@ -202,8 +207,11 @@ class CarControllerTest extends MockMvcTestBase {
         @DisplayName("returns empty content when no matches")
         void searchCars_NoMatches_ReturnsEmptyContent() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform GET request and verify results -> status 200 OK and returns empty content
-            performGetNoAuth(CAR_BASE_URL + "/search?brandIds=999999")
+            performGetNoAuth(CAR_BASE_URL + "/search?brandIds=" + nonExistentId)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isEmpty());
         }

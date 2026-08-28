@@ -17,6 +17,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -93,7 +94,7 @@ class ModelRepositoryTest {
         void findById_NonExistingModel_ReturnsEmpty() {
 
             // Find model by ID
-            Optional<Model> result = modelRepository.findById(99999);
+            Optional<Model> result = modelRepository.findById(UUID.randomUUID());
 
             // Verify result -> model does not exist
             assertThat(result).isEmpty();

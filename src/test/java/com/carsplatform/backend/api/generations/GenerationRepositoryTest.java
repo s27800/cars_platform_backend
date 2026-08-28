@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -88,7 +89,7 @@ class GenerationRepositoryTest {
         void findById_NonExistingGeneration_ReturnsEmpty() {
 
             // Find generation by ID with non-existing ID
-            Optional<Generation> result = generationRepository.findById(99999);
+            Optional<Generation> result = generationRepository.findById(UUID.randomUUID());
 
             // Verify results -> generation not found
             assertThat(result).isEmpty();

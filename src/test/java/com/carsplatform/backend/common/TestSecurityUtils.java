@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 
 /**
@@ -54,14 +55,14 @@ public final class TestSecurityUtils {
 
     private TestSecurityUtils() {}
 
-    public static String generateToken(Long userId) {
+    public static String generateToken(UUID userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + TOKEN_EXPIRATION_MS);
 
         SecretKey key = Keys.hmacShaKeyFor(TEST_JWT_SECRET.getBytes());
 
         return Jwts.builder()
-                .setSubject(Long.toString(userId))
+                .setSubject(userId.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -72,28 +73,28 @@ public final class TestSecurityUtils {
         return generateToken(user.getId());
     }
 
-    public static String generateExpiredToken(Long userId) {
+    public static String generateExpiredToken(UUID userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() - 1000); // = now - 1 second
 
         SecretKey key = Keys.hmacShaKeyFor(TEST_JWT_SECRET.getBytes());
 
         return Jwts.builder()
-                .setSubject(Long.toString(userId))
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date(now.getTime() - 7200000)) // = now - 2 hours
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public static String generateTokenWithInvalidSignature(Long userId) {
+    public static String generateTokenWithInvalidSignature(UUID userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + TOKEN_EXPIRATION_MS);
 
         SecretKey wrongKey = Keys.hmacShaKeyFor("WrongSecretKeyForTestingInvalidSignatureValidation12345678".getBytes());
 
         return Jwts.builder()
-                .setSubject(Long.toString(userId))
+                .setSubject(userId.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(wrongKey, SignatureAlgorithm.HS512)
@@ -127,7 +128,7 @@ public final class TestSecurityUtils {
         SecurityContextHolder.clearContext();
     }
 
-    public static UserPrincipal createUserPrincipal(Long userId, String username, boolean isAdmin) {
+    public static UserPrincipal createUserPrincipal(UUID userId, String username, boolean isAdmin) {
         List<SimpleGrantedAuthority> authorities = isAdmin
                 ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
                 : List.of(new SimpleGrantedAuthority("ROLE_USER"));

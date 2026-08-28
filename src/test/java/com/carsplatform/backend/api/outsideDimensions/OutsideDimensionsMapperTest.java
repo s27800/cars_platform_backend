@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class OutsideDimensionsMapperTest {
 
         // Create test outside dimensions
         testOutsideDimensions = TestDataFactory.defaultOutsideDimensions()
-                .id(1)
+                .id(UUID.randomUUID())
                 .length(4584)
                 .height(1456)
                 .width(1832)
@@ -65,7 +67,7 @@ class OutsideDimensionsMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testOutsideDimensions.getId());
             assertThat(result.getLength()).isEqualTo(4584);
             assertThat(result.getHeight()).isEqualTo(1456);
             assertThat(result.getWidth()).isEqualTo(1832);
@@ -86,7 +88,7 @@ class OutsideDimensionsMapperTest {
 
             // Create outside dimensions with only required fields
             OutsideDimensions minimalDimensions = OutsideDimensions.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .length(4500)
                     .height(1400)
                     .width(1800)

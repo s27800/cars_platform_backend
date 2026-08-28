@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -28,7 +29,7 @@ class UserPrincipalTest {
 
             // Create regular user
             User user = TestDataFactory.defaultUser()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .username("testuser")
                     .email("test@example.com")
                     .password("encodedPassword")
@@ -40,7 +41,7 @@ class UserPrincipalTest {
 
             // Verify UserPrincipal has correct data and ROLE_USER authority
             assertThat(principal).isNotNull();
-            assertThat(principal.getId()).isEqualTo(1L);
+            assertThat(principal.getId()).isEqualTo(user.getId());
             assertThat(principal.getUsername()).isEqualTo("testuser");
             assertThat(principal.getEmail()).isEqualTo("test@example.com");
             assertThat(principal.getPassword()).isEqualTo("encodedPassword");
@@ -58,7 +59,7 @@ class UserPrincipalTest {
 
             // Create admin user
             User adminUser = TestDataFactory.adminUser()
-                    .id(2L)
+                    .id(UUID.randomUUID())
                     .username("admin")
                     .email("admin@example.com")
                     .password("encodedAdminPassword")
@@ -70,7 +71,7 @@ class UserPrincipalTest {
 
             // Verify UserPrincipal has correct data and ROLE_ADMIN authority
             assertThat(principal).isNotNull();
-            assertThat(principal.getId()).isEqualTo(2L);
+            assertThat(principal.getId()).isEqualTo(adminUser.getId());
             assertThat(principal.getUsername()).isEqualTo("admin");
 
             Collection<? extends GrantedAuthority> authorities = principal.getAuthorities();
@@ -86,7 +87,7 @@ class UserPrincipalTest {
 
             // Create user with null isAdmin
             User user = TestDataFactory.defaultUser()
-                    .id(3L)
+                    .id(UUID.randomUUID())
                     .isAdmin(null)
                     .build();
 
@@ -113,7 +114,7 @@ class UserPrincipalTest {
 
             // Create admin user principal
             User adminUser = TestDataFactory.adminUser()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .isAdmin(true)
                     .build();
 
@@ -129,7 +130,7 @@ class UserPrincipalTest {
 
             // Create regular user principal
             User user = TestDataFactory.defaultUser()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .isAdmin(false)
                     .build();
 
@@ -150,7 +151,7 @@ class UserPrincipalTest {
         void isAccountNonExpired_ReturnsTrue() {
 
             // Create user principal
-            User user = TestDataFactory.defaultUser().id(1L).build();
+            User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
@@ -163,7 +164,7 @@ class UserPrincipalTest {
         void isAccountNonLocked_ReturnsTrue() {
 
             // Create user principal
-            User user = TestDataFactory.defaultUser().id(1L).build();
+            User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
@@ -176,7 +177,7 @@ class UserPrincipalTest {
         void isCredentialsNonExpired_ReturnsTrue() {
 
             // Create user principal
-            User user = TestDataFactory.defaultUser().id(1L).build();
+            User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
@@ -189,8 +190,8 @@ class UserPrincipalTest {
         void isEnabled_ReturnsTrue() {
 
             // Create user principal
-            User user = TestDataFactory.defaultUser().id(1L).build();
-            
+            User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
+
             UserPrincipal principal = UserPrincipal.create(user);
 
             // Verify isEnabled returns true
@@ -203,7 +204,7 @@ class UserPrincipalTest {
 
             // Create user principal with specific password
             User user = TestDataFactory.defaultUser()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .password("mySecretPassword")
                     .build();
 
@@ -219,7 +220,7 @@ class UserPrincipalTest {
 
             // Create user principal with specific username
             User user = TestDataFactory.defaultUser()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .username("specificUsername")
                     .build();
 

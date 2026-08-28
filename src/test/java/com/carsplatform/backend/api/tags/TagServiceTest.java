@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,12 +42,12 @@ class TagServiceTest {
 
         // Create test tags
         testTag1 = TestDataFactory.defaultTag()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Electric")
                 .build();
 
         testTag2 = TestDataFactory.defaultTag()
-                .id(2)
+                .id(UUID.randomUUID())
                 .name("Hybrid")
                 .build();
     }
@@ -62,12 +63,12 @@ class TagServiceTest {
 
             // Create test tags
             CarTagResponse response1 = CarTagResponse.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("Electric")
                     .build();
 
             CarTagResponse response2 = CarTagResponse.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("Hybrid")
                     .build();
 

@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +48,7 @@ class BrandServiceTest {
 
         // Create test brand
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .country("Germany")
                 .foundedYear(1916)
@@ -65,16 +66,16 @@ class BrandServiceTest {
 
             // Create additional brand and expected responses
             Brand brand2 = TestDataFactory.defaultBrand()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("Mercedes")
                     .build();
 
             BrandsListResponse response1 = BrandsListResponse.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("BMW")
                     .build();
             BrandsListResponse response2 = BrandsListResponse.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("Mercedes")
                     .build();
 
@@ -120,28 +121,30 @@ class BrandServiceTest {
         void getBrandDetailsById_BrandExists_ReturnsDetails() {
 
             // Create expected response
+            UUID testUuid = UUID.randomUUID();
+
             BrandDetailsResponse expectedResponse = BrandDetailsResponse.builder()
-                    .id(1)
+                    .id(testUuid)
                     .name("BMW")
                     .country("Germany")
                     .foundedYear(1916)
                     .build();
 
             // Mock repository and mapper behavior
-            when(brandRepository.findById(1)).thenReturn(Optional.of(testBrand));
+            when(brandRepository.findById(testBrand.getId())).thenReturn(Optional.of(testBrand));
             when(brandDetailsMapper.toDto(testBrand)).thenReturn(expectedResponse);
 
             // Get brand details by ID
-            BrandDetailsResponse result = brandService.getBrandDetailsById(1);
+            BrandDetailsResponse result = brandService.getBrandDetailsById(testBrand.getId());
 
             // Verify results -> correct brand details are returned
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testUuid);
             assertThat(result.getName()).isEqualTo("BMW");
             assertThat(result.getCountry()).isEqualTo("Germany");
             assertThat(result.getFoundedYear()).isEqualTo(1916);
 
-            verify(brandRepository).findById(1);
+            verify(brandRepository).findById(testBrand.getId());
             verify(brandDetailsMapper).toDto(testBrand);
         }
 
@@ -150,13 +153,15 @@ class BrandServiceTest {
         void getBrandDetailsById_BrandNotFound_ThrowsException() {
 
             // Mock repository to return empty optional
-            when(brandRepository.findById(999)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            
+            when(brandRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Get brand details by ID and verify -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> brandService.getBrandDetailsById(999))
+            assertThatThrownBy(() -> brandService.getBrandDetailsById(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(brandRepository).findById(999);
+            verify(brandRepository).findById(nonExistentId);
             verify(brandDetailsMapper, never()).toDto(any());
         }
     }

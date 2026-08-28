@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,13 +44,13 @@ class ModelServiceTest {
 
         // Create test brand
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
     }
@@ -65,24 +66,24 @@ class ModelServiceTest {
 
             // Create expected response
             ModelDetailsResponse expectedResponse = ModelDetailsResponse.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("3 Series")
                     .description("A test model for unit testing")
                     .build();
 
             // Mock repository and mapper behavior
-            when(repository.findById(1)).thenReturn(Optional.of(testModel));
+            when(repository.findById(testModel.getId())).thenReturn(Optional.of(testModel));
             when(mapper.toDto(testModel)).thenReturn(expectedResponse);
 
             // Get model details by ID
-            ModelDetailsResponse result = modelService.getModelDetailsById(1);
+            ModelDetailsResponse result = modelService.getModelDetailsById(testModel.getId());
 
             // Verify results
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(expectedResponse.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
 
-            verify(repository).findById(1);
+            verify(repository).findById(testModel.getId());
             verify(mapper).toDto(testModel);
         }
 
@@ -91,13 +92,15 @@ class ModelServiceTest {
         void getModelDetailsById_ModelNotFound_ThrowsException() {
 
             // Mock repository behavior
-            when(repository.findById(999)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            
+            when(repository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Get model details by ID and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> modelService.getModelDetailsById(999))
+            assertThatThrownBy(() -> modelService.getModelDetailsById(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(repository).findById(999);
+            verify(repository).findById(nonExistentId);
             verify(mapper, never()).toDto(any());
         }
     }

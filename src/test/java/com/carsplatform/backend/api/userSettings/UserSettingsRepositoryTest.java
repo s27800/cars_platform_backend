@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -75,7 +76,7 @@ class UserSettingsRepositoryTest {
         void findByUserId_NonExistingUser_ReturnsEmpty() {
 
             // Find settings by non-existing user ID
-            Optional<UserSettings> result = userSettingsRepository.findByUserId(99999L);
+            Optional<UserSettings> result = userSettingsRepository.findByUserId(UUID.randomUUID());
 
             // Verify results -> empty is returned
             assertThat(result).isEmpty();

@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -60,31 +61,31 @@ class CarServiceTest {
 
         // Create test brand
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("G20")
                 .build();
 
         // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(testGeneration, testBodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW 330i")
                 .build();
     }
@@ -99,8 +100,10 @@ class CarServiceTest {
         void getCarDetailsForCarId_ExistingCar_ReturnsCarDetails() {
 
             // Create expected response DTO
+            UUID testUuid = UUID.randomUUID();
+
             CarDetailsResponse expectedResponse = CarDetailsResponse.builder()
-                    .id(1)
+                    .id(testUuid)
                     .name("BMW 330i")
                     .doorsNumber(5)
                     .seatsNumber(5)
@@ -108,18 +111,18 @@ class CarServiceTest {
                     .build();
 
             // Mock repository and mapper behavior
-            when(carRepository.findByIdWithDetails(1)).thenReturn(Optional.of(testCar));
+            when(carRepository.findByIdWithDetails(testCar.getId())).thenReturn(Optional.of(testCar));
             when(carDetailsMapper.toDto(testCar)).thenReturn(expectedResponse);
 
             // Get car details by ID
-            CarDetailsResponse result = carService.getCarDetailsForCarId(1);
+            CarDetailsResponse result = carService.getCarDetailsForCarId(testCar.getId());
 
             // Verify results -> correct car details are returned
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testUuid);
             assertThat(result.getName()).isEqualTo("BMW 330i");
 
-            verify(carRepository).findByIdWithDetails(1);
+            verify(carRepository).findByIdWithDetails(testCar.getId());
             verify(carDetailsMapper).toDto(testCar);
         }
 
@@ -128,13 +131,15 @@ class CarServiceTest {
         void getCarDetailsForCarId_NonExistingCar_ThrowsResourceNotFoundException() {
 
             // Mock repository to return empty optional
-            when(carRepository.findByIdWithDetails(999)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            
+            when(carRepository.findByIdWithDetails(nonExistentId)).thenReturn(Optional.empty());
 
             // Get car details by ID and verify -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> carService.getCarDetailsForCarId(999))
+            assertThatThrownBy(() -> carService.getCarDetailsForCarId(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(carRepository).findByIdWithDetails(999);
+            verify(carRepository).findByIdWithDetails(nonExistentId);
             verify(carDetailsMapper, never()).toDto(any());
         }
     }
@@ -151,12 +156,12 @@ class CarServiceTest {
             // Create expected response DTOs and mock data
             Pageable pageable = PageRequest.of(0, 10);
 
-            List<Integer> brandIds = List.of(1);
+            List<UUID> brandIds = List.of(testBrand.getId());
 
             Page<Car> carPage = new PageImpl<>(List.of(testCar), pageable, 1);
             Page<CarsListResponse> expectedResponse = new PageImpl<>(
                     List.of(CarsListResponse.builder()
-                            .id(1)
+                            .id(UUID.randomUUID())
                             .name("BMW 330i")
                             .build()),
                     pageable, 1
@@ -206,7 +211,7 @@ class CarServiceTest {
             Page<Car> carPage = new PageImpl<>(List.of(testCar), pageable, 1);
             Page<CarsListResponse> expectedResponse = new PageImpl<>(
                     List.of(CarsListResponse.builder()
-                            .id(1)
+                            .id(UUID.randomUUID())
                             .name("BMW 330i")
                             .build()),
                     pageable, 1
@@ -246,7 +251,7 @@ class CarServiceTest {
             // Create mock data for non-existing brand
             Pageable pageable = PageRequest.of(0, 10);
 
-            List<Integer> brandIds = List.of(999);
+            List<UUID> brandIds = List.of(UUID.randomUUID());
 
             Page<Car> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
             Page<CarsListResponse> expectedResponse = new PageImpl<>(
@@ -285,8 +290,8 @@ class CarServiceTest {
             // Create mock data with multiple filters
             Pageable pageable = PageRequest.of(0, 10);
 
-            List<Integer> brandIds = List.of(1);
-            List<Integer> bodyTypeIds = List.of(1);
+            List<UUID> brandIds = List.of(testBrand.getId());
+            List<UUID> bodyTypeIds = List.of(testBodyType.getId());
 
             Integer minPower = 200;
             Integer maxPower = 300;
@@ -294,7 +299,7 @@ class CarServiceTest {
             Page<Car> carPage = new PageImpl<>(List.of(testCar), pageable, 1);
             Page<CarsListResponse> expectedResponse = new PageImpl<>(
                     List.of(CarsListResponse.builder()
-                            .id(1)
+                            .id(UUID.randomUUID())
                             .name("BMW 330i")
                             .build()),
                     pageable, 1

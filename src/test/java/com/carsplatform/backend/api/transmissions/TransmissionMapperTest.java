@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class TransmissionMapperTest {
 
         // Create test transmission
         testTransmission = TestDataFactory.defaultTransmission()
-                .id(1)
+                .id(UUID.randomUUID())
                 .transmissionType("Automatic")
                 .transmissionName("DSG 7")
                 .gearsNumber(7)
@@ -58,7 +60,7 @@ class TransmissionMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testTransmission.getId());
             assertThat(result.getTransmissionType()).isEqualTo("Automatic");
             assertThat(result.getTransmissionName()).isEqualTo("DSG 7");
             assertThat(result.getGearsNumber()).isEqualTo(7);
@@ -71,7 +73,7 @@ class TransmissionMapperTest {
 
             // Create manual transmission
             Transmission manual = Transmission.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .transmissionType("Manual")
                     .transmissionName("6-speed manual")
                     .gearsNumber(6)

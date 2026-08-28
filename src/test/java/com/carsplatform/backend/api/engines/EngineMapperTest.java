@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class EngineMapperTest {
 
         // Create test engine
         testEngine = TestDataFactory.defaultEngine()
-                .id(1)
+                .id(UUID.randomUUID())
                 .engineCode("2.0 TSI")
                 .productionYears("2015-2020")
                 .displacement(1984)
@@ -68,7 +70,7 @@ class EngineMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testEngine.getId());
             assertThat(result.getEngineCode()).isEqualTo("2.0 TSI");
             assertThat(result.getProductionYears()).isEqualTo("2015-2020");
             assertThat(result.getDisplacement()).isEqualTo(1984);
@@ -91,7 +93,7 @@ class EngineMapperTest {
 
             // Create minimal engine with null optional fields
             Engine minimalEngine = Engine.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .engineCode(null)
                     .turbo(null)
                     .build();
@@ -101,7 +103,7 @@ class EngineMapperTest {
 
             // Verify null fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(minimalEngine.getId());
             assertThat(result.getEngineCode()).isNull();
             assertThat(result.getTurbo()).isNull();
         }

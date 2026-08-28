@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -70,37 +71,37 @@ class ReviewServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test review
         testReview = TestDataFactory.defaultReview(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
     }
 
@@ -117,17 +118,17 @@ class ReviewServiceTest {
             AverageRatingsResponse expectedResponse = mock(AverageRatingsResponse.class);
 
             // Mock repository and service calls
-            when(carRepository.existsById(1)).thenReturn(true);
-            when(reviewRepository.findAverageRatingsForCarId(1)).thenReturn(expectedResponse);
+            when(carRepository.existsById(testCar.getId())).thenReturn(true);
+            when(reviewRepository.findAverageRatingsForCarId(testCar.getId())).thenReturn(expectedResponse);
 
             // Get average ratings for car
-            AverageRatingsResponse result = reviewService.getAverageRatingsForCar(1);
+            AverageRatingsResponse result = reviewService.getAverageRatingsForCar(testCar.getId());
 
             // Verify results -> correct response returned
             assertThat(result).isNotNull();
 
-            verify(carRepository).existsById(1);
-            verify(reviewRepository).findAverageRatingsForCarId(1);
+            verify(carRepository).existsById(testCar.getId());
+            verify(reviewRepository).findAverageRatingsForCarId(testCar.getId());
         }
 
         @Test
@@ -135,13 +136,15 @@ class ReviewServiceTest {
         void getAverageRatingsForCar_CarNotFound_ThrowsException() {
 
             // Mock repository
-            when(carRepository.existsById(999)).thenReturn(false);
+            UUID nonExistentCarId = UUID.randomUUID();
+
+            when(carRepository.existsById(nonExistentCarId)).thenReturn(false);
 
             // Get average ratings for non-existent car and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> reviewService.getAverageRatingsForCar(999))
+            assertThatThrownBy(() -> reviewService.getAverageRatingsForCar(nonExistentCarId))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(reviewRepository, never()).findAverageRatingsForCarId(anyInt());
+            verify(reviewRepository, never()).findAverageRatingsForCarId(any());
         }
     }
 
@@ -158,22 +161,22 @@ class ReviewServiceTest {
             Pageable pageable = PageRequest.of(0, 10);
             Page<Review> reviewPage = new PageImpl<>(List.of(testReview), pageable, 1);
             Page<ReviewResponse> expectedResponse = new PageImpl<>(
-                    List.of(ReviewResponse.builder().id(1L).build()),
+                    List.of(ReviewResponse.builder().id(UUID.randomUUID()).build()),
                     pageable, 1
             );
 
             // Mock repository
-            when(reviewRepository.findAllApprovedByCarId(1, pageable)).thenReturn(reviewPage);
+            when(reviewRepository.findAllApprovedByCarId(testCar.getId(), pageable)).thenReturn(reviewPage);
             when(reviewMapper.toDtoList(reviewPage)).thenReturn(expectedResponse);
 
             // Get paginated reviews for car
-            Page<ReviewResponse> result = reviewService.getReviewsForCarId(1, pageable);
+            Page<ReviewResponse> result = reviewService.getReviewsForCarId(testCar.getId(), pageable);
 
             // Verify results -> correct response returned
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
 
-            verify(reviewRepository).findAllApprovedByCarId(1, pageable);
+            verify(reviewRepository).findAllApprovedByCarId(testCar.getId(), pageable);
             verify(reviewMapper).toDtoList(reviewPage);
         }
     }
@@ -206,12 +209,12 @@ class ReviewServiceTest {
 
             // Mock repository
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(carRepository.findById(1)).thenReturn(Optional.of(testCar));
-            when(reviewRepository.existsByCarIdAndUserId(1, 1L)).thenReturn(false);
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(reviewRepository.existsByCarIdAndUserId(testCar.getId(), testUser.getId())).thenReturn(false);
             when(createReviewMapper.toDto(request)).thenReturn(mappedReview);
 
             // Create review
-            reviewService.createReview(1, request, "testuser");
+            reviewService.createReview(testCar.getId(), request, "testuser");
 
             // Verify results -> correct review created
             ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
@@ -237,7 +240,7 @@ class ReviewServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Create review with non-existent user and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> reviewService.createReview(1, request, "unknown"))
+            assertThatThrownBy(() -> reviewService.createReview(testCar.getId(), request, "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(reviewRepository, never()).save(any());
@@ -253,11 +256,13 @@ class ReviewServiceTest {
                     .build();
 
             // Mock repository
+            UUID nonExistentCarId = UUID.randomUUID();
+            
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(carRepository.findById(999)).thenReturn(Optional.empty());
+            when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 
             // Create review with non-existent car and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> reviewService.createReview(999, request, "testuser"))
+            assertThatThrownBy(() -> reviewService.createReview(nonExistentCarId, request, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(reviewRepository, never()).save(any());
@@ -274,11 +279,11 @@ class ReviewServiceTest {
 
             // Mock repository
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(carRepository.findById(1)).thenReturn(Optional.of(testCar));
-            when(reviewRepository.existsByCarIdAndUserId(1, 1L)).thenReturn(true);
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(reviewRepository.existsByCarIdAndUserId(testCar.getId(), testUser.getId())).thenReturn(true);
 
             // Create review with already reviewed car and verify result -> ResourceAlreadyExistsException is thrown
-            assertThatThrownBy(() -> reviewService.createReview(1, request, "testuser"))
+            assertThatThrownBy(() -> reviewService.createReview(testCar.getId(), request, "testuser"))
                     .isInstanceOf(ResourceAlreadyExistsException.class);
 
             verify(reviewRepository, never()).save(any());

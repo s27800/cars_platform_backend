@@ -14,6 +14,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -31,18 +32,18 @@ class GenerationsListMapperTest {
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .generations(new ArrayList<>())
                 .build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("G20")
                 .build();
     }
@@ -72,7 +73,7 @@ class GenerationsListMapperTest {
 
             // Verify results -> correct id and name are mapped
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testGeneration.getId());
             assertThat(result.getName()).isEqualTo("G20");
         }
     }
@@ -112,8 +113,8 @@ class GenerationsListMapperTest {
         void map_ModelWithGenerations_MapsAllGenerations() {
 
             // Create model with multiple generations
-            Generation gen1 = TestDataFactory.defaultGeneration(testModel).id(1).name("Gen I").build();
-            Generation gen2 = TestDataFactory.defaultGeneration(testModel).id(2).name("Gen II").build();
+            Generation gen1 = TestDataFactory.defaultGeneration(testModel).id(UUID.randomUUID()).name("Gen I").build();
+            Generation gen2 = TestDataFactory.defaultGeneration(testModel).id(UUID.randomUUID()).name("Gen II").build();
 
             testModel.setGenerations(List.of(gen1, gen2));
 

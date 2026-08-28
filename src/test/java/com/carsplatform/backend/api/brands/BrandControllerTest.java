@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -110,8 +112,11 @@ class BrandControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when brand does not exist")
         void getBrandById_NonExistingBrand_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform GET request and verify results -> 404 brand does not exist
-            performGetNoAuth(BRAND_BASE_URL + "/999999")
+            performGetNoAuth(BRAND_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }
     }

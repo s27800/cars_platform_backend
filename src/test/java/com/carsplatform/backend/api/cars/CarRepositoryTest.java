@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -213,7 +214,7 @@ class CarRepositoryTest {
         void findByIdWithDetails_NonExistingCar_ReturnsEmpty() {
 
             // Find car by ID
-            Optional<Car> result = carRepository.findByIdWithDetails(99999);
+            Optional<Car> result = carRepository.findByIdWithDetails(UUID.randomUUID());
 
             // Verify results -> empty optional is returned
             assertThat(result).isEmpty();

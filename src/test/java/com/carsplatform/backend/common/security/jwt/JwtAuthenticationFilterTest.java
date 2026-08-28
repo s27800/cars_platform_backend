@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
@@ -65,7 +67,7 @@ class JwtAuthenticationFilterTest {
 
             // Create valid token and user principal
             String validToken = "valid.jwt.token";
-            Long userId = 1L;
+            UUID userId = UUID.randomUUID();
 
             UserPrincipal userPrincipal = new UserPrincipal(
                     userId,
@@ -186,7 +188,7 @@ class JwtAuthenticationFilterTest {
 
             // Create valid token and admin user principal
             String validToken = "admin.jwt.token";
-            Long userId = 1L;
+            UUID userId = UUID.randomUUID();
 
             UserPrincipal adminPrincipal = new UserPrincipal(
                     userId,

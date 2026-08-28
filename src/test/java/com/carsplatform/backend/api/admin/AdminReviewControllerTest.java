@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -237,9 +239,12 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when review does not exist")
         void approveReview_ReviewNotFound_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform PATCH request for non-existent review and verify response -> returns 404 Not Found
             performPatchWithAuthNoBody(
-                    ADMIN_REVIEWS_BASE_URL + "/99999/approve?approve=true",
+                    ADMIN_REVIEWS_BASE_URL + "/" + nonExistentId + "/approve?approve=true",
                     adminToken
             ).andExpect(status().isNotFound());
         }

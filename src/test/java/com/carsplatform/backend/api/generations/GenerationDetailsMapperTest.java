@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -34,24 +35,25 @@ class GenerationDetailsMapperTest {
 
     private Generation testGeneration;
     private Model testModel;
+    private Brand testBrand;
 
     @BeforeEach
     void setUp() {
 
         // Create test brand
-        Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+        testBrand = TestDataFactory.defaultBrand()
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
-        testModel = TestDataFactory.defaultModel(brand)
-                .id(1)
+        testModel = TestDataFactory.defaultModel(testBrand)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("E90")
                 .cars(List.of())
                 .build();
@@ -82,7 +84,7 @@ class GenerationDetailsMapperTest {
 
             // Verify result is mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testGeneration.getId());
             assertThat(result.getName()).isEqualTo("E90");
         }
 
@@ -95,7 +97,7 @@ class GenerationDetailsMapperTest {
 
             // Verify model is mapped correctly
             assertThat(result.getModel()).isNotNull();
-            assertThat(result.getModel().getId()).isEqualTo(1);
+            assertThat(result.getModel().getId()).isEqualTo(testModel.getId());
             assertThat(result.getModel().getName()).isEqualTo("3 Series");
         }
 
@@ -108,7 +110,7 @@ class GenerationDetailsMapperTest {
 
             // Verify brand is mapped correctly
             assertThat(result.getBrand()).isNotNull();
-            assertThat(result.getBrand().getId()).isEqualTo(1);
+            assertThat(result.getBrand().getId()).isEqualTo(testBrand.getId());
             assertThat(result.getBrand().getName()).isEqualTo("Test Brand");
         }
 
@@ -132,24 +134,24 @@ class GenerationDetailsMapperTest {
 
             // Create test car with engine, transmission and body type
             Engine engine = TestDataFactory.defaultEngine()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .engineType("Petrol")
                     .displacement(2000)
                     .maxPower(200)
                     .build();
 
             Transmission transmission = TestDataFactory.defaultTransmission()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .transmissionType("Automatic")
                     .build();
 
             BodyType bodyType = TestDataFactory.defaultBodyType()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("Sedan")
                     .build();
 
             Car car = TestDataFactory.defaultCar(testGeneration, bodyType)
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("320i")
                     .engine(engine)
                     .transmission(transmission)

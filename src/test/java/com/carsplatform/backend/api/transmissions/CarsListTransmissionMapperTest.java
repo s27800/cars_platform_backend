@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class CarsListTransmissionMapperTest {
 
         // Create test transmission
         testTransmission = TestDataFactory.defaultTransmission()
-                .id(1)
+                .id(UUID.randomUUID())
                 .transmissionType("Automatic")
                 .build();
     }

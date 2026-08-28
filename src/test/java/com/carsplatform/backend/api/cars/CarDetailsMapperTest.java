@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -44,31 +45,31 @@ class CarDetailsMapperTest {
 
         // Create test brand
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
 
         // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("G20")
                 .build();
 
         // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(testGeneration, testBodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW 320i")
                 .description("Compact executive car")
                 .doorsNumber(4)
@@ -104,7 +105,7 @@ class CarDetailsMapperTest {
 
             // Verify result -> maps all basic fields correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testCar.getId());
             assertThat(result.getName()).isEqualTo("BMW 320i");
             assertThat(result.getDescription()).isEqualTo("Compact executive car");
             assertThat(result.getDoorsNumber()).isEqualTo(4);
@@ -245,7 +246,7 @@ class CarDetailsMapperTest {
 
             // Create test image
             CarImage image = CarImage.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .imageUrl("http://example.com/image.jpg")
                     .car(testCar)
                     .build();
@@ -279,7 +280,7 @@ class CarDetailsMapperTest {
 
             // Create test tag
             Tag tag = TestDataFactory.defaultTag()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("Electric")
                     .build();
 

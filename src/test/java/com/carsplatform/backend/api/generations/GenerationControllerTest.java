@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -123,7 +125,7 @@ class GenerationControllerTest extends MockMvcTestBase {
             // Perform GET request and verify results -> correct id field
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(testGeneration.getId()))
+                    .andExpect(jsonPath("$.id").value(testGeneration.getId().toString()))
                     .andExpect(jsonPath("$.name").value("E90"));
         }
 
@@ -135,7 +137,7 @@ class GenerationControllerTest extends MockMvcTestBase {
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.model").exists())
-                    .andExpect(jsonPath("$.model.id").value(testModel.getId()))
+                    .andExpect(jsonPath("$.model.id").value(testModel.getId().toString()))
                     .andExpect(jsonPath("$.model.name").value("3 Series"));
         }
 
@@ -147,7 +149,7 @@ class GenerationControllerTest extends MockMvcTestBase {
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.brand").exists())
-                    .andExpect(jsonPath("$.brand.id").value(testBrand.getId()))
+                    .andExpect(jsonPath("$.brand.id").value(testBrand.getId().toString()))
                     .andExpect(jsonPath("$.brand.name").value("BMW"));
         }
 
@@ -155,8 +157,11 @@ class GenerationControllerTest extends MockMvcTestBase {
         @DisplayName("returns 404 when generation does not exist")
         void getGenerationById_NonExistingGeneration_Returns404() throws Exception {
 
+            // Use random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
+
             // Perform GET request for non-existing ID and verify results -> 404 Not Found
-            performGetNoAuth(GENERATION_BASE_URL + "/999999")
+            performGetNoAuth(GENERATION_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }
     }

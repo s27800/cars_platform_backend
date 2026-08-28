@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -34,7 +35,7 @@ class BrandDetailsMapperTest {
 
         // Create test brand
         testBrand = Brand.builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .country("Germany")
                 .foundedYear(1916)
@@ -68,7 +69,7 @@ class BrandDetailsMapperTest {
 
             // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("BMW");
             assertThat(result.getCountry()).isEqualTo("Germany");
             assertThat(result.getFoundedYear()).isEqualTo(1916);
@@ -95,21 +96,21 @@ class BrandDetailsMapperTest {
 
             // Create test models and generations for brand
             Model model1 = Model.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("3 Series")
                     .brand(testBrand)
                     .generations(new ArrayList<>())
                     .build();
 
             Model model2 = Model.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("5 Series")
                     .brand(testBrand)
                     .generations(new ArrayList<>())
                     .build();
 
-            Generation gen1 = Generation.builder().id(1).name("E90").model(model1).build();
-            Generation gen2 = Generation.builder().id(2).name("F30").model(model1).build();
+            Generation gen1 = Generation.builder().id(UUID.randomUUID()).name("E90").model(model1).build();
+            Generation gen2 = Generation.builder().id(UUID.randomUUID()).name("F30").model(model1).build();
 
             model1.getGenerations().add(gen1);
             model1.getGenerations().add(gen2);
@@ -121,10 +122,10 @@ class BrandDetailsMapperTest {
 
             // Verify result -> models list is mapped correctly with generationsCount
             assertThat(result.getModels()).hasSize(2);
-            assertThat(result.getModels().get(0).getId()).isEqualTo(1);
+            assertThat(result.getModels().get(0).getId()).isEqualTo(model1.getId());
             assertThat(result.getModels().get(0).getName()).isEqualTo("3 Series");
             assertThat(result.getModels().get(0).getGenerationsCount()).isEqualTo(2);
-            assertThat(result.getModels().get(1).getId()).isEqualTo(2);
+            assertThat(result.getModels().get(1).getId()).isEqualTo(model2.getId());
             assertThat(result.getModels().get(1).getName()).isEqualTo("5 Series");
             assertThat(result.getModels().get(1).getGenerationsCount()).isEqualTo(0);
         }

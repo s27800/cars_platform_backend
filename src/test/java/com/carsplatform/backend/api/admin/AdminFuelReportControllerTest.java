@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -236,10 +238,13 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when fuel report does not exist")
         void approveFuelReport_FuelReportNotFound_Returns404() throws Exception {
+            
+            // Generate random UUID that doesn't exist
+            String nonExistentId = UUID.randomUUID().toString();
 
             // Perform PATCH request for non-existent fuel report and verify response -> returns 404 Not Found
             performPatchWithAuthNoBody(
-                    ADMIN_FUEL_REPORTS_BASE_URL + "/99999/approve?approve=true",
+                    ADMIN_FUEL_REPORTS_BASE_URL + "/" + nonExistentId + "/approve?approve=true",
                     adminToken
             ).andExpect(status().isNotFound());
         }

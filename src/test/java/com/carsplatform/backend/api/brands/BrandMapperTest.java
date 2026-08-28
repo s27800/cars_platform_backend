@@ -16,6 +16,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -33,20 +34,20 @@ class BrandMapperTest {
 
         // Create test data for car
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .country("Germany")
                 .foundedYear(1916)
                 .description("Bavarian Motor Works")
                 .build();
 
-        Model model = TestDataFactory.defaultModel(testBrand).id(1).build();
-        Generation generation = TestDataFactory.defaultGeneration(model).id(1).build();
-        BodyType bodyType = TestDataFactory.defaultBodyType().id(1).build();
+        Model model = TestDataFactory.defaultModel(testBrand).id(UUID.randomUUID()).build();
+        Generation generation = TestDataFactory.defaultGeneration(model).id(UUID.randomUUID()).build();
+        BodyType bodyType = TestDataFactory.defaultBodyType().id(UUID.randomUUID()).build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .images(List.of())
                 .tags(new HashSet<>())
                 .build();
@@ -77,7 +78,7 @@ class BrandMapperTest {
 
             // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("BMW");
             assertThat(result.getCountry()).isEqualTo("Germany");
             assertThat(result.getFoundedYear()).isEqualTo(1916);
