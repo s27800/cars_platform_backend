@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Integer> {
@@ -110,5 +111,34 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
             @Param("minFuelConsumptionMixed") Double minFuelConsumptionMixed,
             @Param("maxFuelConsumptionMixed") Double maxFuelConsumptionMixed,
             Pageable pageable
+    );
+
+    @Query("SELECT c FROM Car c " +
+            "LEFT JOIN FETCH c.tags " +
+            "LEFT JOIN FETCH c.generation g " +
+            "LEFT JOIN FETCH g.model m " +
+            "LEFT JOIN FETCH m.brand " +
+            "LEFT JOIN FETCH c.bodyType " +
+            "WHERE c.id = :id")
+    Optional<Car> findByIdWithTagsAndRelations(@Param("id") Integer id);
+
+    @Query(value = "SELECT DISTINCT c FROM Car c " +
+            "LEFT JOIN FETCH c.engine " +
+            "LEFT JOIN FETCH c.bodyType " +
+            "LEFT JOIN FETCH c.transmission " +
+            "LEFT JOIN FETCH c.images " +
+            "LEFT JOIN c.tags t " +
+            "LEFT JOIN c.generation g " +
+            "LEFT JOIN g.model m " +
+            "LEFT JOIN m.brand b " +
+            "WHERE c.id != :carId " +
+            "AND ((:tagIds IS NOT NULL AND t.id IN :tagIds) " +
+            "OR b.id = :brandId " +
+            "OR c.bodyType.id = :bodyTypeId)")
+    List<Car> findSimilarCars(
+            @Param("carId") Integer carId,
+            @Param("tagIds") Set<Integer> tagIds,
+            @Param("brandId") Integer brandId,
+            @Param("bodyTypeId") Integer bodyTypeId
     );
 }

@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.cars;
 
 import com.carsplatform.backend.api.cars.dtos.CarDetailsResponse;
 import com.carsplatform.backend.api.cars.dtos.CarsListResponse;
+import com.carsplatform.backend.api.tags.Tag;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +63,45 @@ public class CarService {
                 minFuelConsumptionMixed, maxFuelConsumptionMixed, pageable);
 
         return carsListMapper.map(cars);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CarsListResponse> findSimilarCars(Integer carId, int limit) {
+        Car car = carRepository.findByIdWithTagsAndRelations(carId)
+                .orElseThrow(() -> new ResourceNotFoundException("Car", "id", carId));
+
+        Integer brandId = car.getGeneration().getModel().getBrand().getId();
+        Integer bodyTypeId = car.getBodyType().getId();
+
+        Set<Integer> tagIds = car.getTags().stream()
+                .map(Tag::getId)
+                .collect(Collectors.toSet());
+
+        List<Car> similarCars = carRepository.findSimilarCars(
+                carId,
+                tagIds.isEmpty() ? null : tagIds,
+                brandId,
+                bodyTypeId
+        );
+
+        return similarCars.stream()
+                .sorted((c1, c2) -> {
+                    boolean c1SameBrand = c1.getGeneration().getModel().getBrand().getId().equals(brandId);
+                    boolean c2SameBrand = c2.getGeneration().getModel().getBrand().getId().equals(brandId);
+
+                    if (c1SameBrand != c2SameBrand)
+                        return c1SameBrand ? -1 : 1;
+
+                    boolean c1SameBody = c1.getBodyType().getId().equals(bodyTypeId);
+                    boolean c2SameBody = c2.getBodyType().getId().equals(bodyTypeId);
+
+                    if (c1SameBody != c2SameBody)
+                        return c1SameBody ? -1 : 1;
+
+                    return 0;
+                })
+                .limit(limit)
+                .map(carsListMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

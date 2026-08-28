@@ -66,4 +66,13 @@ public class CarController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}/similar")
+    @Operation(summary = "Get similar cars",
+            description = "Returns cars similar to the specified car based on tags, brand, or body type")
+    public ResponseEntity<List<CarsListResponse>> getSimilarCars(
+            @Parameter(description = "ID of the car") @PathVariable Integer id,
+            @RequestParam(defaultValue = "4") int limit) {
+        return ResponseEntity.ok(carService.findSimilarCars(id, limit));
+    }
 }
