@@ -16,6 +16,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -69,7 +70,7 @@ class BodyTypeRepositoryTest {
         void findById_NonExistingBodyType_ReturnsEmpty() {
 
             // Find non-existing body type
-            Optional<BodyType> result = bodyTypeRepository.findById(99999);
+            Optional<BodyType> result = bodyTypeRepository.findById(UUID.randomUUID());
 
             // Verify result -> body type not found
             assertThat(result).isEmpty();
@@ -211,9 +212,9 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns false for non-existing body type")
         void existsById_NonExistingBodyType_ReturnsFalse() {
-            
+
             // Check if body type exists by ID
-            boolean exists = bodyTypeRepository.existsById(99999);
+            boolean exists = bodyTypeRepository.existsById(UUID.randomUUID());
 
             // Verify result -> body type does not exist
             assertThat(exists).isFalse();

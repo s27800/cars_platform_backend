@@ -13,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -30,7 +31,7 @@ class ModelsListMapperTest {
 
         // Create test brand
         testBrand = Brand.builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .country("Germany")
                 .models(new ArrayList<>())
@@ -38,7 +39,7 @@ class ModelsListMapperTest {
 
         // Create test model
         testModel = Model.builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .description("Compact executive car")
                 .brand(testBrand)
@@ -67,8 +68,8 @@ class ModelsListMapperTest {
         void toDto_ValidModel_MapsIdNameAndGenerationsCount() {
 
             // Add generations to test model
-            Generation gen1 = Generation.builder().id(1).name("E90").model(testModel).build();
-            Generation gen2 = Generation.builder().id(2).name("F30").model(testModel).build();
+            Generation gen1 = Generation.builder().id(UUID.randomUUID()).name("E90").model(testModel).build();
+            Generation gen2 = Generation.builder().id(UUID.randomUUID()).name("F30").model(testModel).build();
 
             testModel.setGenerations(List.of(gen1, gen2));
 
@@ -77,7 +78,7 @@ class ModelsListMapperTest {
 
             // Verify result is mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testModel.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
             assertThat(result.getGenerationsCount()).isEqualTo(2);
         }
@@ -130,13 +131,13 @@ class ModelsListMapperTest {
         void map_BrandWithModels_MapsAllModels() {
 
             // Create test models with generations
-            Model model1 = Model.builder().id(1).name("3 Series").generations(new ArrayList<>()).build();
-            Model model2 = Model.builder().id(2).name("5 Series").generations(new ArrayList<>()).build();
-            Model model3 = Model.builder().id(3).name("X5").generations(new ArrayList<>()).build();
+            Model model1 = Model.builder().id(UUID.randomUUID()).name("3 Series").generations(new ArrayList<>()).build();
+            Model model2 = Model.builder().id(UUID.randomUUID()).name("5 Series").generations(new ArrayList<>()).build();
+            Model model3 = Model.builder().id(UUID.randomUUID()).name("X5").generations(new ArrayList<>()).build();
 
             // Add generations to model1
-            model1.getGenerations().add(Generation.builder().id(1).name("E90").build());
-            model1.getGenerations().add(Generation.builder().id(2).name("F30").build());
+            model1.getGenerations().add(Generation.builder().id(UUID.randomUUID()).name("E90").build());
+            model1.getGenerations().add(Generation.builder().id(UUID.randomUUID()).name("F30").build());
 
             testBrand.setModels(List.of(model1, model2, model3));
 

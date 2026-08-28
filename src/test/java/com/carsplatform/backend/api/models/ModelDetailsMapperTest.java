@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -35,12 +36,12 @@ class ModelDetailsMapperTest {
 
         // Create test brand
         testBrand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .generations(List.of())
                 .build();
@@ -71,7 +72,7 @@ class ModelDetailsMapperTest {
 
             // Verify basic fields
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testModel.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
         }
 
@@ -112,13 +113,13 @@ class ModelDetailsMapperTest {
 
             // Create model with generations
             Generation gen1 = TestDataFactory.defaultGeneration(testModel)
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .name("E90")
                     .cars(List.of())
                     .build();
 
             Generation gen2 = TestDataFactory.defaultGeneration(testModel)
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .name("F30")
                     .cars(List.of())
                     .build();

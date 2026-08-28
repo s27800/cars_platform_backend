@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarEngineResponse {
-    private Integer id;
+    private UUID id;
     private String engineCode;
     private String productionYears;
     private Integer displacement;

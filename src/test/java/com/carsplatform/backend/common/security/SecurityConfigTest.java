@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -226,7 +228,7 @@ class SecurityConfigTest extends MockMvcTestBase {
         void protectedEndpoint_ExpiredToken_Returns403() throws Exception {
 
             // Generate expired token
-            String expiredToken = TestSecurityUtils.generateExpiredToken(1L);
+            String expiredToken = TestSecurityUtils.generateExpiredToken(UUID.randomUUID());
 
             // Perform get request with expired token and verify response status is 403 Forbidden
             performGetWithAuth("/api/users/me", expiredToken)

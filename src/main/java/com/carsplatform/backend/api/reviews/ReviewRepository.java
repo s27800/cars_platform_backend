@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
     @Query(
             value =
                     "SELECT r FROM Review r " +
@@ -18,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             countQuery =
                     "SELECT count(r) FROM Review r " +
                     "WHERE r.car.id = :carId AND r.isApproved = true")
-    Page<Review> findAllApprovedByCarId(@Param("carId") Integer carId, Pageable pageable);
+    Page<Review> findAllApprovedByCarId(@Param("carId") UUID carId, Pageable pageable);
 
     @Query(
             value =
@@ -40,9 +42,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AVG(r.soundProofingRating), AVG(r.interiorSpaceRating), AVG(r.maintenanceRating), " +
             "AVG(r.priceQualityRating), AVG(r.failureFreeRating)) " +
             "FROM Review r WHERE r.car.id = :carId AND r.isApproved = true")
-    AverageRatingsResponse findAverageRatingsForCarId(@Param("carId") Integer carId);
+    AverageRatingsResponse findAverageRatingsForCarId(@Param("carId") UUID carId);
 
-    boolean existsByCarIdAndUserId(Integer carId, Long userId);
+    boolean existsByCarIdAndUserId(UUID carId, UUID userId);
 
     @Query(
             value =
@@ -56,5 +58,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             countQuery =
                     "SELECT count(r) FROM Review r " +
                     "WHERE r.user.id = :userId")
-    Page<Review> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+    Page<Review> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 }

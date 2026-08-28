@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/admin/fuel-reports")
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class AdminFuelReportController {
     @PatchMapping("/{id}/approve")
     @Operation(summary = "Approve or reject a fuel report")
     public ResponseEntity<Void> approveFuelReport(
-            @Parameter(description = "ID of the fuel report") @PathVariable Long id,
+            @Parameter(description = "ID of the fuel report") @PathVariable UUID id,
             @Parameter(description = "Whether to approve (true) or reject (false) the fuel report")
             @RequestParam boolean approve) {
 

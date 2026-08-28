@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class GenerationService {
@@ -15,7 +17,7 @@ public class GenerationService {
     private final GenerationDetailsMapper mapper;
 
     @Transactional(readOnly = true)
-    public GenerationDetailsResponse getGenerationDetailsById(Integer generationId) {
+    public GenerationDetailsResponse getGenerationDetailsById(UUID generationId) {
         Generation generation = repository.findById(generationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));
 

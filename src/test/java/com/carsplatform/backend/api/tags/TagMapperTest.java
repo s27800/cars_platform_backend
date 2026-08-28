@@ -12,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,7 +28,7 @@ class TagMapperTest {
     void setUp() {
         // Create test tag
         testTag = TestDataFactory.defaultTag()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Electric")
                 .build();
     }
@@ -57,7 +58,7 @@ class TagMapperTest {
 
             // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testTag.getId());
             assertThat(result.getName()).isEqualTo("Electric");
         }
     }
@@ -94,9 +95,9 @@ class TagMapperTest {
         void toDtoList_SetWithTags_MapsAllTags() {
 
             // Create test tags
-            Tag tag1 = TestDataFactory.defaultTag().id(1).name("Electric").build();
-            Tag tag2 = TestDataFactory.defaultTag().id(2).name("Hybrid").build();
-            Tag tag3 = TestDataFactory.defaultTag().id(3).name("SUV").build();
+            Tag tag1 = TestDataFactory.defaultTag().id(UUID.randomUUID()).name("Electric").build();
+            Tag tag2 = TestDataFactory.defaultTag().id(UUID.randomUUID()).name("Hybrid").build();
+            Tag tag3 = TestDataFactory.defaultTag().id(UUID.randomUUID()).name("SUV").build();
             Set<Tag> tags = Set.of(tag1, tag2, tag3);
 
             // Map to DTOs

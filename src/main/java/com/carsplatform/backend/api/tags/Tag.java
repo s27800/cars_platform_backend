@@ -10,6 +10,7 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tag")
@@ -19,8 +20,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class Tag {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "UUID")
+    private UUID id;
 
     @Column(name = "name", nullable = false, unique = true)
     @NotBlank(message = "Tag name cannot be blank")

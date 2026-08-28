@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -50,12 +51,12 @@ class LikeServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test review
         testReview = Review.builder()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .comment("Test review")
                 .isApproved(true)
                 .build();
@@ -72,12 +73,12 @@ class LikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(reviewRepository.findById(1L)).thenReturn(Optional.of(testReview));
-            when(likeRepository.findByUserIdAndReviewId(1L, 1L)).thenReturn(Optional.empty());
-            when(likeRepository.countByReviewId(1L)).thenReturn(1L);
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
+            when(likeRepository.findByUserIdAndReviewId(testUser.getId(), testReview.getId())).thenReturn(Optional.empty());
+            when(likeRepository.countByReviewId(testReview.getId())).thenReturn(1L);
 
             // Toggle like
-            LikeResponse result = likeService.toggleLike(1L, "testuser");
+            LikeResponse result = likeService.toggleLike(testReview.getId(), "testuser");
 
             // Verify like added
             assertThat(result.isLiked()).isTrue();
@@ -99,19 +100,19 @@ class LikeServiceTest {
 
             // Create like
             Like existingLike = Like.builder()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .user(testUser)
                     .review(testReview)
                     .build();
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(reviewRepository.findById(1L)).thenReturn(Optional.of(testReview));
-            when(likeRepository.findByUserIdAndReviewId(1L, 1L)).thenReturn(Optional.of(existingLike));
-            when(likeRepository.countByReviewId(1L)).thenReturn(0L);
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
+            when(likeRepository.findByUserIdAndReviewId(testUser.getId(), testReview.getId())).thenReturn(Optional.of(existingLike));
+            when(likeRepository.countByReviewId(testReview.getId())).thenReturn(0L);
 
             // Toggle like
-            LikeResponse result = likeService.toggleLike(1L, "testuser");
+            LikeResponse result = likeService.toggleLike(testReview.getId(), "testuser");
 
             // Verify like removed
             assertThat(result.isLiked()).isFalse();
@@ -129,7 +130,7 @@ class LikeServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Toggle like for non-existent user
-            assertThatThrownBy(() -> likeService.toggleLike(1L, "unknown"))
+            assertThatThrownBy(() -> likeService.toggleLike(testReview.getId(), "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             // Verify like not saved or deleted
@@ -142,11 +143,13 @@ class LikeServiceTest {
         void toggleLike_ReviewNotFound_ThrowsException() {
 
             // Mock dependencies
+            UUID nonExistentReviewId = UUID.randomUUID();
+            
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(reviewRepository.findById(999L)).thenReturn(Optional.empty());
+            when(reviewRepository.findById(nonExistentReviewId)).thenReturn(Optional.empty());
 
             // Toggle like for non-existent review
-            assertThatThrownBy(() -> likeService.toggleLike(999L, "testuser"))
+            assertThatThrownBy(() -> likeService.toggleLike(nonExistentReviewId, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             // Verify like not saved or deleted
@@ -166,11 +169,11 @@ class LikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(likeRepository.existsByUserIdAndReviewId(1L, 1L)).thenReturn(true);
-            when(likeRepository.countByReviewId(1L)).thenReturn(5L);
+            when(likeRepository.existsByUserIdAndReviewId(testUser.getId(), testReview.getId())).thenReturn(true);
+            when(likeRepository.countByReviewId(testReview.getId())).thenReturn(5L);
 
             // Create like
-            LikeResponse result = likeService.getLikeStatus(1L, "testuser");
+            LikeResponse result = likeService.getLikeStatus(testReview.getId(), "testuser");
 
             // Verify result
             assertThat(result.isLiked()).isTrue();
@@ -183,11 +186,11 @@ class LikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(likeRepository.existsByUserIdAndReviewId(1L, 1L)).thenReturn(false);
-            when(likeRepository.countByReviewId(1L)).thenReturn(3L);
+            when(likeRepository.existsByUserIdAndReviewId(testUser.getId(), testReview.getId())).thenReturn(false);
+            when(likeRepository.countByReviewId(testReview.getId())).thenReturn(3L);
 
             // Get like status
-            LikeResponse result = likeService.getLikeStatus(1L, "testuser");
+            LikeResponse result = likeService.getLikeStatus(testReview.getId(), "testuser");
 
             // Verify result
             assertThat(result.isLiked()).isFalse();
@@ -202,7 +205,7 @@ class LikeServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Get like status for non-existent user
-            assertThatThrownBy(() -> likeService.getLikeStatus(1L, "unknown"))
+            assertThatThrownBy(() -> likeService.getLikeStatus(testReview.getId(), "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
     }

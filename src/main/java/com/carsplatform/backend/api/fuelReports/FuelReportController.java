@@ -20,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/fuel-reports")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class FuelReportController {
     @Operation(summary = "Get average fuel consumption for a car")
     public ResponseEntity<AverageFuelConsumptionResponse> getAverageFuelConsumptionByCarId(
             @Parameter(description = "ID of the car")
-            @PathVariable Integer carId) {
+            @PathVariable UUID carId) {
 
         AverageFuelConsumptionResponse response = service.getAverageFuelConsumptionForCar(carId);
         return ResponseEntity.ok(response);
@@ -41,7 +43,7 @@ public class FuelReportController {
     @GetMapping("/{carId}")
     @Operation(summary = "Get fuel consumption reports for a car")
     public ResponseEntity<Page<FuelReportResponse>> getFuelReports(
-            @Parameter(description = "ID of the car") @PathVariable Integer carId,
+            @Parameter(description = "ID of the car") @PathVariable UUID carId,
             Pageable pageable) {
 
         return ResponseEntity.ok(service.getFuelReportsForCarId(carId, pageable));
@@ -51,7 +53,7 @@ public class FuelReportController {
     @Operation(summary = "Add new fuel consumption report for a car")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> createFuelReport(
-            @Parameter(description = "ID of the car") @PathVariable Integer carId,
+            @Parameter(description = "ID of the car") @PathVariable UUID carId,
             @Valid @RequestBody CreateFuelReportRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
 

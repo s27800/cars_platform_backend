@@ -17,6 +17,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -33,18 +34,18 @@ class CarImageMapperTest {
     void setUp() {
 
         // Create test car and image
-        Brand brand = TestDataFactory.defaultBrand().id(1).build();
-        Model model = TestDataFactory.defaultModel(brand).id(1).build();
-        Generation generation = TestDataFactory.defaultGeneration(model).id(1).build();
-        BodyType bodyType = TestDataFactory.defaultBodyType().id(1).build();
+        Brand brand = TestDataFactory.defaultBrand().id(UUID.randomUUID()).build();
+        Model model = TestDataFactory.defaultModel(brand).id(UUID.randomUUID()).build();
+        Generation generation = TestDataFactory.defaultGeneration(model).id(UUID.randomUUID()).build();
+        BodyType bodyType = TestDataFactory.defaultBodyType().id(UUID.randomUUID()).build();
 
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .images(new ArrayList<>())
                 .build();
 
         testImage = CarImage.builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .imageUrl("https://example.com/car-image.jpg")
                 .isMain(true)
                 .car(testCar)
@@ -76,7 +77,7 @@ class CarImageMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testImage.getId());
             assertThat(result.getImageUrl()).isEqualTo("https://example.com/car-image.jpg");
             assertThat(result.getIsMain()).isTrue();
         }
@@ -129,14 +130,14 @@ class CarImageMapperTest {
 
             // Create list of car images
             CarImage image1 = CarImage.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .imageUrl("https://example.com/image1.jpg")
                     .isMain(true)
                     .car(testCar)
                     .build();
 
             CarImage image2 = CarImage.builder()
-                    .id(2)
+                    .id(UUID.randomUUID())
                     .imageUrl("https://example.com/image2.jpg")
                     .isMain(false)
                     .car(testCar)

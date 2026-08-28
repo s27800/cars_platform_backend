@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -45,41 +46,41 @@ class AdminFuelReportMapperTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Toyota")
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Camry")
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("XV70")
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Camry 2.5")
                 .build();
 
         // Create test fuel report
         testFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .isApproved(false)
                 .build();
     }

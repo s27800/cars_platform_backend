@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminFuelReportResponse {
-    private Long id;
+    private UUID id;
     private BigDecimal fuelConsumption;
     private String comment;
     private LocalDateTime reportDate;

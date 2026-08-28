@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -72,32 +73,32 @@ class FuelReportServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
     }
 
@@ -118,18 +119,18 @@ class FuelReportServiceTest {
                     .build();
 
             // Mock repository and mapper
-            when(fuelReportRepository.findAverageFuelConsumptionForCarId(1))
+            when(fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId()))
                     .thenReturn(Optional.of(avgConsumption));
             when(averageFuelConsumptionMapper.toDto(avgConsumption)).thenReturn(expectedResponse);
 
             // Get average fuel consumption for car
-            AverageFuelConsumptionResponse result = fuelReportService.getAverageFuelConsumptionForCar(1);
+            AverageFuelConsumptionResponse result = fuelReportService.getAverageFuelConsumptionForCar(testCar.getId());
 
             // Verify result -> average fuel consumption is returned
             assertThat(result).isNotNull();
             assertThat(result.getAverageFuelConsumption()).isEqualTo(avgConsumption);
 
-            verify(fuelReportRepository).findAverageFuelConsumptionForCarId(1);
+            verify(fuelReportRepository).findAverageFuelConsumptionForCarId(testCar.getId());
             verify(averageFuelConsumptionMapper).toDto(avgConsumption);
         }
 
@@ -143,12 +144,12 @@ class FuelReportServiceTest {
                     .build();
 
             // Mock repository and mapper
-            when(fuelReportRepository.findAverageFuelConsumptionForCarId(1))
+            when(fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId()))
                     .thenReturn(Optional.empty());
             when(averageFuelConsumptionMapper.toDto(BigDecimal.ZERO)).thenReturn(expectedResponse);
 
             // Get average fuel consumption for car
-            AverageFuelConsumptionResponse result = fuelReportService.getAverageFuelConsumptionForCar(1);
+            AverageFuelConsumptionResponse result = fuelReportService.getAverageFuelConsumptionForCar(testCar.getId());
 
             // Verify result -> average fuel consumption is zero
             assertThat(result.getAverageFuelConsumption()).isEqualTo(BigDecimal.ZERO);
@@ -166,25 +167,25 @@ class FuelReportServiceTest {
 
             // Set up fuel reports
             Pageable pageable = PageRequest.of(0, 10);
-            FuelReport report = TestDataFactory.defaultFuelReport(testUser, testCar).id(1L).build();
+            FuelReport report = TestDataFactory.defaultFuelReport(testUser, testCar).id(UUID.randomUUID()).build();
             Page<FuelReport> reportPage = new PageImpl<>(List.of(report), pageable, 1);
             Page<FuelReportResponse> expectedResponse = new PageImpl<>(
-                    List.of(FuelReportResponse.builder().id(1L).build()),
+                    List.of(FuelReportResponse.builder().id(UUID.randomUUID()).build()),
                     pageable, 1
             );
 
             // Mock repository and mapper
-            when(fuelReportRepository.findByCarIdAndIsApprovedTrue(1, pageable)).thenReturn(reportPage);
+            when(fuelReportRepository.findByCarIdAndIsApprovedTrue(testCar.getId(), pageable)).thenReturn(reportPage);
             when(fuelReportMapper.toDtoList(reportPage)).thenReturn(expectedResponse);
 
             // Get fuel reports for car
-            Page<FuelReportResponse> result = fuelReportService.getFuelReportsForCarId(1, pageable);
+            Page<FuelReportResponse> result = fuelReportService.getFuelReportsForCarId(testCar.getId(), pageable);
 
             // Verify result -> paginated fuel reports are returned
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
 
-            verify(fuelReportRepository).findByCarIdAndIsApprovedTrue(1, pageable);
+            verify(fuelReportRepository).findByCarIdAndIsApprovedTrue(testCar.getId(), pageable);
             verify(fuelReportMapper).toDtoList(reportPage);
         }
     }
@@ -208,11 +209,11 @@ class FuelReportServiceTest {
 
             // Mock repository and mapper
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(carRepository.findById(1)).thenReturn(Optional.of(testCar));
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
             when(createFuelReportMapper.toDto(request)).thenReturn(mappedReport);
 
             // Create fuel report
-            fuelReportService.createFuelReport(1, request, "testuser");
+            fuelReportService.createFuelReport(testCar.getId(), request, "testuser");
 
             // Verify result -> fuel report is saved
             ArgumentCaptor<FuelReport> reportCaptor = ArgumentCaptor.forClass(FuelReport.class);
@@ -238,7 +239,7 @@ class FuelReportServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Create fuel report and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> fuelReportService.createFuelReport(1, request, "unknown"))
+            assertThatThrownBy(() -> fuelReportService.createFuelReport(testCar.getId(), request, "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(fuelReportRepository, never()).save(any());
@@ -254,11 +255,13 @@ class FuelReportServiceTest {
                     .build();
 
             // Mock repository
+            UUID nonExistentCarId = UUID.randomUUID();
+            
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(carRepository.findById(999)).thenReturn(Optional.empty());
+            when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 
             // Create fuel report and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> fuelReportService.createFuelReport(999, request, "testuser"))
+            assertThatThrownBy(() -> fuelReportService.createFuelReport(nonExistentCarId, request, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(fuelReportRepository, never()).save(any());

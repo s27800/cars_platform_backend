@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/admin/reviews")
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class AdminReviewController {
     @PatchMapping("/{id}/approve")
     @Operation(summary = "Approve or reject a review")
     public ResponseEntity<Void> approveReview(
-            @Parameter(description = "ID of the review") @PathVariable Long id,
+            @Parameter(description = "ID of the review") @PathVariable UUID id,
             @Parameter(description = "Whether to approve (true) or reject (false) the review")
             @RequestParam boolean approve) {
 

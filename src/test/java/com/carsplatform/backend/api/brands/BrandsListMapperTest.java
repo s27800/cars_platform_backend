@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -24,7 +26,7 @@ class BrandsListMapperTest {
 
         // Create test brand
         testBrand = Brand.builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("Tesla")
                 .country("USA")
                 .foundedYear(2003)
@@ -57,7 +59,7 @@ class BrandsListMapperTest {
 
             // Verify result -> brand is mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("Tesla");
         }
     }

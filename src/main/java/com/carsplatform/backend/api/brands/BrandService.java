@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class BrandService {
     }
 
     @Transactional(readOnly = true)
-    public BrandDetailsResponse getBrandDetailsById(Integer brandId) {
+    public BrandDetailsResponse getBrandDetailsById(UUID brandId) {
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandId));
 

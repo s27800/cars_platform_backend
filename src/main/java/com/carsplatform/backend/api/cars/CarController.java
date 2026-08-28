@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cars")
@@ -27,7 +28,7 @@ public class CarController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get detailed information about a car")
-    public ResponseEntity<CarDetailsResponse> getCarDetailsById(@Parameter(description = "ID of the car to retrieve") @PathVariable Integer id) {
+    public ResponseEntity<CarDetailsResponse> getCarDetailsById(@Parameter(description = "ID of the car to retrieve") @PathVariable UUID id) {
         CarDetailsResponse carDetailsResponse = carService.getCarDetailsForCarId(id);
         return ResponseEntity.ok(carDetailsResponse);
     }
@@ -36,11 +37,11 @@ public class CarController {
     @Operation(summary = "Search and sort cars by filters")
     public ResponseEntity<Page<CarsListResponse>> searchCars(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) List<Integer> brandIds,
-            @RequestParam(required = false) List<Integer> modelIds,
-            @RequestParam(required = false) List<Integer> generationIds,
-            @RequestParam(required = false) List<Integer> bodyTypeIds,
-            @RequestParam(required = false) List<Integer> tagIds,
+            @RequestParam(required = false) List<UUID> brandIds,
+            @RequestParam(required = false) List<UUID> modelIds,
+            @RequestParam(required = false) List<UUID> generationIds,
+            @RequestParam(required = false) List<UUID> bodyTypeIds,
+            @RequestParam(required = false) List<UUID> tagIds,
             @RequestParam(required = false) Integer minDisplacement,
             @RequestParam(required = false) Integer maxDisplacement,
             @RequestParam(required = false) List<String> engineTypes,
@@ -71,7 +72,7 @@ public class CarController {
     @Operation(summary = "Get similar cars",
             description = "Returns cars similar to the specified car based on tags, brand, or body type")
     public ResponseEntity<List<CarsListResponse>> getSimilarCars(
-            @Parameter(description = "ID of the car") @PathVariable Integer id,
+            @Parameter(description = "ID of the car") @PathVariable UUID id,
             @RequestParam(defaultValue = "4") int limit) {
         return ResponseEntity.ok(carService.findSimilarCars(id, limit));
     }

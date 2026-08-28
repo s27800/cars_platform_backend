@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +53,7 @@ class UserServiceTest {
     void setUp() {
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
     }
 
@@ -101,15 +102,15 @@ class UserServiceTest {
         void loadUserById_UserExists_ReturnsUserPrincipal() {
 
             // Mock repository
-            when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+            when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
             // Load user by ID
-            var result = userService.loadUserById(1L);
+            var result = userService.loadUserById(testUser.getId());
 
             // Verify result -> user is loaded
             assertThat(result).isInstanceOf(UserPrincipal.class);
             assertThat(result.getUsername()).isEqualTo("testuser");
-            verify(userRepository).findById(1L);
+            verify(userRepository).findById(testUser.getId());
         }
 
         @Test
@@ -117,12 +118,14 @@ class UserServiceTest {
         void loadUserById_UserNotFound_ThrowsException() {
 
             // Mock repository
-            when(userRepository.findById(999L)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            
+            when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Load user by non-existing ID and verify result -> UsernameNotFoundException is thrown
-            assertThatThrownBy(() -> userService.loadUserById(999L))
+            assertThatThrownBy(() -> userService.loadUserById(nonExistentId))
                     .isInstanceOf(UsernameNotFoundException.class)
-                    .hasMessageContaining("User not found with id: 999");
+                    .hasMessageContaining("User not found with id: " + nonExistentId);
         }
     }
 

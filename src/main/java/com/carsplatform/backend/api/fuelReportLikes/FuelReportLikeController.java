@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/likes/fuel-report")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class FuelReportLikeController {
     @PostMapping("/{fuelReportId}")
     @Operation(summary = "Toggle like for a fuel report")
     public ResponseEntity<FuelReportLikeResponse> toggleLike(
-            @PathVariable Long fuelReportId,
+            @PathVariable UUID fuelReportId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(
@@ -35,7 +37,7 @@ public class FuelReportLikeController {
     @GetMapping("/{fuelReportId}/status")
     @Operation(summary = "Get like status and count for a fuel report")
     public ResponseEntity<FuelReportLikeResponse> getLikeStatus(
-            @PathVariable Long fuelReportId,
+            @PathVariable UUID fuelReportId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(

@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -26,7 +28,7 @@ class UserMapperTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .username("testuser")
                 .email("testuser@example.com")
                 .firstName("Test")
@@ -60,7 +62,7 @@ class UserMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getId()).isEqualTo(testUser.getId());
             assertThat(result.getUsername()).isEqualTo("testuser");
             assertThat(result.getEmail()).isEqualTo("testuser@example.com");
             assertThat(result.getFirstName()).isEqualTo("Test");
@@ -74,7 +76,7 @@ class UserMapperTest {
 
             // Create admin user
             User adminUser = TestDataFactory.adminUser()
-                    .id(2L)
+                    .id(UUID.randomUUID())
                     .build();
 
             // Map admin user

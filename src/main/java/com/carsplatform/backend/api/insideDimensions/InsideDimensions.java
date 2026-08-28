@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "inside_dimensions")
 @Data
@@ -18,8 +20,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InsideDimensions {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "UUID")
+    private UUID id;
 
     @Column(name = "height_from_seat_to_roof_front")
     private Integer heightFromSeatToRoofFront;

@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/likes")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class LikeController {
     @PostMapping("/{reviewId}")
     @Operation(summary = "Toggle like for a review")
     public ResponseEntity<LikeResponse> toggleLike(
-            @PathVariable Long reviewId,
+            @PathVariable UUID reviewId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(
@@ -35,7 +37,7 @@ public class LikeController {
     @GetMapping("/{reviewId}/status")
     @Operation(summary = "Get like status and count for a review")
     public ResponseEntity<LikeResponse> getLikeStatus(
-            @PathVariable Long reviewId,
+            @PathVariable UUID reviewId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(

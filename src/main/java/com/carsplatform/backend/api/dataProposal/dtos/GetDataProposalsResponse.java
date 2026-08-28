@@ -10,14 +10,15 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetDataProposalsResponse {
-    private Long id;
-    private Long userId;
+    private UUID id;
+    private UUID userId;
     private String username;
     private AdminCarInfoResponse carInfo;
     private String category;

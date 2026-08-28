@@ -20,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class ReviewController {
     @Operation(summary = "Get average ratings for a car")
     public ResponseEntity<AverageRatingsResponse> getAverageRatingsForCar(
             @Parameter(description = "ID of the car to get ratings for")
-            @PathVariable Integer carId) {
+            @PathVariable UUID carId) {
 
         AverageRatingsResponse averageRatings = service.getAverageRatingsForCar(carId);
 
@@ -42,7 +44,7 @@ public class ReviewController {
     @GetMapping("/{carId}")
     @Operation(summary = "Get reviews for a car")
     public ResponseEntity<Page<ReviewResponse>> getReviews(
-            @PathVariable Integer carId,
+            @PathVariable UUID carId,
             Pageable pageable) {
 
         return ResponseEntity.ok(service.getReviewsForCarId(carId, pageable));
@@ -52,7 +54,7 @@ public class ReviewController {
     @Operation(summary = "Add new review for a car")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> createReview(
-            @Parameter(description = "ID of the car") @PathVariable Integer carId,
+            @Parameter(description = "ID of the car") @PathVariable UUID carId,
             @Valid @RequestBody CreateReviewRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
 

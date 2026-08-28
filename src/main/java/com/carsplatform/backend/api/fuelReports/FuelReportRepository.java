@@ -10,11 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
+public interface FuelReportRepository extends JpaRepository<FuelReport, UUID> {
     @EntityGraph(attributePaths = {"user"})
-    Page<FuelReport> findByCarIdAndIsApprovedTrue(Integer carId, Pageable pageable);
+    Page<FuelReport> findByCarIdAndIsApprovedTrue(UUID carId, Pageable pageable);
 
     @Query(
             value =
@@ -33,7 +34,7 @@ public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
     @Query("SELECT AVG(fr.fuelConsumption) " +
             "FROM FuelReport fr " +
             "WHERE fr.car.id = :carId AND fr.isApproved = true")
-    Optional<BigDecimal> findAverageFuelConsumptionForCarId(@Param("carId") Integer carId);
+    Optional<BigDecimal> findAverageFuelConsumptionForCarId(@Param("carId") UUID carId);
 
     @Query(
             value =
@@ -47,5 +48,5 @@ public interface FuelReportRepository extends JpaRepository<FuelReport, Long> {
             countQuery =
                     "SELECT count(fr) FROM FuelReport fr " +
                     "WHERE fr.user.id = :userId")
-    Page<FuelReport> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+    Page<FuelReport> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 }

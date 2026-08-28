@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,7 +28,7 @@ class PerformanceMapperTest {
 
         // Create test performance
         testPerformance = TestDataFactory.defaultPerformance()
-                .id(1)
+                .id(UUID.randomUUID())
                 .maxSpeed(250)
                 .acceleration0100(new BigDecimal("7.2"))
                 .acceleration100200(new BigDecimal("22.5"))
@@ -66,7 +67,7 @@ class PerformanceMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testPerformance.getId());
             assertThat(result.getMaxSpeed()).isEqualTo(250);
             assertThat(result.getAcceleration0100()).isEqualByComparingTo(new BigDecimal("7.2"));
             assertThat(result.getAcceleration100200()).isEqualByComparingTo(new BigDecimal("22.5"));
@@ -85,7 +86,7 @@ class PerformanceMapperTest {
 
             // Create performance without optional fields
             Performance minimalPerformance = Performance.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .maxSpeed(200)
                     .acceleration0100(null)
                     .build();

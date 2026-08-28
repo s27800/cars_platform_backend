@@ -20,10 +20,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CarDetailsResponse {
-    private Integer id;
+    private UUID id;
     private String name;
     private String description;
     private Integer doorsNumber;

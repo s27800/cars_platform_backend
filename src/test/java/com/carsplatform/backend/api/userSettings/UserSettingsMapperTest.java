@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -44,12 +46,12 @@ class UserSettingsMapperTest {
 
             // Create user and settings for testing
             User user = User.builder()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .username("testuser")
                     .build();
 
             UserSettings settings = UserSettings.builder()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .user(user)
                     .theme("dark")
                     .build();
@@ -59,7 +61,7 @@ class UserSettingsMapperTest {
 
             // Verify results -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getId()).isEqualTo(settings.getId());
             assertThat(result.getTheme()).isEqualTo("dark");
         }
     }

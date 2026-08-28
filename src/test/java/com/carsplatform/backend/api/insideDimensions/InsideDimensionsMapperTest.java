@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -25,7 +27,7 @@ class InsideDimensionsMapperTest {
 
         // Create test inside dimensions
         testInsideDimensions = TestDataFactory.defaultInsideDimensions()
-                .id(1)
+                .id(UUID.randomUUID())
                 .heightFromSeatToRoofFront(1020)
                 .heightFromSeatToRoofBack(960)
                 .maxTrunkSpace(1680)
@@ -62,7 +64,7 @@ class InsideDimensionsMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testInsideDimensions.getId());
             assertThat(result.getHeightFromSeatToRoofFront()).isEqualTo(1020);
             assertThat(result.getHeightFromSeatToRoofBack()).isEqualTo(960);
             assertThat(result.getMaxTrunkSpace()).isEqualTo(1680);
@@ -79,7 +81,7 @@ class InsideDimensionsMapperTest {
 
             // Create inside dimensions with only required fields
             InsideDimensions minimalDimensions = InsideDimensions.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .heightFromSeatToRoofFront(1000)
                     .build();
 
@@ -87,7 +89,7 @@ class InsideDimensionsMapperTest {
             CarInsideDimensionsResponse result = mapper.toDto(minimalDimensions);
 
             // Verify null optional fields are handled correctly
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(minimalDimensions.getId());
             assertThat(result.getHeightFromSeatToRoofFront()).isEqualTo(1000);
             assertThat(result.getMaxTrunkSpace()).isNull();
         }

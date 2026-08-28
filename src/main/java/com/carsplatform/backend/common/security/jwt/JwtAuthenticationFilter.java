@@ -19,6 +19,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(jwt)) {
                 if (tokenProvider.validateToken(jwt)) {
-                    Long userId = tokenProvider.getUserIdFromJWT(jwt);
+                    UUID userId = tokenProvider.getUserIdFromJWT(jwt);
 
                     UserDetails userDetails = userService.loadUserById(userId);
 

@@ -16,6 +16,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -33,30 +34,30 @@ class ModelMapperTest {
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
 
         // Create test model
         testModel = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("3 Series")
                 .description("Compact executive car")
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(testModel)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .images(List.of())
                 .tags(new HashSet<>())
                 .build();
@@ -87,7 +88,7 @@ class ModelMapperTest {
 
             // Verify result is mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1);
+            assertThat(result.getId()).isEqualTo(testModel.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
             assertThat(result.getDescription()).isEqualTo("Compact executive car");
         }

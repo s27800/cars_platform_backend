@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,27 +38,27 @@ class GetDataProposalsMapperTest {
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .name("BMW 320i")
                 .images(List.of())
                 .tags(new HashSet<>())
@@ -65,13 +66,13 @@ class GetDataProposalsMapperTest {
 
         // Create test user
         User user = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test proposal
         testProposal = new DataProposal();
 
-        testProposal.setId(1L);
+        testProposal.setId(UUID.randomUUID());
         testProposal.setUser(user);
         testProposal.setCar(testCar);
         testProposal.setCategory("engine");
@@ -107,9 +108,9 @@ class GetDataProposalsMapperTest {
 
             // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getId()).isEqualTo(testProposal.getId());
             assertThat(result.getCarInfo()).isNotNull();
-            assertThat(result.getCarInfo().getCarId()).isEqualTo(1);
+            assertThat(result.getCarInfo().getCarId()).isEqualTo(testCar.getId());
             assertThat(result.getCarInfo().getCarName()).isEqualTo("BMW 320i");
             assertThat(result.getCarInfo().getBrandName()).isEqualTo("Test Brand");
             assertThat(result.getCarInfo().getModelName()).isEqualTo("Test Model");
@@ -132,7 +133,7 @@ class GetDataProposalsMapperTest {
 
             // Verify carInfo is mapped correctly
             assertThat(result.getCarInfo()).isNotNull();
-            assertThat(result.getCarInfo().getCarId()).isEqualTo(1);
+            assertThat(result.getCarInfo().getCarId()).isEqualTo(testCar.getId());
             assertThat(result.getCarInfo().getCarName()).isEqualTo("BMW 320i");
             assertThat(result.getCarInfo().getBrandName()).isEqualTo("Test Brand");
             assertThat(result.getCarInfo().getModelName()).isEqualTo("Test Model");

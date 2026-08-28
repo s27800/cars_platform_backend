@@ -19,6 +19,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -76,7 +77,7 @@ class BrandRepositoryTest {
         void findById_NonExistingBrand_ReturnsEmpty() {
 
             // Find non-existing brand
-            Optional<Brand> result = brandRepository.findById(99999);
+            Optional<Brand> result = brandRepository.findById(UUID.randomUUID());
 
             // Verify result -> brand does not exist
             assertThat(result).isEmpty();
@@ -269,7 +270,7 @@ class BrandRepositoryTest {
         void existsById_NonExistingBrand_ReturnsFalse() {
 
             // Check if brand exists by ID
-            boolean exists = brandRepository.existsById(99999);
+            boolean exists = brandRepository.existsById(UUID.randomUUID());
 
             // Verify result -> brand does not exist
             assertThat(exists).isFalse();

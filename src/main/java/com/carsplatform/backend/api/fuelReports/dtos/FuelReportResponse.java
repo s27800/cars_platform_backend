@@ -4,6 +4,7 @@ import com.carsplatform.backend.api.users.dtos.UsernameResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FuelReportResponse {
-    private Long id;
+    private UUID id;
     private BigDecimal fuelConsumption;
     private String comment;
     private LocalDateTime reportDate;

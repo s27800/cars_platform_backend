@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -58,37 +59,37 @@ class AdminFuelReportServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test fuel report
         testFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .isApproved(false)
                 .build();
     }
@@ -156,11 +157,11 @@ class AdminFuelReportServiceTest {
         void approveFuelReport_FuelReportExists_ApprovesFuelReport() {
 
             // Mock repository
-            when(fuelReportRepository.findById(1L)).thenReturn(Optional.of(testFuelReport));
+            when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
             when(fuelReportRepository.save(any(FuelReport.class))).thenReturn(testFuelReport);
 
             // Approve fuel report
-            adminFuelReportService.approveFuelReport(1L, true);
+            adminFuelReportService.approveFuelReport(testFuelReport.getId(), true);
 
             // Verify results -> fuel report is approved
             ArgumentCaptor<FuelReport> fuelReportCaptor = ArgumentCaptor.forClass(FuelReport.class);
@@ -173,27 +174,19 @@ class AdminFuelReportServiceTest {
         }
 
         @Test
-        @DisplayName("should reject fuel report when approve is false")
-        void approveFuelReport_ApproveFalse_RejectsFuelReport() {
-
-            // Set fuel report as approved first
-            testFuelReport.setIsApproved(true);
+        @DisplayName("should delete fuel report when approve is false")
+        void approveFuelReport_ApproveFalse_DeletesFuelReport() {
 
             // Mock repository
-            when(fuelReportRepository.findById(1L)).thenReturn(Optional.of(testFuelReport));
-            when(fuelReportRepository.save(any(FuelReport.class))).thenReturn(testFuelReport);
+            when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
+            doNothing().when(fuelReportRepository).delete(any(FuelReport.class));
 
             // Reject fuel report
-            adminFuelReportService.approveFuelReport(1L, false);
+            adminFuelReportService.approveFuelReport(testFuelReport.getId(), false);
 
-            // Verify results -> fuel report is rejected
-            ArgumentCaptor<FuelReport> fuelReportCaptor = ArgumentCaptor.forClass(FuelReport.class);
-
-            verify(fuelReportRepository).save(fuelReportCaptor.capture());
-
-            FuelReport savedFuelReport = fuelReportCaptor.getValue();
-
-            assertThat(savedFuelReport.getIsApproved()).isFalse();
+            // Verify results -> fuel report is deleted
+            verify(fuelReportRepository).delete(testFuelReport);
+            verify(fuelReportRepository, never()).save(any());
         }
 
         @Test
@@ -201,10 +194,12 @@ class AdminFuelReportServiceTest {
         void approveFuelReport_FuelReportNotFound_ThrowsException() {
 
             // Mock repository
-            when(fuelReportRepository.findById(999L)).thenReturn(Optional.empty());
+            UUID nonExistentId = UUID.randomUUID();
+            
+            when(fuelReportRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Approve fuel report and verify result -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> adminFuelReportService.approveFuelReport(999L, true))
+            assertThatThrownBy(() -> adminFuelReportService.approveFuelReport(nonExistentId, true))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(fuelReportRepository, never()).save(any());

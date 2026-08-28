@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -45,38 +46,38 @@ class FuelReportMapperTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .username("reporter")
                 .build();
 
         // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test model
         Model model = TestDataFactory.defaultModel(brand)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
-                .id(1)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test fuel report
         testFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
-                .id(1L)
+                .id(UUID.randomUUID())
                 .fuelConsumption(new BigDecimal("7.8"))
                 .comment("Good fuel economy")
                 .reportDate(LocalDateTime.of(2024, 1, 15, 10, 30))
@@ -109,7 +110,7 @@ class FuelReportMapperTest {
 
             // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getId()).isEqualTo(testFuelReport.getId());
             assertThat(result.getFuelConsumption()).isEqualByComparingTo(new BigDecimal("7.8"));
             assertThat(result.getComment()).isEqualTo("Good fuel economy");
             assertThat(result.getReportDate()).isEqualTo(LocalDateTime.of(2024, 1, 15, 10, 30));
@@ -180,12 +181,12 @@ class FuelReportMapperTest {
 
             // Set up fuel reports
             FuelReport report1 = TestDataFactory.defaultFuelReport(testUser, testCar)
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .fuelConsumption(new BigDecimal("7.5"))
                     .build();
 
             FuelReport report2 = TestDataFactory.defaultFuelReport(testUser, testCar)
-                    .id(2L)
+                    .id(UUID.randomUUID())
                     .fuelConsumption(new BigDecimal("8.2"))
                     .build();
 

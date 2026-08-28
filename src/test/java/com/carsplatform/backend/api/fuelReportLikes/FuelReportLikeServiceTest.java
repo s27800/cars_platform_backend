@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -51,12 +52,12 @@ class FuelReportLikeServiceTest {
 
         // Create test user
         testUser = TestDataFactory.defaultUser()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .build();
 
         // Create test fuel report
         testFuelReport = FuelReport.builder()
-                .id(1L)
+                .id(UUID.randomUUID())
                 .fuelConsumption(new BigDecimal("7.5"))
                 .comment("Test fuel report")
                 .isApproved(true)
@@ -74,12 +75,12 @@ class FuelReportLikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(fuelReportRepository.findById(1L)).thenReturn(Optional.of(testFuelReport));
-            when(fuelReportLikeRepository.findByUserIdAndFuelReportId(1L, 1L)).thenReturn(Optional.empty());
-            when(fuelReportLikeRepository.countByFuelReportId(1L)).thenReturn(1L);
+            when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
+            when(fuelReportLikeRepository.findByUserIdAndFuelReportId(testUser.getId(), testFuelReport.getId())).thenReturn(Optional.empty());
+            when(fuelReportLikeRepository.countByFuelReportId(testFuelReport.getId())).thenReturn(1L);
 
             // Toggle like
-            FuelReportLikeResponse result = fuelReportLikeService.toggleLike(1L, "testuser");
+            FuelReportLikeResponse result = fuelReportLikeService.toggleLike(testFuelReport.getId(), "testuser");
 
             // Verify like added
             assertThat(result.isLiked()).isTrue();
@@ -102,19 +103,19 @@ class FuelReportLikeServiceTest {
 
             // Create like
             FuelReportLike existingLike = FuelReportLike.builder()
-                    .id(1L)
+                    .id(UUID.randomUUID())
                     .user(testUser)
                     .fuelReport(testFuelReport)
                     .build();
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(fuelReportRepository.findById(1L)).thenReturn(Optional.of(testFuelReport));
-            when(fuelReportLikeRepository.findByUserIdAndFuelReportId(1L, 1L)).thenReturn(Optional.of(existingLike));
-            when(fuelReportLikeRepository.countByFuelReportId(1L)).thenReturn(0L);
+            when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
+            when(fuelReportLikeRepository.findByUserIdAndFuelReportId(testUser.getId(), testFuelReport.getId())).thenReturn(Optional.of(existingLike));
+            when(fuelReportLikeRepository.countByFuelReportId(testFuelReport.getId())).thenReturn(0L);
 
             // Toggle like
-            FuelReportLikeResponse result = fuelReportLikeService.toggleLike(1L, "testuser");
+            FuelReportLikeResponse result = fuelReportLikeService.toggleLike(testFuelReport.getId(), "testuser");
 
             // Verify like removed
             assertThat(result.isLiked()).isFalse();
@@ -132,7 +133,7 @@ class FuelReportLikeServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Toggle like for non-existent user
-            assertThatThrownBy(() -> fuelReportLikeService.toggleLike(1L, "unknown"))
+            assertThatThrownBy(() -> fuelReportLikeService.toggleLike(testFuelReport.getId(), "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             // Verify like not saved or deleted
@@ -145,11 +146,13 @@ class FuelReportLikeServiceTest {
         void toggleLike_FuelReportNotFound_ThrowsException() {
 
             // Mock dependencies
+            UUID nonExistentReportId = UUID.randomUUID();
+            
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(fuelReportRepository.findById(999L)).thenReturn(Optional.empty());
+            when(fuelReportRepository.findById(nonExistentReportId)).thenReturn(Optional.empty());
 
             // Toggle like for non-existent fuel report
-            assertThatThrownBy(() -> fuelReportLikeService.toggleLike(999L, "testuser"))
+            assertThatThrownBy(() -> fuelReportLikeService.toggleLike(nonExistentReportId, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             // Verify like not saved or deleted
@@ -169,11 +172,11 @@ class FuelReportLikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(fuelReportLikeRepository.existsByUserIdAndFuelReportId(1L, 1L)).thenReturn(true);
-            when(fuelReportLikeRepository.countByFuelReportId(1L)).thenReturn(5L);
+            when(fuelReportLikeRepository.existsByUserIdAndFuelReportId(testUser.getId(), testFuelReport.getId())).thenReturn(true);
+            when(fuelReportLikeRepository.countByFuelReportId(testFuelReport.getId())).thenReturn(5L);
 
             // Get like status
-            FuelReportLikeResponse result = fuelReportLikeService.getLikeStatus(1L, "testuser");
+            FuelReportLikeResponse result = fuelReportLikeService.getLikeStatus(testFuelReport.getId(), "testuser");
 
             // Verify result -> liked
             assertThat(result.isLiked()).isTrue();
@@ -186,11 +189,11 @@ class FuelReportLikeServiceTest {
 
             // Mock dependencies
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(fuelReportLikeRepository.existsByUserIdAndFuelReportId(1L, 1L)).thenReturn(false);
-            when(fuelReportLikeRepository.countByFuelReportId(1L)).thenReturn(3L);
+            when(fuelReportLikeRepository.existsByUserIdAndFuelReportId(testUser.getId(), testFuelReport.getId())).thenReturn(false);
+            when(fuelReportLikeRepository.countByFuelReportId(testFuelReport.getId())).thenReturn(3L);
 
             // Get like status
-            FuelReportLikeResponse result = fuelReportLikeService.getLikeStatus(1L, "testuser");
+            FuelReportLikeResponse result = fuelReportLikeService.getLikeStatus(testFuelReport.getId(), "testuser");
 
             // Verify result -> not liked
             assertThat(result.isLiked()).isFalse();
@@ -205,10 +208,10 @@ class FuelReportLikeServiceTest {
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
             // Get like status for non-existent user and verify results -> ResourceNotFoundException is thrown
-            assertThatThrownBy(() -> fuelReportLikeService.getLikeStatus(1L, "unknown"))
+            assertThatThrownBy(() -> fuelReportLikeService.getLikeStatus(testFuelReport.getId(), "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(fuelReportLikeRepository, never()).existsByUserIdAndFuelReportId(anyLong(), anyLong());
+            verify(fuelReportLikeRepository, never()).existsByUserIdAndFuelReportId(any(), any());
         }
     }
 }
