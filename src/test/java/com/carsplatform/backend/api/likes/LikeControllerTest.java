@@ -130,15 +130,15 @@ class LikeControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void toggleLike_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void toggleLike_NotAuthenticated_Returns401() throws Exception {
 
             // Perform post request to toggle like without authentication and verify results -> 403 is returned
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .post(LIKE_BASE_URL + "/" + testReview.getId())
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            ).andExpect(status().isForbidden());
+            ).andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -185,12 +185,12 @@ class LikeControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getLikeStatus_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getLikeStatus_NotAuthenticated_Returns401() throws Exception {
 
             // Perform get request to retrieve like status without authentication and verify results -> 403 is returned
             performGetNoAuth(LIKE_BASE_URL + "/" + testReview.getId() + "/status")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

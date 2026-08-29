@@ -77,11 +77,11 @@ class SecurityConfigTest extends MockMvcTestBase {
 
         @Test
         @DisplayName("GET /api/users/me requires authentication")
-        void getUserProfile_NoAuth_Returns403() throws Exception {
+        void getUserProfile_NoAuth_Returns401() throws Exception {
 
-            // Perform get request without authentication and verify response status is 403 Forbidden
+            // Perform get request without authentication and verify response status is 401 Unauthorized
             performGetNoAuth("/api/users/me")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -98,46 +98,46 @@ class SecurityConfigTest extends MockMvcTestBase {
 
         @Test
         @DisplayName("POST /api/reviews requires authentication")
-        void createReview_NoAuth_Returns403() throws Exception {
+        void createReview_NoAuth_Returns401() throws Exception {
 
-            // Perform post request without authentication and verify response status is 403 Forbidden
+            // Perform post request without authentication and verify response status is 401 Unauthorized
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .post("/api/reviews/1")
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                             .content("{}")
-            ).andExpect(status().isForbidden());
+            ).andExpect(status().isUnauthorized());
         }
 
         @Test
         @DisplayName("POST /api/fuel-reports requires authentication")
-        void createFuelReport_NoAuth_Returns403() throws Exception {
+        void createFuelReport_NoAuth_Returns401() throws Exception {
 
-            // Perform post request without authentication and verify response status is 403 Forbidden
+            // Perform post request without authentication and verify response status is 401 Unauthorized
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .post("/api/fuel-reports/1")
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                             .content("{}")
-            ).andExpect(status().isForbidden());
+            ).andExpect(status().isUnauthorized());
         }
 
         @Test
         @DisplayName("GET /api/likes/1/status requires authentication")
-        void getLikeStatus_NoAuth_Returns403() throws Exception {
+        void getLikeStatus_NoAuth_Returns401() throws Exception {
 
-            // Perform get request without authentication and verify response status is 403 Forbidden
+            // Perform get request without authentication and verify response status is 401 Unauthorized
             performGetNoAuth("/api/likes/1/status")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
         @DisplayName("GET /api/users/me/data-proposals requires authentication")
-        void getUserDataProposals_NoAuth_Returns403() throws Exception {
+        void getUserDataProposals_NoAuth_Returns401() throws Exception {
 
-            // Perform get request without authentication and verify response status is 403 Forbidden
+            // Perform get request without authentication and verify response status is 401 Unauthorized
             performGetNoAuth("/api/users/me/data-proposals")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
     }
 
@@ -215,37 +215,37 @@ class SecurityConfigTest extends MockMvcTestBase {
     class TokenValidationTests {
 
         @Test
-        @DisplayName("invalid token format returns 403")
-        void protectedEndpoint_InvalidToken_Returns403() throws Exception {
+        @DisplayName("invalid token format returns 401")
+        void protectedEndpoint_InvalidToken_Returns401() throws Exception {
 
-            // Perform get request with invalid token and verify response status is 403 Forbidden
+            // Perform get request with invalid token and verify response status is 401 Unauthorized
             performGetWithAuth("/api/users/me", "invalid.jwt.token")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
-        @DisplayName("expired token returns 403")
-        void protectedEndpoint_ExpiredToken_Returns403() throws Exception {
+        @DisplayName("expired token returns 401")
+        void protectedEndpoint_ExpiredToken_Returns401() throws Exception {
 
             // Generate expired token
             String expiredToken = TestSecurityUtils.generateExpiredToken(UUID.randomUUID());
 
-            // Perform get request with expired token and verify response status is 403 Forbidden
+            // Perform get request with expired token and verify response status is 401 Unauthorized
             performGetWithAuth("/api/users/me", expiredToken)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
-        @DisplayName("missing Bearer prefix returns 403")
-        void protectedEndpoint_NoBearerPrefix_Returns403() throws Exception {
+        @DisplayName("missing Bearer prefix returns 401")
+        void protectedEndpoint_NoBearerPrefix_Returns401() throws Exception {
 
-            // Perform get request with missing Bearer prefix and verify response status is 403 Forbidden
+            // Perform get request with missing Bearer prefix and verify response status is 401 Unauthorized
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .get("/api/users/me")
                             .header("Authorization", "sometoken")
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            ).andExpect(status().isForbidden());
+            ).andExpect(status().isUnauthorized());
         }
     }
 

@@ -110,8 +110,8 @@ class JwtAuthenticationFilterTest {
         }
 
         @Test
-        @DisplayName("returns 403 Forbidden when invalid token")
-        void doFilter_InvalidToken_Returns403() throws Exception {
+        @DisplayName("returns 401 Unauthorized when invalid token")
+        void doFilter_InvalidToken_Returns401() throws Exception {
 
             // Mock dependencies
             String invalidToken = "invalid.jwt.token";
@@ -124,15 +124,15 @@ class JwtAuthenticationFilterTest {
             // Execute filter
             jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
-            // Verify 403 is returned and filter chain does NOT continue
-            verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+            // Verify 401 is returned and filter chain does NOT continue
+            verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             verify(response).setContentType("application/json");
             verify(filterChain, never()).doFilter(request, response);
         }
 
         @Test
-        @DisplayName("returns 403 Forbidden when token validation throws exception")
-        void doFilter_ExceptionDuringValidation_Returns403() throws Exception {
+        @DisplayName("returns 401 Unauthorized when token validation throws exception")
+        void doFilter_ExceptionDuringValidation_Returns401() throws Exception {
 
             // Mock dependencies
             String token = "some.jwt.token";
@@ -145,8 +145,8 @@ class JwtAuthenticationFilterTest {
             // Execute filter
             jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
-            // Verify 403 is returned and filter chain does NOT continue
-            verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+            // Verify 401 is returned and filter chain does NOT continue
+            verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             verify(response).setContentType("application/json");
             verify(filterChain, never()).doFilter(request, response);
         }

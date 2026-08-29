@@ -50,11 +50,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Access denied\", \"message\": \"" + authException.getMessage() + "\"}");
-                        })
+
+                        // Missing or invalid credentials
+                        .authenticationEntryPoint((request, response, authException) ->
+                                SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED,
+                                        "Authentication is required to access this resource."))
+
+                        // Invalid role
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_FORBIDDEN,
+                                        "You do not have permission to perform this action."))
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(

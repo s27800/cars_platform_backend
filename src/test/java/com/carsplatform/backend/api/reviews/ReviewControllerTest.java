@@ -274,8 +274,8 @@ class ReviewControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void createReview_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void createReview_NotAuthenticated_Returns401() throws Exception {
 
             // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
@@ -293,9 +293,9 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .failureFreeRating(4.0)
                     .build();
 
-            // Perform POST request and verify response -> returns 403 Forbidden
+            // Perform POST request and verify response -> returns 401 Unauthorized
             performPostNoAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

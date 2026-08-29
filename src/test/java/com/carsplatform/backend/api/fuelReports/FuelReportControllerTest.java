@@ -201,7 +201,7 @@ class FuelReportControllerTest extends MockMvcTestBase {
 
         @Test
         @DisplayName("returns 401 when not authenticated")
-        void createFuelReport_NotAuthenticated_Returns403() throws Exception {
+        void createFuelReport_NotAuthenticated_Returns401() throws Exception {
 
             // Create fuel report request
             CreateFuelReportRequest request = CreateFuelReportRequest.builder()
@@ -209,9 +209,9 @@ class FuelReportControllerTest extends MockMvcTestBase {
                     .comment("City driving")
                     .build();
 
-            // Perform POST request without authentication and verify response -> returns 403 Forbidden
+            // Perform POST request without authentication and verify response -> returns 401 Unauthorized
             performPostNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId(), request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

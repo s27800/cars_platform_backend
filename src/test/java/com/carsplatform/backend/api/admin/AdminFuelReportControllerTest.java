@@ -174,12 +174,12 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getPendingFuelReports_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getPendingFuelReports_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform GET request without authentication and verify response -> returns 403 Forbidden
+            // Perform GET request without authentication and verify response -> returns 401 Unauthorized
             performGetNoAuth(ADMIN_FUEL_REPORTS_BASE_URL + "/pending")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
     }
 
@@ -227,12 +227,12 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void approveFuelReport_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void approveFuelReport_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform PATCH request without authentication to approve the fuel report and verify response -> returns 403 Forbidden
+            // Perform PATCH request without authentication to approve the fuel report and verify response -> returns 401 Unauthorized
             performPatchNoAuthNoBody(ADMIN_FUEL_REPORTS_BASE_URL + "/" + pendingFuelReport.getId() + "/approve?approve=true")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

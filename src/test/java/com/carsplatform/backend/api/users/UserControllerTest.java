@@ -74,33 +74,33 @@ class UserControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getCurrentUserProfile_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getCurrentUserProfile_NotAuthenticated_Returns401() throws Exception {
 
             // Perform request without authentication -> verify response is 403
             performGetNoAuth(USER_BASE_URL + "/me")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
-        @DisplayName("returns 403 with invalid token")
-        void getCurrentUserProfile_InvalidToken_Returns403() throws Exception {
+        @DisplayName("returns 401 with invalid token")
+        void getCurrentUserProfile_InvalidToken_Returns401() throws Exception {
 
             // Perform request with invalid token -> verify response is 403
             performGetWithAuth(USER_BASE_URL + "/me", "invalid.token.here")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
-        @DisplayName("returns 403 with expired token")
-        void getCurrentUserProfile_ExpiredToken_Returns403() throws Exception {
+        @DisplayName("returns 401 with expired token")
+        void getCurrentUserProfile_ExpiredToken_Returns401() throws Exception {
 
             // Generate expired token
             String expiredToken = TestSecurityUtils.generateExpiredToken(userId);
 
             // Perform request with expired token -> verify response is 403
             performGetWithAuth(USER_BASE_URL + "/me", expiredToken)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
     }
 
@@ -128,8 +128,8 @@ class UserControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void updateUserProfile_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void updateUserProfile_NotAuthenticated_Returns401() throws Exception {
 
             // Create request with updated profile data
             UserModifyRequest request = UserModifyRequest.builder()
@@ -138,7 +138,7 @@ class UserControllerTest extends MockMvcTestBase {
 
             // Perform request without authentication -> verify response is 403
             performPutNoAuth(USER_BASE_URL + "/me", request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -207,8 +207,8 @@ class UserControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void changePassword_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void changePassword_NotAuthenticated_Returns401() throws Exception {
 
             // Create request with correct data
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
@@ -218,7 +218,7 @@ class UserControllerTest extends MockMvcTestBase {
 
             // Perform request without authentication -> verify response is 403
             performPostNoAuth(USER_BASE_URL + "/me/change-password", request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -283,12 +283,12 @@ class UserControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getUserDataProposals_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getUserDataProposals_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform GET request without authentication and verify results -> 403 Forbidden is returned
+            // Perform GET request without authentication and verify results -> 401 Unauthorized is returned
             performGetNoAuth(USER_BASE_URL + "/me/data-proposals")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test

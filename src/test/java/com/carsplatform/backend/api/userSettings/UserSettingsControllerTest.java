@@ -65,12 +65,12 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getSettings_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getSettings_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform GET request without authentication and verify response -> returns 403 Forbidden
+            // Perform GET request without authentication and verify response -> returns 401 Unauthorized
             performGetNoAuth(SETTINGS_URL)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
     }
 
@@ -153,17 +153,17 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void updateSettings_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void updateSettings_NotAuthenticated_Returns401() throws Exception {
 
             // Create request with dark theme
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("dark")
                     .build();
 
-            // Perform PUT request without authentication and verify response -> returns 403 Forbidden
+            // Perform PUT request without authentication and verify response -> returns 401 Unauthorized
             performPutNoAuth(SETTINGS_URL, request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
     }
 }
