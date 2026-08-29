@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ class BrandMapperTest {
         // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
-                .images(List.of())
+                .images(new LinkedHashSet<>())
                 .tags(new HashSet<>())
                 .build();
     }

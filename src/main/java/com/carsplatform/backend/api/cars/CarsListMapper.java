@@ -50,6 +50,6 @@ public interface CarsListMapper {
                 .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
                 .findFirst()
                 .map(CarImage::getImageUrl)
-                .orElse(car.getImages().get(0).getImageUrl());
+                .orElse(car.getImages().iterator().next().getImageUrl());
     }
 }

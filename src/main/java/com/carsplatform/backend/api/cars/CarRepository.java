@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, UUID> {
-    @Query("SELECT c FROM Car c " +
+    @Query("SELECT DISTINCT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
             "LEFT JOIN FETCH c.chassis " +
             "LEFT JOIN FETCH c.transmission " +
@@ -25,6 +25,8 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "LEFT JOIN FETCH c.generation.model " +
             "LEFT JOIN FETCH c.generation.model.brand " +
             "LEFT JOIN FETCH c.bodyType " +
+            "LEFT JOIN FETCH c.images " +
+            "LEFT JOIN FETCH c.tags " +
             "WHERE c.id = :id")
     Optional<Car> findByIdWithDetails(@Param("id") UUID id);
 

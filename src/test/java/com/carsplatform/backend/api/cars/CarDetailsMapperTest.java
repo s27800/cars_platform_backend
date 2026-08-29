@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -75,7 +76,7 @@ class CarDetailsMapperTest {
                 .doorsNumber(4)
                 .seatsNumber(5)
                 .productionYears("2019-2023")
-                .images(List.of())
+                .images(new LinkedHashSet<>())
                 .tags(new HashSet<>())
                 .build();
     }
@@ -231,7 +232,7 @@ class CarDetailsMapperTest {
         void toDto_CarWithEmptyImages_MapsEmptyList() {
 
             // Set empty images list for car
-            testCar.setImages(List.of());
+            testCar.setImages(new LinkedHashSet<>());
 
             // Map valid car
             CarDetailsResponse result = mapper.toDto(testCar);
@@ -251,7 +252,7 @@ class CarDetailsMapperTest {
                     .car(testCar)
                     .build();
 
-            testCar.setImages(List.of(image));
+            testCar.setImages(new LinkedHashSet<>(Set.of(image)));
 
             // Map valid car
             CarDetailsResponse result = mapper.toDto(testCar);

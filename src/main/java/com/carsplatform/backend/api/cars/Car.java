@@ -22,6 +22,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -94,7 +95,7 @@ public class Car {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<CarImage> images = new ArrayList<>();
+    private Set<CarImage> images = new LinkedHashSet<>();
 
     @ManyToMany
     @JoinTable(

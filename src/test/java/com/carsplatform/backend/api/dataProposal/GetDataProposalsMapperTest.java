@@ -18,6 +18,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -60,7 +61,7 @@ class GetDataProposalsMapperTest {
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .name("BMW 320i")
-                .images(List.of())
+                .images(new LinkedHashSet<>())
                 .tags(new HashSet<>())
                 .build();
 
