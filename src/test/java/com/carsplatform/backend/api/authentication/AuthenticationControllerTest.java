@@ -3,10 +3,15 @@ package com.carsplatform.backend.api.authentication;
 import com.carsplatform.backend.api.authentication.dtos.LoginRequest;
 import com.carsplatform.backend.api.authentication.dtos.RegisterRequest;
 import com.carsplatform.backend.common.MockMvcTestBase;
+import com.carsplatform.backend.common.security.LoginAttemptService;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,6 +21,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthenticationControllerTest extends MockMvcTestBase {
 
     private static final String AUTH_BASE_URL = "/api/auth";
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
+
+    @BeforeEach
+    @AfterEach
+    void resetLoginAttempts() {
+        loginAttemptService.reset();
+    }
 
 
     @Nested
@@ -213,6 +228,47 @@ class AuthenticationControllerTest extends MockMvcTestBase {
             // Perform POST request and verify response is 401 Unauthorized
             performPostNoAuth(AUTH_BASE_URL + "/login", loginRequest)
                     .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @DisplayName("returns 429 after too many failed login attempts")
+        void login_TooManyFailedAttempts_Returns429() throws Exception {
+
+            // Register user
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .username("bruteforceuser")
+                    .email("bruteforce@example.com")
+                    .password("CorrectPassword123!")
+                    .firstName("Brute")
+                    .lastName("Force")
+                    .build();
+
+            performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
+                    .andExpect(status().isCreated());
+
+            LoginRequest wrongPassword = LoginRequest.builder()
+                    .username("bruteforceuser")
+                    .password("WrongPassword123!")
+                    .build();
+
+            // Exhaust the limit of failed attempts
+            for (int attempt = 0; attempt < 5; attempt++)
+                performPostNoAuth(AUTH_BASE_URL + "/login", wrongPassword)
+                        .andExpect(status().isUnauthorized());
+
+            // Verify the next attempt is refused before the credentials are even checked
+            performPostNoAuth(AUTH_BASE_URL + "/login", wrongPassword)
+                    .andExpect(status().isTooManyRequests())
+                    .andExpect(header().exists("Retry-After"));
+
+            // Verify the lock applies to the correct password as well
+            LoginRequest correctPassword = LoginRequest.builder()
+                    .username("bruteforceuser")
+                    .password("CorrectPassword123!")
+                    .build();
+
+            performPostNoAuth(AUTH_BASE_URL + "/login", correctPassword)
+                    .andExpect(status().isTooManyRequests());
         }
 
         @Test

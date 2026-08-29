@@ -8,6 +8,7 @@ import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsE
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.security.jwt.JwtTokenProvider;
+import com.carsplatform.backend.common.security.LoginAttemptService;
 import com.carsplatform.backend.common.security.UserPrincipal;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,14 +30,30 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final LoginAttemptService loginAttemptService;
 
     public AuthenticationResponse loginUser(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+
+        // Account not locked validation
+        loginAttemptService.assertNotBlocked(loginRequest.getUsername());
+
+        Authentication authentication;
+
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+
+            // Save failed attempt
+            loginAttemptService.loginFailed(loginRequest.getUsername());
+            throw ex;
+        }
+
+        loginAttemptService.loginSucceeded(loginRequest.getUsername());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);

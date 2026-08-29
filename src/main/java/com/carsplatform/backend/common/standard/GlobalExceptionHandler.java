@@ -2,7 +2,9 @@ package com.carsplatform.backend.common.standard;
 
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
+import com.carsplatform.backend.common.security.TooManyLoginAttemptsException;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -126,6 +128,24 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyLoginAttemptsException(
+            TooManyLoginAttemptsException ex,
+            WebRequest request
+    ) {
+        log.warn("Login blocked: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+                .message(ex.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getSecondsUntilUnlock()))
+                .body(errorResponse);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
