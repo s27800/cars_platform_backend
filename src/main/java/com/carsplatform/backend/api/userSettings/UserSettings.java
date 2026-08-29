@@ -32,4 +32,7 @@ public class UserSettings {
 
     @Size(max = 20)
     private String theme = "light";
+
+    @Size(max = 10)
+    private String language = "en";
 }

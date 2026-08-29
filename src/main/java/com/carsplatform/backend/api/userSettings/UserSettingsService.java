@@ -34,7 +34,11 @@ public class UserSettingsService {
         UserSettings settings = userSettingsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("UserSettings", "userId", currentUser.getId()));
 
-        settings.setTheme(request.getTheme());
+        if (request.getTheme() != null)
+            settings.setTheme(request.getTheme());
+
+        if (request.getLanguage() != null)
+            settings.setLanguage(request.getLanguage());
 
         return userSettingsRepository.save(settings);
     }
