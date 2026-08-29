@@ -690,18 +690,20 @@ class DtoValidationTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 400 when theme is null")
-        void updateSettings_NullTheme_Returns400() throws Exception {
+        @DisplayName("omitting a field leaves its current value untouched")
+        void updateSettings_NullTheme_LeavesThemeUnchanged() throws Exception {
 
-            // Create request with null theme
-            UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
-                    .theme(null)
-                    .build();
+            // Perform PUT request to update the theme
+            performPutWithAuth("/api/user-settings",
+                    UpdateUserSettingsRequest.builder().theme("dark").build(), userToken)
+                    .andExpect(status().isOk());
 
-            // Perform request and verify result -> 400 Bad Request is returned
-            performPutWithAuth("/api/user-settings", request, userToken)
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errors.theme").exists());
+            // Perform request and verify result -> the previously stored theme stays unchanged
+            performPutWithAuth("/api/user-settings",
+                    UpdateUserSettingsRequest.builder().language("pl").build(), userToken)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.language").value("pl"))
+                    .andExpect(jsonPath("$.theme").value("dark"));
         }
 
         @Test
