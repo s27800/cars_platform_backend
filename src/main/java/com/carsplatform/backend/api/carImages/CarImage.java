@@ -29,9 +29,9 @@ public class CarImage {
     @EqualsAndHashCode.Exclude
     private Car car;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, length = 500)
     @NotBlank(message = "Image URL cannot be blank")
-    @Size(max = 255)
+    @Size(max = 500)
     private String imageUrl;
 
     @Column(name = "is_main")
