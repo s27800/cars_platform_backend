@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -651,6 +652,20 @@ class DtoValidationTest extends MockMvcTestBase {
             performPostWithAuth("/api/data-proposals/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.proposedValues").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400 when the proposal touches a field outside its category")
+        void createDataProposal_NonEditableFieldOnly_Returns400() throws Exception {
+
+            // Create request that proposes a change of the entity identifier
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+            request.setCategory("ENGINE");
+            request.setProposedValues(Map.of("id", UUID.randomUUID().toString()));
+
+            // Perform request and verify result -> 400 Bad Request is returned
+            performPostWithAuth("/api/data-proposals/" + testCar.getId(), request, userToken)
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
