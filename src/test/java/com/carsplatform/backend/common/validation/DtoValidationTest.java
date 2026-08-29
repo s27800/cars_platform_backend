@@ -170,6 +170,82 @@ class DtoValidationTest extends MockMvcTestBase {
         }
 
         @Test
+        @DisplayName("returns 400 when password has no uppercase letter or digit")
+        void register_PasswordWithoutComplexity_Returns400WithFieldError() throws Exception {
+
+            // Create request with a long but trivial password
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("onlylowercase")
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for password
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.password").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400 when password exceeds the 72 bytes used by BCrypt")
+        void register_TooLongPassword_Returns400WithFieldError() throws Exception {
+
+            // Create request with a password longer than BCrypt takes into account
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("Aa1" + "x".repeat(80))
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for password
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.password").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400, not 500, when first name is longer than the column")
+        void register_TooLongFirstName_Returns400WithFieldError() throws Exception {
+
+            // Create request with a first name longer than the users.first_name column
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("Password123!")
+                    .firstName("A".repeat(150))
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for first name
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.firstName").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400, not 500, when username is longer than the column")
+        void register_TooLongUsername_Returns400WithFieldError() throws Exception {
+
+            // Create request with a username longer than the users.username column
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("u".repeat(80))
+                    .email("valid@example.com")
+                    .password("Password123!")
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for username
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.username").exists());
+        }
+
+        @Test
         @DisplayName("returns 400 with multiple field errors")
         void register_MultipleInvalidFields_Returns400WithMultipleErrors() throws Exception {
 
@@ -307,6 +383,22 @@ class DtoValidationTest extends MockMvcTestBase {
             // Perform request and assert validation error for new password
             performPostWithAuth("/api/users/me/change-password", request, userToken)
                     .andExpect(status().isBadRequest());
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Pageable limits")
+    class PageableLimitTests {
+
+        @Test
+        @DisplayName("caps the page size instead of materializing the whole table")
+        void search_HugePageSize_IsCappedAtMaximum() throws Exception {
+
+            // Request a page size larger than the configured maximum
+            performGetNoAuth("/api/cars/search?page=0&size=1000000")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.pageable.pageSize").value(100));
         }
     }
 
