@@ -255,17 +255,17 @@ class ReviewControllerTest extends MockMvcTestBase {
             // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This is a great test car review comment")
-                    .engineRating(5.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .engineRating(5)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
 
             // Perform POST request and verify response -> returns 201 Created
@@ -280,17 +280,17 @@ class ReviewControllerTest extends MockMvcTestBase {
             // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This review should not be created")
-                    .engineRating(5.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .engineRating(5)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
 
             // Perform POST request and verify response -> returns 401 Unauthorized
@@ -305,17 +305,17 @@ class ReviewControllerTest extends MockMvcTestBase {
             // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Short")
-                    .engineRating(5.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .engineRating(5)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
 
             // Perform POST request and verify response -> returns 400 Bad Request
@@ -330,7 +330,7 @@ class ReviewControllerTest extends MockMvcTestBase {
             // Create valid request with missing rating fields
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This is a valid length comment for testing purposes")
-                    .engineRating(5.0)
+                    .engineRating(5)
                     .build();
 
             // Perform POST request and verify response -> returns 400 Bad Request

@@ -454,17 +454,17 @@ class DtoValidationTest extends MockMvcTestBase {
         private CreateReviewRequest validReviewRequest() {
             return CreateReviewRequest.builder()
                     .comment("This is a valid comment with enough characters")
-                    .engineRating(4.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .engineRating(4)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
         }
 
@@ -516,7 +516,7 @@ class DtoValidationTest extends MockMvcTestBase {
 
             // Create request with engine rating below 1
             CreateReviewRequest request = validReviewRequest();
-            request.setEngineRating(0.0);
+            request.setEngineRating(0);
 
             // Perform request and verify result -> 400 Bad Request is returned
             performPostWithAuth("/api/reviews/" + testCar.getId(), request, userToken)
@@ -530,7 +530,7 @@ class DtoValidationTest extends MockMvcTestBase {
 
             // Create request with engine rating above 5
             CreateReviewRequest request = validReviewRequest();
-            request.setEngineRating(6.0);
+            request.setEngineRating(6);
 
             // Perform request and verify result -> 400 Bad Request is returned
             performPostWithAuth("/api/reviews/" + testCar.getId(), request, userToken)
@@ -560,16 +560,16 @@ class DtoValidationTest extends MockMvcTestBase {
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Valid comment with enough characters")
                     .engineRating(null)
-                    .transmissionRating(0.0)
-                    .steeringRating(6.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .transmissionRating(0)
+                    .steeringRating(6)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
 
             // Perform request and verify result -> 400 Bad Request is returned
