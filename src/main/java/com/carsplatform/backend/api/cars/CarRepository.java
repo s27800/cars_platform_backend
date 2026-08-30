@@ -137,11 +137,14 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "WHERE c.id != :carId " +
             "AND ((:tagIds IS NOT NULL AND t.id IN :tagIds) " +
             "OR b.id = :brandId " +
-            "OR c.bodyType.id = :bodyTypeId)")
+            "OR c.bodyType.id = :bodyTypeId) " +
+            "ORDER BY CASE WHEN b.id = :brandId THEN 0 ELSE 1 END, " +
+            "CASE WHEN c.bodyType.id = :bodyTypeId THEN 0 ELSE 1 END")
     List<Car> findSimilarCars(
             @Param("carId") UUID carId,
             @Param("tagIds") Set<UUID> tagIds,
             @Param("brandId") UUID brandId,
-            @Param("bodyTypeId") UUID bodyTypeId
+            @Param("bodyTypeId") UUID bodyTypeId,
+            Pageable pageable
     );
 }
