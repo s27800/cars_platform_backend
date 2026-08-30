@@ -61,4 +61,16 @@ public class FuelReportController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/{fuelReportId}")
+    @Operation(summary = "Delete own fuel report")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Void> deleteFuelReport(
+            @Parameter(description = "ID of the fuel report to delete") @PathVariable UUID fuelReportId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        service.deleteOwnFuelReport(fuelReportId, userDetails.getUsername());
+
+        return ResponseEntity.noContent().build();
+    }
 }

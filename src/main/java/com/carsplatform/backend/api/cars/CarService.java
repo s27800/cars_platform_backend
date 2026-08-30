@@ -79,13 +79,18 @@ public class CarService {
                 .map(Tag::getId)
                 .collect(Collectors.toSet());
 
-        List<Car> similarCars = carRepository.findSimilarCars(
+        List<UUID> similarCarIds = carRepository.findSimilarCarIds(
                 carId,
                 tagIds.isEmpty() ? null : tagIds,
                 brandId,
                 bodyTypeId,
                 PageRequest.of(0, limit)
         );
+
+        if (similarCarIds.isEmpty())
+            return List.of();
+
+        List<Car> similarCars = carRepository.findByIdsWithRelations(similarCarIds);
 
         return carsListMapper.map(similarCars);
     }

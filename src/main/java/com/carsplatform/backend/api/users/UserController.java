@@ -93,4 +93,15 @@ public class UserController {
 
         return ResponseEntity.ok(dataProposalService.getUserDataProposals(userDetails.getUsername(), pageable));
     }
+
+    @DeleteMapping("/me")
+    @Operation(summary = "Delete current user's account")
+    public ResponseEntity<SimpleResponse> deleteCurrentUser() {
+        userService.deleteCurrentUser();
+
+        return ResponseEntity.ok(SimpleResponse.builder()
+                .message("Account deleted successfully.")
+                .success(true)
+                .build());
+    }
 }
