@@ -289,4 +289,78 @@ class ReviewServiceTest {
             verify(reviewRepository, never()).save(any());
         }
     }
+
+
+    @Nested
+    @DisplayName("deleteOwnReview")
+    class DeleteOwnReviewTests {
+
+        @Test
+        @DisplayName("should delete review when user owns it")
+        void deleteOwnReview_UserOwnsReview_DeletesSuccessfully() {
+
+            // Mock repository
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
+
+            // Delete review
+            reviewService.deleteOwnReview(testReview.getId(), "testuser");
+
+            // Verify result -> review is deleted
+            verify(reviewRepository).delete(testReview);
+        }
+
+        @Test
+        @DisplayName("should throw ResourceNotFoundException when user not found")
+        void deleteOwnReview_UserNotFound_ThrowsException() {
+
+            // Mock repository
+            when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+            // Delete review with non-existent user and verify result -> ResourceNotFoundException is thrown
+            assertThatThrownBy(() -> reviewService.deleteOwnReview(testReview.getId(), "unknown"))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(reviewRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("should throw ResourceNotFoundException when review not found")
+        void deleteOwnReview_ReviewNotFound_ThrowsException() {
+
+            // Mock repository
+            UUID nonExistentReviewId = UUID.randomUUID();
+
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+            when(reviewRepository.findById(nonExistentReviewId)).thenReturn(Optional.empty());
+
+            // Delete non-existent review and verify result -> ResourceNotFoundException is thrown
+            assertThatThrownBy(() -> reviewService.deleteOwnReview(nonExistentReviewId, "testuser"))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(reviewRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("should throw IllegalStateException when user does not own review")
+        void deleteOwnReview_UserDoesNotOwnReview_ThrowsException() {
+
+            // Create another user who doesn't own the review
+            User anotherUser = TestDataFactory.defaultUser()
+                    .id(UUID.randomUUID())
+                    .username("anotheruser")
+                    .build();
+
+            // Mock repository
+            when(userRepository.findByUsername("anotheruser")).thenReturn(Optional.of(anotherUser));
+            when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
+
+            // Delete review owned by another user and verify result -> IllegalStateException is thrown
+            assertThatThrownBy(() -> reviewService.deleteOwnReview(testReview.getId(), "anotheruser"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("You can only delete your own reviews");
+
+            verify(reviewRepository, never()).delete(any());
+        }
+    }
 }

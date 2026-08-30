@@ -82,4 +82,14 @@ public class UserService implements UserDetailsService {
 
         log.info("Password changed for user: {}", currentUser.getUsername());
     }
+
+    @Transactional
+    public void deleteCurrentUser() {
+        User currentUser = getCurrentUser();
+        String username = currentUser.getUsername();
+
+        userRepository.delete(currentUser);
+
+        log.info("User account deleted: {}", username);
+    }
 }

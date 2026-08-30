@@ -267,4 +267,90 @@ class FuelReportServiceTest {
             verify(fuelReportRepository, never()).save(any());
         }
     }
+
+
+    @Nested
+    @DisplayName("deleteOwnFuelReport")
+    class DeleteOwnFuelReportTests {
+
+        @Test
+        @DisplayName("should delete fuel report when user owns it")
+        void deleteOwnFuelReport_UserOwnsReport_DeletesSuccessfully() {
+
+            // Create test fuel report
+            FuelReport testReport = TestDataFactory.defaultFuelReport(testUser, testCar)
+                    .id(UUID.randomUUID())
+                    .build();
+
+            // Mock repository
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+            when(fuelReportRepository.findById(testReport.getId())).thenReturn(Optional.of(testReport));
+
+            // Delete fuel report
+            fuelReportService.deleteOwnFuelReport(testReport.getId(), "testuser");
+
+            // Verify result -> fuel report is deleted
+            verify(fuelReportRepository).delete(testReport);
+        }
+
+        @Test
+        @DisplayName("should throw ResourceNotFoundException when user not found")
+        void deleteOwnFuelReport_UserNotFound_ThrowsException() {
+
+            // Mock repository
+            UUID reportId = UUID.randomUUID();
+
+            when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+            // Delete fuel report with non-existent user and verify result -> ResourceNotFoundException is thrown
+            assertThatThrownBy(() -> fuelReportService.deleteOwnFuelReport(reportId, "unknown"))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(fuelReportRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("should throw ResourceNotFoundException when fuel report not found")
+        void deleteOwnFuelReport_ReportNotFound_ThrowsException() {
+
+            // Mock repository
+            UUID nonExistentReportId = UUID.randomUUID();
+
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+            when(fuelReportRepository.findById(nonExistentReportId)).thenReturn(Optional.empty());
+
+            // Delete non-existent fuel report and verify result -> ResourceNotFoundException is thrown
+            assertThatThrownBy(() -> fuelReportService.deleteOwnFuelReport(nonExistentReportId, "testuser"))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(fuelReportRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("should throw IllegalStateException when user does not own fuel report")
+        void deleteOwnFuelReport_UserDoesNotOwnReport_ThrowsException() {
+
+            // Create another user who doesn't own the report
+            User anotherUser = TestDataFactory.defaultUser()
+                    .id(UUID.randomUUID())
+                    .username("anotheruser")
+                    .build();
+
+            // Create test fuel report owned by testUser
+            FuelReport testReport = TestDataFactory.defaultFuelReport(testUser, testCar)
+                    .id(UUID.randomUUID())
+                    .build();
+
+            // Mock repository
+            when(userRepository.findByUsername("anotheruser")).thenReturn(Optional.of(anotherUser));
+            when(fuelReportRepository.findById(testReport.getId())).thenReturn(Optional.of(testReport));
+
+            // Delete fuel report owned by another user and verify result -> IllegalStateException is thrown
+            assertThatThrownBy(() -> fuelReportService.deleteOwnFuelReport(testReport.getId(), "anotheruser"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("You can only delete your own fuel reports");
+
+            verify(fuelReportRepository, never()).delete(any());
+        }
+    }
 }

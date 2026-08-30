@@ -73,4 +73,18 @@ public class ReviewService {
 
         reviewRepository.save(review);
     }
+
+    @Transactional
+    public void deleteOwnReview(UUID reviewId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
+
+        if (!review.getUser().getId().equals(user.getId()))
+            throw new IllegalStateException("You can only delete your own reviews.");
+
+        reviewRepository.delete(review);
+    }
 }

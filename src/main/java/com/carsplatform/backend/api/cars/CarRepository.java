@@ -125,11 +125,7 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "WHERE c.id = :id")
     Optional<Car> findByIdWithTagsAndRelations(@Param("id") UUID id);
 
-    @Query(value = "SELECT DISTINCT c FROM Car c " +
-            "LEFT JOIN FETCH c.engine " +
-            "LEFT JOIN FETCH c.bodyType " +
-            "LEFT JOIN FETCH c.transmission " +
-            "LEFT JOIN FETCH c.images " +
+    @Query("SELECT DISTINCT c.id FROM Car c " +
             "LEFT JOIN c.tags t " +
             "LEFT JOIN c.generation g " +
             "LEFT JOIN g.model m " +
@@ -137,14 +133,23 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "WHERE c.id != :carId " +
             "AND ((:tagIds IS NOT NULL AND t.id IN :tagIds) " +
             "OR b.id = :brandId " +
-            "OR c.bodyType.id = :bodyTypeId) " +
-            "ORDER BY CASE WHEN b.id = :brandId THEN 0 ELSE 1 END, " +
-            "CASE WHEN c.bodyType.id = :bodyTypeId THEN 0 ELSE 1 END")
-    List<Car> findSimilarCars(
+            "OR c.bodyType.id = :bodyTypeId)")
+    List<UUID> findSimilarCarIds(
             @Param("carId") UUID carId,
             @Param("tagIds") Set<UUID> tagIds,
             @Param("brandId") UUID brandId,
             @Param("bodyTypeId") UUID bodyTypeId,
             Pageable pageable
     );
+
+    @Query("SELECT c FROM Car c " +
+            "LEFT JOIN FETCH c.engine " +
+            "LEFT JOIN FETCH c.bodyType " +
+            "LEFT JOIN FETCH c.transmission " +
+            "LEFT JOIN FETCH c.images " +
+            "LEFT JOIN FETCH c.generation g " +
+            "LEFT JOIN FETCH g.model m " +
+            "LEFT JOIN FETCH m.brand " +
+            "WHERE c.id IN :ids")
+    List<Car> findByIdsWithRelations(@Param("ids") List<UUID> ids);
 }

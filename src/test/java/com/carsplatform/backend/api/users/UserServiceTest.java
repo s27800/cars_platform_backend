@@ -298,7 +298,43 @@ class UserServiceTest {
         }
     }
 
-    
+
+    @Nested
+    @DisplayName("deleteCurrentUser")
+    class DeleteCurrentUserTests {
+
+        @Test
+        @DisplayName("should delete current user successfully")
+        void deleteCurrentUser_AuthenticatedUser_DeletesSuccessfully() {
+
+            // Mock security context
+            mockSecurityContext("testuser");
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Delete current user
+            userService.deleteCurrentUser();
+
+            // Verify result -> user is deleted
+            verify(userRepository).delete(testUser);
+        }
+
+        @Test
+        @DisplayName("should throw ResourceNotFoundException when user not found")
+        void deleteCurrentUser_UserNotFound_ThrowsException() {
+
+            // Mock security context
+            mockSecurityContext("unknown");
+            when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+            // Delete current user and verify result -> ResourceNotFoundException is thrown
+            assertThatThrownBy(() -> userService.deleteCurrentUser())
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(userRepository, never()).delete(any());
+        }
+    }
+
+
     @org.junit.jupiter.api.AfterEach
     void clearSecurityContext() {
         SecurityContextHolder.clearContext();

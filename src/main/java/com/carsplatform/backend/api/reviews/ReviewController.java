@@ -62,4 +62,16 @@ public class ReviewController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/{reviewId}")
+    @Operation(summary = "Delete own review")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Void> deleteReview(
+            @Parameter(description = "ID of the review to delete") @PathVariable UUID reviewId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        service.deleteOwnReview(reviewId, userDetails.getUsername());
+
+        return ResponseEntity.noContent().build();
+    }
 }

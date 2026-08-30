@@ -90,6 +90,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/users/**", "/api/user-settings/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**", "/api/fuel-reports/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/reviews/**", "/api/fuel-reports/**").authenticated()
                         .requestMatchers("/api/data-proposals/**").authenticated()
                         .requestMatchers("/api/likes/**").authenticated()
 

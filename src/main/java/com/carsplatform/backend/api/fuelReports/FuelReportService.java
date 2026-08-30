@@ -76,4 +76,18 @@ public class FuelReportService {
 
         fuelReportRepository.save(report);
     }
+
+    @Transactional
+    public void deleteOwnFuelReport(UUID fuelReportId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        FuelReport report = fuelReportRepository.findById(fuelReportId)
+                .orElseThrow(() -> new ResourceNotFoundException("FuelReport", "id", fuelReportId));
+
+        if (!report.getUser().getId().equals(user.getId()))
+            throw new IllegalStateException("You can only delete your own fuel reports.");
+
+        fuelReportRepository.delete(report);
+    }
 }
