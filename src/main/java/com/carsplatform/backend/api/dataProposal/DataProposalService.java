@@ -109,6 +109,7 @@ public class DataProposalService {
             throw new IllegalStateException("Proposal contains no fields that can be applied.");
 
         switch (proposal.getCategory().toUpperCase()) {
+            case "BASIC_INFO" -> updateEntity(car, changes);
             case "ENGINE" -> {
                 if (car.getEngine() == null) throw new IllegalStateException("Car has no engine defined.");
                 updateEntity(car.getEngine(), changes);
