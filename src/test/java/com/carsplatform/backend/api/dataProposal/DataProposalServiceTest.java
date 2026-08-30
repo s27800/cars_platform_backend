@@ -8,6 +8,8 @@ import com.carsplatform.backend.api.dataProposal.dtos.CreateDataProposalRequest;
 import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
+import com.carsplatform.backend.api.tags.Tag;
+import com.carsplatform.backend.api.tags.TagRepository;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.TestDataFactory;
@@ -35,10 +37,12 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -58,6 +62,9 @@ class DataProposalServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -293,6 +300,38 @@ class DataProposalServiceTest {
                     .hasMessageContaining("User not found");
 
             verify(dataProposalRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("should create data proposal with TAGS category")
+        void createDataProposal_TagsCategory_CreatesProposal() {
+
+            // Create request with TAGS category
+            UUID tag1Id = UUID.randomUUID();
+            UUID tag2Id = UUID.randomUUID();
+
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+            request.setCategory("TAGS");
+            request.setComment("Add and remove tags");
+            request.setProposedValues(Map.of(
+                    "addTagIds", List.of(tag1Id.toString(), tag2Id.toString()),
+                    "removeTagIds", List.of(UUID.randomUUID().toString())
+            ));
+
+            // Mock repositories to return existing car and user
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Send create proposal request
+            dataProposalService.createDataProposal(testCar.getId(), "testuser", request);
+
+            // Verify results -> proposal is saved with correct data
+            ArgumentCaptor<DataProposal> proposalCaptor = ArgumentCaptor.forClass(DataProposal.class);
+            verify(dataProposalRepository).save(proposalCaptor.capture());
+
+            DataProposal savedProposal = proposalCaptor.getValue();
+            assertThat(savedProposal.getCategory()).isEqualTo("TAGS");
+            assertThat(savedProposal.getProposedValues()).containsKeys("addTagIds", "removeTagIds");
         }
     }
 
@@ -533,6 +572,110 @@ class DataProposalServiceTest {
 
             // Verify results
             assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            verify(carRepository).save(testCar);
+        }
+
+        @Test
+        @DisplayName("should handle TAGS category when approving - add tags")
+        void resolveDataProposal_ApproveTagsCategory_AddsTags() {
+
+            // Create tags to add
+            UUID tag1Id = UUID.randomUUID();
+            UUID tag2Id = UUID.randomUUID();
+
+            Tag tag1 = Tag.builder().id(tag1Id).name("Sportowy").build();
+            Tag tag2 = Tag.builder().id(tag2Id).name("Ekonomiczny").build();
+
+            // Initialize car tags as mutable set
+            testCar.setTags(new HashSet<>());
+
+            // Prepare test data with TAGS category
+            testProposal.setCategory("TAGS");
+            testProposal.setProposedValues(Map.of("addTagIds", List.of(tag1Id.toString(), tag2Id.toString())));
+
+            // Mock repositories
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
+            when(tagRepository.findAllById(anyList())).thenReturn(List.of(tag1, tag2));
+
+            // Send resolve proposal request
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Tags added");
+
+            // Verify results
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            assertThat(testCar.getTags()).containsExactlyInAnyOrder(tag1, tag2);
+            verify(carRepository).save(testCar);
+        }
+
+        @Test
+        @DisplayName("should handle TAGS category when approving - remove tags")
+        void resolveDataProposal_ApproveTagsCategory_RemovesTags() {
+
+            // Create existing tags
+            UUID tag1Id = UUID.randomUUID();
+            UUID tag2Id = UUID.randomUUID();
+            UUID tag3Id = UUID.randomUUID();
+
+            Tag tag1 = Tag.builder().id(tag1Id).name("Sportowy").build();
+            Tag tag2 = Tag.builder().id(tag2Id).name("Ekonomiczny").build();
+            Tag tag3 = Tag.builder().id(tag3Id).name("Rodzinny").build();
+
+            // Initialize car with existing tags
+            Set<Tag> existingTags = new HashSet<>();
+            existingTags.add(tag1);
+            existingTags.add(tag2);
+            existingTags.add(tag3);
+            testCar.setTags(existingTags);
+
+            // Prepare test data with TAGS category - remove tag1 and tag2
+            testProposal.setCategory("TAGS");
+            testProposal.setProposedValues(Map.of("removeTagIds", List.of(tag1Id.toString(), tag2Id.toString())));
+
+            // Mock repositories
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
+
+            // Send resolve proposal request
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Tags removed");
+
+            // Verify results
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            assertThat(testCar.getTags()).containsExactly(tag3);
+            verify(carRepository).save(testCar);
+        }
+
+        @Test
+        @DisplayName("should handle TAGS category when approving - add and remove tags")
+        void resolveDataProposal_ApproveTagsCategory_AddAndRemoveTags() {
+
+            // Create existing tag
+            UUID existingTagId = UUID.randomUUID();
+            Tag existingTag = Tag.builder().id(existingTagId).name("Sportowy").build();
+
+            // Create new tag to add
+            UUID newTagId = UUID.randomUUID();
+            Tag newTag = Tag.builder().id(newTagId).name("Ekonomiczny").build();
+
+            // Initialize car with existing tag
+            Set<Tag> existingTags = new HashSet<>();
+            existingTags.add(existingTag);
+            testCar.setTags(existingTags);
+
+            // Prepare test data - add newTag, remove existingTag
+            testProposal.setCategory("TAGS");
+            testProposal.setProposedValues(Map.of(
+                    "addTagIds", List.of(newTagId.toString()),
+                    "removeTagIds", List.of(existingTagId.toString())
+            ));
+
+            // Mock repositories
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
+            when(tagRepository.findAllById(anyList())).thenReturn(List.of(newTag));
+
+            // Send resolve proposal request
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Tags modified");
+
+            // Verify results
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+            assertThat(testCar.getTags()).containsExactly(newTag);
             verify(carRepository).save(testCar);
         }
     }

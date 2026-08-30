@@ -34,7 +34,10 @@ public final class DataProposalFields {
                     "minTrunkSpace", "maxTrunkSpace", "heightFromSeatToRoofFront", "heightFromSeatToRoofBack"),
 
             "BASIC_INFO", Set.of(
-                    "doorsNumber", "seatsNumber", "productionYears", "description")
+                    "doorsNumber", "seatsNumber", "productionYears", "description"),
+
+            "TAGS", Set.of(
+                    "addTagIds", "removeTagIds")
     );
 
     private DataProposalFields() {

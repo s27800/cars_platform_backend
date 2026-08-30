@@ -4,6 +4,8 @@ import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.dataProposal.dtos.CreateDataProposalRequest;
 import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
+import com.carsplatform.backend.api.tags.Tag;
+import com.carsplatform.backend.api.tags.TagRepository;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 
@@ -22,8 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ public class DataProposalService {
     private final DataProposalRepository dataProposalRepository;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
     private final ObjectMapper objectMapper;
     private final GetDataProposalsMapper dataProposalsMapper;
 
@@ -136,10 +142,40 @@ public class DataProposalService {
                     throw new IllegalStateException("Car has no outside dimensions defined.");
                 updateEntity(car.getOutsideDimensions(), changes);
             }
+            case "TAGS" -> applyTagChanges(car, changes);
             default -> throw new IllegalArgumentException("Unknown category: " + proposal.getCategory() + ".");
         }
 
         carRepository.save(car);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void applyTagChanges(Car car, Map<String, Object> changes) {
+        
+        // Handle tags to add
+        Object addTagIdsObj = changes.get("addTagIds");
+        if (addTagIdsObj instanceof List<?> addTagIdsList) {
+            List<UUID> addTagIds = addTagIdsList.stream()
+                    .map(id -> id instanceof String ? UUID.fromString((String) id) : (UUID) id)
+                    .collect(Collectors.toList());
+
+            if (!addTagIds.isEmpty()) {
+                List<Tag> tagsToAdd = tagRepository.findAllById(addTagIds);
+                car.getTags().addAll(tagsToAdd);
+            }
+        }
+
+        // Handle tags to remove
+        Object removeTagIdsObj = changes.get("removeTagIds");
+        if (removeTagIdsObj instanceof List<?> removeTagIdsList) {
+            Set<UUID> removeTagIds = removeTagIdsList.stream()
+                    .map(id -> id instanceof String ? UUID.fromString((String) id) : (UUID) id)
+                    .collect(Collectors.toSet());
+
+            if (!removeTagIds.isEmpty()) {
+                car.getTags().removeIf(tag -> removeTagIds.contains(tag.getId()));
+            }
+        }
     }
 
     private void updateEntity(Object entityToUpdate, Map<String, Object> changes) {
