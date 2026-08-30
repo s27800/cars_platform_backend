@@ -31,8 +31,10 @@ public class UserSettings {
     private User user;
 
     @Size(max = 20)
+    @Builder.Default
     private String theme = "light";
 
     @Size(max = 10)
+    @Builder.Default
     private String language = "en";
 }

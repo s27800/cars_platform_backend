@@ -33,5 +33,6 @@ public class Tag {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
+    @Builder.Default
     private Set<Car> cars = new HashSet<>();
 }

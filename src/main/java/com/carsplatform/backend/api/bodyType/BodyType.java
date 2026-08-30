@@ -33,5 +33,6 @@ public class BodyType {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
+    @Builder.Default
     private List<Car> cars = new ArrayList<>();
 }

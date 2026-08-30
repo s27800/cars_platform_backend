@@ -52,6 +52,7 @@ public class FuelReport {
     private LocalDateTime reportDate;
 
     @Column(name = "is_approved")
+    @Builder.Default
     private Boolean isApproved = false;
 
     @Formula("(SELECT COUNT(*) FROM fuel_report_likes frl WHERE frl.fuel_report_id = id)")

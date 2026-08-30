@@ -35,5 +35,6 @@ public class CarImage {
     private String imageUrl;
 
     @Column(name = "is_main")
+    @Builder.Default
     private Boolean isMain = false;
 }

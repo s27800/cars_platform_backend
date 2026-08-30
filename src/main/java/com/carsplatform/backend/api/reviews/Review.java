@@ -102,6 +102,7 @@ public class Review {
     private LocalDateTime reviewDate;
 
     @Column(name = "is_approved")
+    @Builder.Default
     private Boolean isApproved = false;
 
     @Formula("(SELECT COUNT(*) FROM likes l WHERE l.review_id = id)")
