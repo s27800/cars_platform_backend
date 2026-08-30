@@ -140,19 +140,19 @@ class FuelReportServiceTest {
 
             // Set up expected response
             AverageFuelConsumptionResponse expectedResponse = AverageFuelConsumptionResponse.builder()
-                    .averageFuelConsumption(BigDecimal.ZERO)
+                    .averageFuelConsumption(null)
                     .build();
 
             // Mock repository and mapper
             when(fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId()))
                     .thenReturn(Optional.empty());
-            when(averageFuelConsumptionMapper.toDto(BigDecimal.ZERO)).thenReturn(expectedResponse);
+            when(averageFuelConsumptionMapper.toDto(null)).thenReturn(expectedResponse);
 
             // Get average fuel consumption for car
             AverageFuelConsumptionResponse result = fuelReportService.getAverageFuelConsumptionForCar(testCar.getId());
 
-            // Verify result -> average fuel consumption is zero
-            assertThat(result.getAverageFuelConsumption()).isEqualTo(BigDecimal.ZERO);
+            // Verify result -> average fuel consumption is null
+            assertThat(result.getAverageFuelConsumption()).isNull();
         }
     }
 
@@ -256,7 +256,7 @@ class FuelReportServiceTest {
 
             // Mock repository
             UUID nonExistentCarId = UUID.randomUUID();
-            
+
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 

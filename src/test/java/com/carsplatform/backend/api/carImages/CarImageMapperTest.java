@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +41,7 @@ class CarImageMapperTest {
 
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
-                .images(new ArrayList<>())
+                .images(new LinkedHashSet<>())
                 .build();
 
         testImage = CarImage.builder()
@@ -118,7 +118,7 @@ class CarImageMapperTest {
         void toDtoList_EmptyList_ReturnsEmptyList() {
 
             // Map empty list
-            List<CarImageResponse> result = mapper.toDtoList(new ArrayList<>());
+            List<CarImageResponse> result = mapper.toDtoList(new LinkedHashSet<>());
 
             // Verify result is empty
             assertThat(result).isEmpty();

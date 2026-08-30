@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -150,6 +151,105 @@ class DataProposalServiceTest {
             assertThat(savedProposal.getUser()).isEqualTo(testUser);
             assertThat(savedProposal.getCategory()).isEqualTo("ENGINE");
             assertThat(savedProposal.getStatus()).isEqualTo(DataProposalStatus.PENDING);
+        }
+
+        @Test
+        @DisplayName("should drop fields that do not belong to the category")
+        void createDataProposal_UnknownFields_AreFilteredOut() {
+
+            // Create request with the entity id and a field of another category
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+
+            request.setCategory("ENGINE");
+            request.setProposedValues(new LinkedHashMap<>(Map.of(
+                    "maxPower", 220,
+                    "id", UUID.randomUUID().toString(),
+                    "gearsNumber", 8
+            )));
+
+            // Mock repositories to return existing car and user
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Send create proposal request
+            dataProposalService.createDataProposal(testCar.getId(), "testuser", request);
+
+            // Verify results -> only the editable engine field is stored
+            ArgumentCaptor<DataProposal> proposalCaptor = ArgumentCaptor.forClass(DataProposal.class);
+
+            verify(dataProposalRepository).save(proposalCaptor.capture());
+
+            assertThat(proposalCaptor.getValue().getProposedValues())
+                    .containsOnlyKeys("maxPower");
+        }
+
+        @Test
+        @DisplayName("should throw IllegalArgumentException when no editable field is left")
+        void createDataProposal_OnlyUnknownFields_ThrowsException() {
+
+            // Create request containing nothing but non-editable fields
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+
+            request.setCategory("ENGINE");
+            request.setProposedValues(Map.of("id", UUID.randomUUID().toString()));
+
+            // Mock repositories to return existing car and user
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Send create proposal request and verify results -> IllegalArgumentException is thrown
+            assertThatThrownBy(() -> dataProposalService.createDataProposal(testCar.getId(), "testuser", request))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("No editable fields");
+
+            verify(dataProposalRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("should throw IllegalArgumentException for an unknown category")
+        void createDataProposal_UnknownCategory_ThrowsException() {
+
+            // Create request with a category that does not exist
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+
+            request.setCategory("USERS");
+            request.setProposedValues(Map.of("isAdmin", true));
+
+            // Mock repositories to return existing car and user
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Send create proposal request and verify results -> IllegalArgumentException is thrown
+            assertThatThrownBy(() -> dataProposalService.createDataProposal(testCar.getId(), "testuser", request))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Unknown category");
+
+            verify(dataProposalRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("should store the category in upper case")
+        void createDataProposal_LowerCaseCategory_IsNormalized() {
+
+            // Create request with a lower case category
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+
+            request.setCategory("engine");
+            request.setProposedValues(Map.of("maxPower", 220));
+
+            // Mock repositories to return existing car and user
+            when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // Send create proposal request
+            dataProposalService.createDataProposal(testCar.getId(), "testuser", request);
+
+            // Verify results -> category is stored normalized
+            ArgumentCaptor<DataProposal> proposalCaptor = ArgumentCaptor.forClass(DataProposal.class);
+
+            verify(dataProposalRepository).save(proposalCaptor.capture());
+
+            assertThat(proposalCaptor.getValue().getCategory()).isEqualTo("ENGINE");
         }
 
         @Test
@@ -323,12 +423,41 @@ class DataProposalServiceTest {
         }
 
         @Test
+        @DisplayName("should ignore non-editable fields of a proposal stored before the whitelist")
+        void resolveDataProposal_ApproveLegacyProposalWithForbiddenField_AppliesOnlyAllowedFields() throws Exception {
+
+            // Prepare a proposal that also carries the entity id
+            testProposal.setCategory("ENGINE");
+            testProposal.setProposedValues(new LinkedHashMap<>(Map.of(
+                    "maxPower", 250,
+                    "id", UUID.randomUUID().toString()
+            )));
+
+            // Mock repositories to return existing proposal
+            when(dataProposalRepository.findById(testProposal.getId())).thenReturn(Optional.of(testProposal));
+
+            // Mock ObjectMapper behavior
+            when(objectMapper.valueToTree(testCar.getEngine())).thenReturn(mock(ObjectNode.class));
+            when(objectMapper.valueToTree(Map.of("maxPower", 250))).thenReturn(mock(ObjectNode.class));
+            when(objectMapper.readerForUpdating(testCar.getEngine())).thenReturn(mock(ObjectReader.class));
+
+            // Send approval request
+            dataProposalService.resolveDataProposal(testProposal.getId(), true, "Approved");
+
+            // Verify results -> only the whitelisted field was handed over to the mapper
+            assertThat(testProposal.getStatus()).isEqualTo(DataProposalStatus.APPROVED);
+
+            verify(objectMapper).valueToTree(Map.of("maxPower", 250));
+            verify(objectMapper, never()).valueToTree(testProposal.getProposedValues());
+        }
+
+        @Test
         @DisplayName("should throw EntityNotFoundException when proposal not found")
         void resolveDataProposal_ProposalNotFound_ThrowsException() {
 
             // Mock repositories to return non-existent proposal
             UUID nonExistentProposalId = UUID.randomUUID();
-            
+
             when(dataProposalRepository.findById(nonExistentProposalId)).thenReturn(Optional.empty());
 
             // Send resolve proposal request and verify results -> EntityNotFoundException is thrown

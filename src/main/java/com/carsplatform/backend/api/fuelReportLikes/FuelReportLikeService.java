@@ -9,6 +9,7 @@ import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundExcept
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,13 +38,19 @@ public class FuelReportLikeService {
             fuelReportLikeRepository.delete(existingLike.get());
             isLikedNow = false;
         } else {
-            FuelReportLike newLike = FuelReportLike.builder()
-                    .user(user)
-                    .fuelReport(fuelReport)
-                    .build();
+            try {
+                FuelReportLike newLike = FuelReportLike.builder()
+                        .user(user)
+                        .fuelReport(fuelReport)
+                        .build();
 
-            fuelReportLikeRepository.save(newLike);
-            isLikedNow = true;
+                fuelReportLikeRepository.save(newLike);
+                isLikedNow = true;
+            } catch (DataIntegrityViolationException e) {
+                
+                // Like already exists
+                isLikedNow = true;
+            }
         }
 
         long count = fuelReportLikeRepository.countByFuelReportId(fuelReportId);

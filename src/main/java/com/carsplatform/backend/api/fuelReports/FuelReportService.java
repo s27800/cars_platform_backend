@@ -40,7 +40,7 @@ public class FuelReportService {
         Optional<BigDecimal> avgConsumption = fuelReportRepository.findAverageFuelConsumptionForCarId(carId);
 
         return averageFuelConsumptionMapper.toDto(
-                avgConsumption.orElse(BigDecimal.ZERO)
+                avgConsumption.orElse(null)
         );
     }
 

@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,7 +83,7 @@ class CarsListMapperTest {
                 .name("320i")
                 .engine(engine)
                 .transmission(transmission)
-                .images(List.of())
+                .images(new LinkedHashSet<>())
                 .tags(new HashSet<>())
                 .build();
     }
@@ -173,7 +174,7 @@ class CarsListMapperTest {
             secondaryImage.setIsMain(false);
             secondaryImage.setCar(testCar);
 
-            testCar.setImages(List.of(secondaryImage, mainImage));
+            testCar.setImages(new LinkedHashSet<>(List.of(secondaryImage, mainImage)));
 
             // Map valid car with images
             CarsListResponse result = mapper.toDto(testCar);
@@ -187,7 +188,7 @@ class CarsListMapperTest {
         void toDto_CarWithNoImages_ReturnsNullImageUrl() {
 
             // Set no images
-            testCar.setImages(List.of());
+            testCar.setImages(new LinkedHashSet<>());
 
             // Map valid car with no images
             CarsListResponse result = mapper.toDto(testCar);

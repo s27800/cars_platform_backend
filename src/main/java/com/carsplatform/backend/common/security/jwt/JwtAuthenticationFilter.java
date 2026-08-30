@@ -1,6 +1,7 @@
 package com.carsplatform.backend.common.security.jwt;
 
 import com.carsplatform.backend.api.users.UserService;
+import com.carsplatform.backend.common.security.SecurityErrorResponseWriter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,18 +52,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    // Token is present but invalid - return 403 Forbidden
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\": \"Access denied\", \"message\": \"Invalid JWT token\"}");
+                    // Token is present but invalid or expired
+                    SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED,
+                            "Invalid or expired authentication token.");
                     return;
                 }
             }
         } catch (Exception ex) {
-            log.error("Could not set user authentication in security context", ex);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Access denied\", \"message\": \"" + ex.getMessage() + "\"}");
+            log.warn("Could not set user authentication in security context: {}", ex.getMessage());
+
+            SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid or expired authentication token.");
+
             return;
         }
 
@@ -71,9 +72,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
             return bearerToken.substring(7);
-        }
+
         return null;
     }
 }

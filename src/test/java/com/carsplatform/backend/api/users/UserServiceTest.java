@@ -119,7 +119,7 @@ class UserServiceTest {
 
             // Mock repository
             UUID nonExistentId = UUID.randomUUID();
-            
+
             when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
             // Load user by non-existing ID and verify result -> UsernameNotFoundException is thrown
@@ -296,6 +296,12 @@ class UserServiceTest {
 
             verify(userRepository, never()).save(any());
         }
+    }
+
+    
+    @org.junit.jupiter.api.AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
 

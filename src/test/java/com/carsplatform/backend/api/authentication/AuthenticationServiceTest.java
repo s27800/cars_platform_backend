@@ -7,9 +7,12 @@ import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
+import com.carsplatform.backend.common.security.LoginAttemptService;
+import com.carsplatform.backend.common.security.TooManyLoginAttemptsException;
 import com.carsplatform.backend.common.security.UserPrincipal;
 import com.carsplatform.backend.common.security.jwt.JwtTokenProvider;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +28,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,6 +55,9 @@ class AuthenticationServiceTest {
     @Mock
     private JwtTokenProvider tokenProvider;
 
+    @Mock
+    private LoginAttemptService loginAttemptService;
+
     @InjectMocks
     private AuthenticationService authenticationService;
 
@@ -62,6 +69,11 @@ class AuthenticationServiceTest {
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .build();
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
 
@@ -97,6 +109,9 @@ class AuthenticationServiceTest {
 
             verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
             verify(tokenProvider).generateToken(authentication);
+
+            // Verify the failure counter is cleared after a successful login
+            verify(loginAttemptService).loginSucceeded("testuser");
         }
 
         @Test
@@ -113,6 +128,27 @@ class AuthenticationServiceTest {
             // Login user and verify results -> BadCredentialsException is thrown
             assertThatThrownBy(() -> authenticationService.loginUser(loginRequest))
                     .isInstanceOf(BadCredentialsException.class);
+
+            // Verify the failed attempt is counted towards the brute force limit
+            verify(loginAttemptService).loginFailed("testuser");
+        }
+
+        @Test
+        @DisplayName("should not authenticate at all when the account is temporarily locked")
+        void login_BlockedAccount_ThrowsWithoutAuthenticating() {
+
+            // Create login request for a locked account
+            LoginRequest loginRequest = new LoginRequest("testuser", "password123");
+
+            // Mock login attempt service to report the account as blocked
+            doThrow(new TooManyLoginAttemptsException(900))
+                    .when(loginAttemptService).assertNotBlocked("testuser");
+
+            // Login user and verify results -> TooManyLoginAttemptsException is thrown
+            assertThatThrownBy(() -> authenticationService.loginUser(loginRequest))
+                    .isInstanceOf(TooManyLoginAttemptsException.class);
+
+            verify(authenticationManager, never()).authenticate(any());
         }
 
         @Test

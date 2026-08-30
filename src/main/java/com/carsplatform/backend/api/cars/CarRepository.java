@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, UUID> {
-    @Query("SELECT c FROM Car c " +
+    @Query("SELECT DISTINCT c FROM Car c " +
             "LEFT JOIN FETCH c.engine " +
             "LEFT JOIN FETCH c.chassis " +
             "LEFT JOIN FETCH c.transmission " +
@@ -25,6 +25,8 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "LEFT JOIN FETCH c.generation.model " +
             "LEFT JOIN FETCH c.generation.model.brand " +
             "LEFT JOIN FETCH c.bodyType " +
+            "LEFT JOIN FETCH c.images " +
+            "LEFT JOIN FETCH c.tags " +
             "WHERE c.id = :id")
     Optional<Car> findByIdWithDetails(@Param("id") UUID id);
 
@@ -135,11 +137,14 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
             "WHERE c.id != :carId " +
             "AND ((:tagIds IS NOT NULL AND t.id IN :tagIds) " +
             "OR b.id = :brandId " +
-            "OR c.bodyType.id = :bodyTypeId)")
+            "OR c.bodyType.id = :bodyTypeId) " +
+            "ORDER BY CASE WHEN b.id = :brandId THEN 0 ELSE 1 END, " +
+            "CASE WHEN c.bodyType.id = :bodyTypeId THEN 0 ELSE 1 END")
     List<Car> findSimilarCars(
             @Param("carId") UUID carId,
             @Param("tagIds") Set<UUID> tagIds,
             @Param("brandId") UUID brandId,
-            @Param("bodyTypeId") UUID bodyTypeId
+            @Param("bodyTypeId") UUID bodyTypeId,
+            Pageable pageable
     );
 }

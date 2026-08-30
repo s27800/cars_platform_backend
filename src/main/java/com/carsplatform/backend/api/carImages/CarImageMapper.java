@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ public interface CarImageMapper {
     CarImageResponse toDto(CarImage carImage);
 
     @Named("toDtoList")
-    default List<CarImageResponse> toDtoList(List<CarImage> images) {
+    default List<CarImageResponse> toDtoList(Collection<CarImage> images) {
         if (images == null)
             return null;
 

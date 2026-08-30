@@ -42,13 +42,22 @@ public class DataProposalService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found."));
 
+        // Keep only the fields that belong to the category
+        String category = DataProposalFields.normalizeCategory(dto.getCategory());
+        Map<String, Object> proposedValues = DataProposalFields.filter(category, dto.getProposedValues());
+
+        if (proposedValues.isEmpty())
+            throw new IllegalArgumentException(
+                    "No editable fields for category " + category + ". Allowed fields: "
+                            + DataProposalFields.allowedFieldsFor(category) + ".");
+
         DataProposal proposal = new DataProposal();
 
         proposal.setCar(car);
         proposal.setUser(user);
-        proposal.setCategory(dto.getCategory());
+        proposal.setCategory(category);
         proposal.setComment(dto.getComment());
-        proposal.setProposedValues(dto.getProposedValues());
+        proposal.setProposedValues(proposedValues);
         proposal.setStatus(DataProposalStatus.PENDING);
 
         dataProposalRepository.save(proposal);
@@ -92,9 +101,15 @@ public class DataProposalService {
 
     private void applyChanges(DataProposal proposal) {
         Car car = proposal.getCar();
-        Map<String, Object> changes = proposal.getProposedValues();
+
+        // Filtered again on approval
+        Map<String, Object> changes = DataProposalFields.filter(proposal.getCategory(), proposal.getProposedValues());
+
+        if (changes.isEmpty())
+            throw new IllegalStateException("Proposal contains no fields that can be applied.");
 
         switch (proposal.getCategory().toUpperCase()) {
+            case "BASIC_INFO" -> updateEntity(car, changes);
             case "ENGINE" -> {
                 if (car.getEngine() == null) throw new IllegalStateException("Car has no engine defined.");
                 updateEntity(car.getEngine(), changes);

@@ -8,6 +8,7 @@ import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundExcept
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,27 +83,10 @@ public class CarService {
                 carId,
                 tagIds.isEmpty() ? null : tagIds,
                 brandId,
-                bodyTypeId
+                bodyTypeId,
+                PageRequest.of(0, limit)
         );
 
-        return similarCars.stream()
-                .sorted((c1, c2) -> {
-                    boolean c1SameBrand = c1.getGeneration().getModel().getBrand().getId().equals(brandId);
-                    boolean c2SameBrand = c2.getGeneration().getModel().getBrand().getId().equals(brandId);
-
-                    if (c1SameBrand != c2SameBrand)
-                        return c1SameBrand ? -1 : 1;
-
-                    boolean c1SameBody = c1.getBodyType().getId().equals(bodyTypeId);
-                    boolean c2SameBody = c2.getBodyType().getId().equals(bodyTypeId);
-
-                    if (c1SameBody != c2SameBody)
-                        return c1SameBody ? -1 : 1;
-
-                    return 0;
-                })
-                .limit(limit)
-                .map(carsListMapper::toDto)
-                .collect(Collectors.toList());
+        return carsListMapper.map(similarCars);
     }
 }

@@ -42,5 +42,6 @@ public class Model {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
+    @Builder.Default
     private List<Generation> generations = new ArrayList<>();
 }

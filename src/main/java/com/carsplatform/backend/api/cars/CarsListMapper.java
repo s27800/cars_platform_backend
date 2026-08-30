@@ -38,6 +38,14 @@ public interface CarsListMapper {
         return generation.getCars().stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    @Named("mapList")
+    default List<CarsListResponse> map(List<Car> cars) {
+        if (cars == null)
+            return null;
+
+        return cars.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     @Named("map")
     default Page<CarsListResponse> map(Page<Car> cars) {
         return cars.map(this::toDto);
@@ -50,6 +58,6 @@ public interface CarsListMapper {
                 .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
                 .findFirst()
                 .map(CarImage::getImageUrl)
-                .orElse(car.getImages().get(0).getImageUrl());
+                .orElse(car.getImages().iterator().next().getImageUrl());
     }
 }

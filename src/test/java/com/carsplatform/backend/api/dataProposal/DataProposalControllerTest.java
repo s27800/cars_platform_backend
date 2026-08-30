@@ -148,8 +148,8 @@ class DataProposalControllerTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void createProposal_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void createProposal_NotAuthenticated_Returns401() throws Exception {
 
             // Create request without authentication
             CreateDataProposalRequest request = new CreateDataProposalRequest();
@@ -157,9 +157,9 @@ class DataProposalControllerTest extends MockMvcTestBase {
             request.setCategory("engine");
             request.setProposedValues(Map.of("maxPower", 225));
 
-            // Perform POST request without authentication and verify results -> 403 Forbidden is returned
+            // Perform POST request without authentication and verify results -> 401 Unauthorized is returned
             performPostNoAuth(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request)
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -183,12 +183,12 @@ class DataProposalControllerTest extends MockMvcTestBase {
     class GetPendingProposalsTests {
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void getPendingProposals_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void getPendingProposals_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform GET request without authentication and verify results -> 403 Forbidden is returned
+            // Perform GET request without authentication and verify results -> 401 Unauthorized is returned
             performGetNoAuth(DATA_PROPOSAL_BASE_URL + "/pending")
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -207,15 +207,15 @@ class DataProposalControllerTest extends MockMvcTestBase {
     class ResolveProposalTests {
 
         @Test
-        @DisplayName("returns 403 when not authenticated")
-        void resolveProposal_NotAuthenticated_Returns403() throws Exception {
+        @DisplayName("returns 401 when not authenticated")
+        void resolveProposal_NotAuthenticated_Returns401() throws Exception {
 
-            // Perform PATCH request without authentication and verify results -> 403 Forbidden is returned
+            // Perform PATCH request without authentication and verify results -> 401 Unauthorized is returned
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .patch(DATA_PROPOSAL_BASE_URL + "/resolve/" + testProposal.getId() + "?approve=true")
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            ).andExpect(status().isForbidden());
+            ).andExpect(status().isUnauthorized());
         }
 
         @Test

@@ -48,5 +48,6 @@ public class Brand {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
+    @Builder.Default
     private List<Model> models = new ArrayList<>();
 }

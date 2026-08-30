@@ -18,11 +18,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @DisplayName("JwtTokenProvider Unit Tests")
@@ -31,7 +34,7 @@ class JwtTokenProviderTest {
     private JwtTokenProvider jwtTokenProvider;
 
     private static final String JWT_SECRET = "verySecretKeyThatIsAtLeast64BytesLongForHS512AlgorithmToWorkProperly1234567890";
-    private static final int JWT_EXPIRATION_MS = 3600000; // 1 hour
+    private static final long JWT_EXPIRATION_MS = 3600000L; // 1 hour
 
     @BeforeEach
     void setUp() {
@@ -234,6 +237,97 @@ class JwtTokenProviderTest {
 
             // Verify token is invalid due to being null
             assertThat(isValid).isFalse();
+        }
+    }
+
+
+    @Nested
+    @DisplayName("configuration")
+    class ConfigurationTests {
+
+        @Test
+        @DisplayName("rejects a secret shorter than the 64 bytes required by HS512")
+        void signingKey_TooShortSecret_ThrowsException() {
+
+            // Create provider with a too short secret
+            JwtTokenProvider providerWithShortSecret = new JwtTokenProvider();
+
+            ReflectionTestUtils.setField(providerWithShortSecret, "jwtSecret", "tooShortSecret");
+            ReflectionTestUtils.setField(providerWithShortSecret, "jwtExpirationInMs", JWT_EXPIRATION_MS);
+
+            // Verify configuration is rejected
+            assertThatThrownBy(providerWithShortSecret::validateConfiguration)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("at least 64 bytes");
+        }
+
+        @Test
+        @DisplayName("signs the secret as UTF-8 regardless of the platform encoding")
+        void signingKey_NonAsciiSecret_UsesUtf8() {
+
+            // Create provider with a secret containing non-ASCII characters
+            String nonAsciiSecret = "zażółćGęśląJaźńSekretnyKluczDoPodpisywaniaTokenówJWTwAplikacjiCars";
+
+            JwtTokenProvider providerWithNonAsciiSecret = new JwtTokenProvider();
+
+            ReflectionTestUtils.setField(providerWithNonAsciiSecret, "jwtSecret", nonAsciiSecret);
+            ReflectionTestUtils.setField(providerWithNonAsciiSecret, "jwtExpirationInMs", JWT_EXPIRATION_MS);
+
+            UserPrincipal userPrincipal = new UserPrincipal(
+                    UUID.randomUUID(),
+                    "testuser",
+                    "test@example.com",
+                    "password",
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userPrincipal, null, userPrincipal.getAuthorities()
+            );
+
+            String token = providerWithNonAsciiSecret.generateToken(authentication);
+
+            // Verify the token is verifiable with a key built explicitly from the UTF-8 bytes
+            SecretKey utf8Key = Keys.hmacShaKeyFor(nonAsciiSecret.getBytes(StandardCharsets.UTF_8));
+
+            assertThatCode(() -> Jwts.parserBuilder().setSigningKey(utf8Key).build().parseClaimsJws(token))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("handles an expiration longer than Integer.MAX_VALUE milliseconds")
+        void generateToken_ExpirationBeyondIntRange_ReturnsFutureExpiry() {
+
+            long thirtyDaysInMs = 30L * 24 * 60 * 60 * 1000;
+
+            JwtTokenProvider providerWithLongExpiration = new JwtTokenProvider();
+
+            ReflectionTestUtils.setField(providerWithLongExpiration, "jwtSecret", JWT_SECRET);
+            ReflectionTestUtils.setField(providerWithLongExpiration, "jwtExpirationInMs", thirtyDaysInMs);
+
+            UserPrincipal userPrincipal = new UserPrincipal(
+                    UUID.randomUUID(),
+                    "testuser",
+                    "test@example.com",
+                    "password",
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userPrincipal, null, userPrincipal.getAuthorities()
+            );
+
+            String token = providerWithLongExpiration.generateToken(authentication);
+
+            // Verify the expiration date lies in the future
+            Date expiration = Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+
+            assertThat(expiration).isAfter(new Date());
         }
     }
 }

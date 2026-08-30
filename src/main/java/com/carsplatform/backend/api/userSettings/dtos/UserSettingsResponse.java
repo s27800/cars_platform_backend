@@ -14,4 +14,5 @@ import java.util.UUID;
 public class UserSettingsResponse {
     private UUID id;
     private String theme;
+    private String language;
 }

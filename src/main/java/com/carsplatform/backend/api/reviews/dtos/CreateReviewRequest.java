@@ -20,45 +20,45 @@ public class CreateReviewRequest {
 
     @NotNull(message = "Engine rating is required")
     @Min(1) @Max(5)
-    private Double engineRating;
+    private Integer engineRating;
 
     @NotNull(message = "Transmission rating is required")
     @Min(1) @Max(5)
-    private Double transmissionRating;
+    private Integer transmissionRating;
 
     @NotNull(message = "Steering rating is required")
     @Min(1) @Max(5)
-    private Double steeringRating;
+    private Integer steeringRating;
 
     @NotNull(message = "Suspension rating is required")
     @Min(1) @Max(5)
-    private Double suspensionRating;
+    private Integer suspensionRating;
 
     @NotNull(message = "Visibility rating is required")
     @Min(1) @Max(5)
-    private Double visibilityRating;
+    private Integer visibilityRating;
 
     @NotNull(message = "Ergonomics rating is required")
     @Min(1) @Max(5)
-    private Double ergonomicsRating;
+    private Integer ergonomicsRating;
 
     @NotNull(message = "Sound proofing rating is required")
     @Min(1) @Max(5)
-    private Double soundProofingRating;
+    private Integer soundProofingRating;
 
     @NotNull(message = "Interior space rating is required")
     @Min(1) @Max(5)
-    private Double interiorSpaceRating;
+    private Integer interiorSpaceRating;
 
     @NotNull(message = "Maintenance rating is required")
     @Min(1) @Max(5)
-    private Double maintenanceRating;
+    private Integer maintenanceRating;
 
     @NotNull(message = "Price/Quality rating is required")
     @Min(1) @Max(5)
-    private Double priceQualityRating;
+    private Integer priceQualityRating;
 
     @NotNull(message = "Failure free rating is required")
     @Min(1) @Max(5)
-    private Double failureFreeRating;
+    private Integer failureFreeRating;
 }

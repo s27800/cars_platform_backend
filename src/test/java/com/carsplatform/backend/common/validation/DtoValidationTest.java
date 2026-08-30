@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -166,6 +167,82 @@ class DtoValidationTest extends MockMvcTestBase {
             performPostNoAuth("/api/auth/register", request)
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.password").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400 when password has no uppercase letter or digit")
+        void register_PasswordWithoutComplexity_Returns400WithFieldError() throws Exception {
+
+            // Create request with a long but trivial password
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("onlylowercase")
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for password
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.password").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400 when password exceeds the 72 bytes used by BCrypt")
+        void register_TooLongPassword_Returns400WithFieldError() throws Exception {
+
+            // Create request with a password longer than BCrypt takes into account
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("Aa1" + "x".repeat(80))
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for password
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.password").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400, not 500, when first name is longer than the column")
+        void register_TooLongFirstName_Returns400WithFieldError() throws Exception {
+
+            // Create request with a first name longer than the users.first_name column
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("validuser")
+                    .email("valid@example.com")
+                    .password("Password123!")
+                    .firstName("A".repeat(150))
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for first name
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.firstName").exists());
+        }
+
+        @Test
+        @DisplayName("returns 400, not 500, when username is longer than the column")
+        void register_TooLongUsername_Returns400WithFieldError() throws Exception {
+
+            // Create request with a username longer than the users.username column
+            RegisterRequest request = RegisterRequest.builder()
+                    .username("u".repeat(80))
+                    .email("valid@example.com")
+                    .password("Password123!")
+                    .firstName("Test")
+                    .lastName("User")
+                    .build();
+
+            // Perform request and assert validation error for username
+            performPostNoAuth("/api/auth/register", request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.username").exists());
         }
 
         @Test
@@ -311,6 +388,22 @@ class DtoValidationTest extends MockMvcTestBase {
 
 
     @Nested
+    @DisplayName("Pageable limits")
+    class PageableLimitTests {
+
+        @Test
+        @DisplayName("caps the page size instead of materializing the whole table")
+        void search_HugePageSize_IsCappedAtMaximum() throws Exception {
+
+            // Request a page size larger than the configured maximum
+            performGetNoAuth("/api/cars/search?page=0&size=1000000")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.pageable.pageSize").value(100));
+        }
+    }
+
+
+    @Nested
     @DisplayName("Error Response Format")
     class ErrorResponseFormatTests {
 
@@ -361,17 +454,17 @@ class DtoValidationTest extends MockMvcTestBase {
         private CreateReviewRequest validReviewRequest() {
             return CreateReviewRequest.builder()
                     .comment("This is a valid comment with enough characters")
-                    .engineRating(4.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .engineRating(4)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
         }
 
@@ -423,7 +516,7 @@ class DtoValidationTest extends MockMvcTestBase {
 
             // Create request with engine rating below 1
             CreateReviewRequest request = validReviewRequest();
-            request.setEngineRating(0.0);
+            request.setEngineRating(0);
 
             // Perform request and verify result -> 400 Bad Request is returned
             performPostWithAuth("/api/reviews/" + testCar.getId(), request, userToken)
@@ -437,7 +530,7 @@ class DtoValidationTest extends MockMvcTestBase {
 
             // Create request with engine rating above 5
             CreateReviewRequest request = validReviewRequest();
-            request.setEngineRating(6.0);
+            request.setEngineRating(6);
 
             // Perform request and verify result -> 400 Bad Request is returned
             performPostWithAuth("/api/reviews/" + testCar.getId(), request, userToken)
@@ -467,16 +560,16 @@ class DtoValidationTest extends MockMvcTestBase {
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Valid comment with enough characters")
                     .engineRating(null)
-                    .transmissionRating(0.0)
-                    .steeringRating(6.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(4.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(4.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(4.0)
-                    .priceQualityRating(4.0)
-                    .failureFreeRating(4.0)
+                    .transmissionRating(0)
+                    .steeringRating(6)
+                    .suspensionRating(4)
+                    .visibilityRating(4)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(4)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(4)
+                    .priceQualityRating(4)
+                    .failureFreeRating(4)
                     .build();
 
             // Perform request and verify result -> 400 Bad Request is returned
@@ -654,6 +747,20 @@ class DtoValidationTest extends MockMvcTestBase {
         }
 
         @Test
+        @DisplayName("returns 400 when the proposal touches a field outside its category")
+        void createDataProposal_NonEditableFieldOnly_Returns400() throws Exception {
+
+            // Create request that proposes a change of the entity identifier
+            CreateDataProposalRequest request = new CreateDataProposalRequest();
+            request.setCategory("ENGINE");
+            request.setProposedValues(Map.of("id", UUID.randomUUID().toString()));
+
+            // Perform request and verify result -> 400 Bad Request is returned
+            performPostWithAuth("/api/data-proposals/" + testCar.getId(), request, userToken)
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
         @DisplayName("accepts valid data proposal request")
         void createDataProposal_ValidRequest_Returns201() throws Exception {
 
@@ -690,18 +797,20 @@ class DtoValidationTest extends MockMvcTestBase {
         }
 
         @Test
-        @DisplayName("returns 400 when theme is null")
-        void updateSettings_NullTheme_Returns400() throws Exception {
+        @DisplayName("omitting a field leaves its current value untouched")
+        void updateSettings_NullTheme_LeavesThemeUnchanged() throws Exception {
 
-            // Create request with null theme
-            UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
-                    .theme(null)
-                    .build();
+            // Perform PUT request to update the theme
+            performPutWithAuth("/api/user-settings",
+                    UpdateUserSettingsRequest.builder().theme("dark").build(), userToken)
+                    .andExpect(status().isOk());
 
-            // Perform request and verify result -> 400 Bad Request is returned
-            performPutWithAuth("/api/user-settings", request, userToken)
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errors.theme").exists());
+            // Perform request and verify result -> the previously stored theme stays unchanged
+            performPutWithAuth("/api/user-settings",
+                    UpdateUserSettingsRequest.builder().language("pl").build(), userToken)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.language").value("pl"))
+                    .andExpect(jsonPath("$.theme").value("dark"));
         }
 
         @Test

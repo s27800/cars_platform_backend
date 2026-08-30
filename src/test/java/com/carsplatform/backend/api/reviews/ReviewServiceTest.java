@@ -193,16 +193,16 @@ class ReviewServiceTest {
             // Create valid request
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Great car, highly recommended!")
-                    .engineRating(5.0)
-                    .transmissionRating(4.0)
-                    .steeringRating(4.0)
-                    .suspensionRating(4.0)
-                    .visibilityRating(5.0)
-                    .ergonomicsRating(4.0)
-                    .soundProofingRating(3.0)
-                    .interiorSpaceRating(4.0)
-                    .maintenanceRating(3.0)
-                    .priceQualityRating(4.0)
+                    .engineRating(5)
+                    .transmissionRating(4)
+                    .steeringRating(4)
+                    .suspensionRating(4)
+                    .visibilityRating(5)
+                    .ergonomicsRating(4)
+                    .soundProofingRating(3)
+                    .interiorSpaceRating(4)
+                    .maintenanceRating(3)
+                    .priceQualityRating(4)
                     .build();
 
             Review mappedReview = new Review();
@@ -257,7 +257,7 @@ class ReviewServiceTest {
 
             // Mock repository
             UUID nonExistentCarId = UUID.randomUUID();
-            
+
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 

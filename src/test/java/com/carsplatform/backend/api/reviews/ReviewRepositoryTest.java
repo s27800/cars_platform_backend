@@ -108,9 +108,13 @@ class ReviewRepositoryTest {
         @DisplayName("returns only approved reviews")
         void approvedReviews_ReturnsOnlyApproved() {
 
+            // Create second user for pending review
+            User user2 = TestDataFactory.createUser("pending");
+            entityManager.persist(user2);
+
             // Create approved and pending reviews for the same car
             Review approvedReview = createReview(testUser, testCar, true);
-            Review pendingReview = createReview(testUser, testCar, false);
+            Review pendingReview = createReview(user2, testCar, false);
 
             entityManager.persist(approvedReview);
             entityManager.persist(pendingReview);

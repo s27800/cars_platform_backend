@@ -36,11 +36,13 @@ public class DataProposal {
     @JsonIgnore
     private Car car;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String category;
 
+    @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @Column(name = "admin_comment", columnDefinition = "TEXT")
     private String adminComment;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -48,7 +50,7 @@ public class DataProposal {
     private Map<String, Object> proposedValues;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private DataProposalStatus status = DataProposalStatus.PENDING;
 
     private LocalDateTime createdAt = LocalDateTime.now();

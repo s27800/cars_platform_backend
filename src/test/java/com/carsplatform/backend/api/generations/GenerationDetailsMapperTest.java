@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -155,7 +156,7 @@ class GenerationDetailsMapperTest {
                     .name("320i")
                     .engine(engine)
                     .transmission(transmission)
-                    .images(List.of())
+                    .images(new LinkedHashSet<>())
                     .tags(new HashSet<>())
                     .build();
 
