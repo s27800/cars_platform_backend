@@ -1,4 +1,4 @@
-package com.carsplatform.backend.api.likes;
+package com.carsplatform.backend.api.reviewLikes;
 
 import com.carsplatform.backend.api.bodyType.BodyType;
 import com.carsplatform.backend.api.brands.Brand;
@@ -7,6 +7,7 @@ import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,14 +31,14 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("LikeRepository Integration Tests")
-class LikeRepositoryTest {
+@DisplayName("ReviewLikeRepository Integration Tests")
+class ReviewLikeRepositoryTest {
 
     @Autowired
     private EntityManager entityManager;
 
     @Autowired
-    private LikeRepository likeRepository;
+    private ReviewLikeRepository reviewLikeRepository;
 
     private User testUser;
     private User anotherUser;
@@ -45,8 +46,6 @@ class LikeRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create users
         testUser = TestDataFactory.defaultUser()
                 .username("liker")
                 .email("liker@example.com")
@@ -59,7 +58,6 @@ class LikeRepositoryTest {
                 .build();
         entityManager.persist(anotherUser);
 
-        // Create car data
         Brand brand = TestDataFactory.defaultBrand().name("BMW").build();
         entityManager.persist(brand);
 
@@ -81,7 +79,6 @@ class LikeRepositoryTest {
         entityManager.persist(car.getOutsideDimensions());
         entityManager.persist(car);
 
-        // Create review
         testReview = Review.builder()
                 .user(anotherUser)
                 .car(car)
@@ -97,12 +94,11 @@ class LikeRepositoryTest {
                 .maintenanceRating(5)
                 .priceQualityRating(5)
                 .failureFreeRating(5)
-                .isApproved(true)
+                .status(ModerationStatus.APPROVED)
                 .reviewDate(LocalDateTime.now())
                 .build();
         entityManager.persist(testReview);
 
-        // Save
         entityManager.flush();
     }
 
@@ -114,17 +110,12 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("returns like when exists")
         void findByUserIdAndReviewId_LikeExists_ReturnsLike() {
-
-            // Create like
-            Like like = TestDataFactory.defaultLike(testUser, testReview).build();
+            ReviewLike like = TestDataFactory.defaultReviewLike(testUser, testReview).build();
             entityManager.persist(like);
             entityManager.flush();
 
-            // Find like
-            Optional<Like> result = likeRepository.findByUserIdAndReviewId(
+            Optional<ReviewLike> result = reviewLikeRepository.findByUserIdAndReviewId(
                     testUser.getId(), testReview.getId());
-
-            // Verify result -> like exists
             assertThat(result).isPresent();
             assertThat(result.get().getUser().getId()).isEqualTo(testUser.getId());
             assertThat(result.get().getReview().getId()).isEqualTo(testReview.getId());
@@ -133,29 +124,20 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("returns empty when like does not exist")
         void findByUserIdAndReviewId_NoLike_ReturnsEmpty() {
-
-            // Find like that does not exist
-            Optional<Like> result = likeRepository.findByUserIdAndReviewId(
+            Optional<ReviewLike> result = reviewLikeRepository.findByUserIdAndReviewId(
                     testUser.getId(), testReview.getId());
-
-            // Verify result -> like does not exist
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("returns empty for different user")
         void findByUserIdAndReviewId_DifferentUser_ReturnsEmpty() {
-
-            // Create like
-            Like like = TestDataFactory.defaultLike(testUser, testReview).build();
+            ReviewLike like = TestDataFactory.defaultReviewLike(testUser, testReview).build();
             entityManager.persist(like);
             entityManager.flush();
 
-            // Find like for different user
-            Optional<Like> result = likeRepository.findByUserIdAndReviewId(
+            Optional<ReviewLike> result = reviewLikeRepository.findByUserIdAndReviewId(
                     anotherUser.getId(), testReview.getId());
-
-            // Verify result -> like does not exist for different user
             assertThat(result).isEmpty();
         }
     }
@@ -168,29 +150,20 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("returns true when like exists")
         void existsByUserIdAndReviewId_LikeExists_ReturnsTrue() {
-
-            // Create like
-            Like like = TestDataFactory.defaultLike(testUser, testReview).build();
+            ReviewLike like = TestDataFactory.defaultReviewLike(testUser, testReview).build();
             entityManager.persist(like);
             entityManager.flush();
 
-            // Check if like exists
-            boolean exists = likeRepository.existsByUserIdAndReviewId(
+            boolean exists = reviewLikeRepository.existsByUserIdAndReviewId(
                     testUser.getId(), testReview.getId());
-
-            // Verify result -> like exists
             assertThat(exists).isTrue();
         }
 
         @Test
         @DisplayName("returns false when like does not exist")
         void existsByUserIdAndReviewId_NoLike_ReturnsFalse() {
-
-            // Check if non-existing like exists
-            boolean exists = likeRepository.existsByUserIdAndReviewId(
+            boolean exists = reviewLikeRepository.existsByUserIdAndReviewId(
                     testUser.getId(), testReview.getId());
-
-            // Verify result -> like does not exist
             assertThat(exists).isFalse();
         }
     }
@@ -203,34 +176,25 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("returns correct count")
         void countByReviewId_MultipleLikes_ReturnsCorrectCount() {
-
-            // Create likes
-            Like like1 = TestDataFactory.defaultLike(testUser, testReview).build();
+            ReviewLike like1 = TestDataFactory.defaultReviewLike(testUser, testReview).build();
             entityManager.persist(like1);
 
             User user3 = TestDataFactory.createUser("3");
             entityManager.persist(user3);
 
-            Like like2 = TestDataFactory.defaultLike(user3, testReview).build();
+            ReviewLike like2 = TestDataFactory.defaultReviewLike(user3, testReview).build();
             entityManager.persist(like2);
 
             entityManager.flush();
 
-            // Count likes for the review
-            long count = likeRepository.countByReviewId(testReview.getId());
-
-            // Verify result -> correct count is returned
+            long count = reviewLikeRepository.countByReviewId(testReview.getId());
             assertThat(count).isEqualTo(2);
         }
 
         @Test
         @DisplayName("returns zero when no likes")
         void countByReviewId_NoLikes_ReturnsZero() {
-
-            // Count likes for the review
-            long count = likeRepository.countByReviewId(testReview.getId());
-
-            // Verify result -> zero is returned
+            long count = reviewLikeRepository.countByReviewId(testReview.getId());
             assertThat(count).isZero();
         }
     }
@@ -243,20 +207,17 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("persists new like")
         void save_NewLike_PersistsLike() {
-
-            // Create like
-            Like like = TestDataFactory.defaultLike(testUser, testReview).build();
-            Like saved = likeRepository.save(like);
+            ReviewLike like = TestDataFactory.defaultReviewLike(testUser, testReview).build();
+            ReviewLike saved = reviewLikeRepository.save(like);
             entityManager.flush();
 
-            // Verify like exists
             assertThat(saved.getId()).isNotNull();
-            Like found = entityManager.find(Like.class, saved.getId());
+            ReviewLike found = entityManager.find(ReviewLike.class, saved.getId());
             assertThat(found).isNotNull();
         }
     }
 
-    
+
     @Nested
     @DisplayName("delete Tests")
     class DeleteTests {
@@ -264,18 +225,14 @@ class LikeRepositoryTest {
         @Test
         @DisplayName("removes like")
         void delete_ExistingLike_RemovesLike() {
-
-            // Create like
-            Like like = TestDataFactory.defaultLike(testUser, testReview).build();
+            ReviewLike like = TestDataFactory.defaultReviewLike(testUser, testReview).build();
             entityManager.persist(like);
             entityManager.flush();
 
-            // Delete like
-            likeRepository.delete(like);
+            reviewLikeRepository.delete(like);
             entityManager.flush();
 
-            // Verify like removed
-            Like found = entityManager.find(Like.class, like.getId());
+            ReviewLike found = entityManager.find(ReviewLike.class, like.getId());
             assertThat(found).isNull();
         }
     }

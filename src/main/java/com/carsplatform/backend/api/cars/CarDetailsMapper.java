@@ -2,7 +2,6 @@ package com.carsplatform.backend.api.cars;
 
 import com.carsplatform.backend.api.bodyType.BodyTypeMapper;
 import com.carsplatform.backend.api.cars.dtos.CarDetailsResponse;
-
 import com.carsplatform.backend.api.brands.BrandMapper;
 import com.carsplatform.backend.api.carImages.CarImageMapper;
 import com.carsplatform.backend.api.chassis.ChassisMapper;
@@ -19,7 +18,10 @@ import com.carsplatform.backend.api.users.UsernameMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {
+
+@Mapper(
+    componentModel = "spring",
+    uses = {
         UsernameMapper.class,
         BrandMapper.class,
         ModelMapper.class,
@@ -33,8 +35,10 @@ import org.mapstruct.Mapping;
         OutsideDimensionsMapper.class,
         CarImageMapper.class,
         TagMapper.class
-})
+    }
+)
 public interface CarDetailsMapper {
+
     @Mapping(target = "brand", qualifiedByName = "map", source = "car")
     @Mapping(target = "model", qualifiedByName = "map", source = "car")
     @Mapping(target = "generation", qualifiedByName = "toDto")

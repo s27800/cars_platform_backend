@@ -1,10 +1,10 @@
 package com.carsplatform.backend.api.fuelReportLikes;
 
-import com.carsplatform.backend.api.fuelReportLikes.dtos.FuelReportLikeResponse;
 import com.carsplatform.backend.api.fuelReports.FuelReportRepository;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.LikeResponse;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -15,15 +15,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+
+/**
+ * Likes on fuel reports. Behaves exactly like
+ * {@link com.carsplatform.backend.api.reviewLikes.ReviewLikeService}, only for fuel reports.
+ */
 @Service
 @RequiredArgsConstructor
 public class FuelReportLikeService {
+
     private final FuelReportLikeRepository fuelReportLikeRepository;
     private final UserRepository userRepository;
     private final FuelReportRepository fuelReportRepository;
 
+
     @Transactional
-    public FuelReportLikeResponse toggleLike(UUID fuelReportId, String username) {
+    public LikeResponse toggleLike(UUID fuelReportId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
@@ -36,6 +43,7 @@ public class FuelReportLikeService {
 
         if (existingLike.isPresent()) {
             fuelReportLikeRepository.delete(existingLike.get());
+
             isLikedNow = false;
         } else {
             try {
@@ -45,31 +53,30 @@ public class FuelReportLikeService {
                         .build();
 
                 fuelReportLikeRepository.save(newLike);
+
                 isLikedNow = true;
             } catch (DataIntegrityViolationException e) {
-                
-                // Like already exists
                 isLikedNow = true;
             }
         }
 
         long count = fuelReportLikeRepository.countByFuelReportId(fuelReportId);
 
-        return FuelReportLikeResponse.builder()
+        return LikeResponse.builder()
                 .isLiked(isLikedNow)
                 .likesCount(count)
                 .build();
     }
 
     @Transactional(readOnly = true)
-    public FuelReportLikeResponse getLikeStatus(UUID fuelReportId, String username) {
+    public LikeResponse getLikeStatus(UUID fuelReportId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
         boolean isLiked = fuelReportLikeRepository.existsByUserIdAndFuelReportId(user.getId(), fuelReportId);
         long count = fuelReportLikeRepository.countByFuelReportId(fuelReportId);
 
-        return FuelReportLikeResponse.builder()
+        return LikeResponse.builder()
                 .isLiked(isLiked)
                 .likesCount(count)
                 .build();

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/brands")
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class BrandController {
 
     private final BrandService brandService;
+
 
     @GetMapping
     @Operation(summary = "Get a list of all car brands")
@@ -36,8 +38,8 @@ public class BrandController {
     @GetMapping("/{id}")
     @Operation(summary = "Get brand details with a list of models")
     public ResponseEntity<BrandDetailsResponse> getModelsByBrandId(
-            @Parameter(description = "ID of the brand") @PathVariable UUID id) {
-
+            @Parameter(description = "ID of the brand") @PathVariable UUID id
+    ) {
         BrandDetailsResponse models = brandService.getBrandDetailsById(id);
 
         return ResponseEntity.ok(models);

@@ -41,14 +41,10 @@ class ModelServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .id(UUID.randomUUID())
                 .name("3 Series")
@@ -63,22 +59,16 @@ class ModelServiceTest {
         @Test
         @DisplayName("should return model details when model exists")
         void getModelDetailsById_ModelExists_ReturnsDetails() {
-
-            // Create expected response
             ModelDetailsResponse expectedResponse = ModelDetailsResponse.builder()
                     .id(UUID.randomUUID())
                     .name("3 Series")
                     .description("A test model for unit testing")
                     .build();
 
-            // Mock repository and mapper behavior
             when(repository.findById(testModel.getId())).thenReturn(Optional.of(testModel));
             when(mapper.toDto(testModel)).thenReturn(expectedResponse);
 
-            // Get model details by ID
             ModelDetailsResponse result = modelService.getModelDetailsById(testModel.getId());
-
-            // Verify results
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(expectedResponse.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
@@ -90,13 +80,10 @@ class ModelServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when model does not exist")
         void getModelDetailsById_ModelNotFound_ThrowsException() {
-
-            // Mock repository behavior
             UUID nonExistentId = UUID.randomUUID();
-            
+
             when(repository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-            // Get model details by ID and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> modelService.getModelDetailsById(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 

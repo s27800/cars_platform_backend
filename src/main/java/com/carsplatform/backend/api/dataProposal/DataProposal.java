@@ -2,6 +2,9 @@ package com.carsplatform.backend.api.dataProposal;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
+import com.carsplatform.backend.common.ProposalCategory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -16,11 +19,13 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "data_proposal")
 @Data
 @NoArgsConstructor
 public class DataProposal {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")
@@ -36,8 +41,9 @@ public class DataProposal {
     @JsonIgnore
     private Car car;
 
-    @Column(nullable = false, length = 100)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ProposalCategory category;
 
     @Column(columnDefinition = "TEXT")
     private String comment;
@@ -51,7 +57,7 @@ public class DataProposal {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private DataProposalStatus status = DataProposalStatus.PENDING;
+    private ModerationStatus status = ModerationStatus.PENDING;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 

@@ -1,6 +1,8 @@
-package com.carsplatform.backend.api.admin.dtos;
+package com.carsplatform.backend.api.reviews.dtos;
 
+import com.carsplatform.backend.api.cars.dtos.CarInfoResponse;
 import com.carsplatform.backend.api.users.dtos.UsernameResponse;
+import com.carsplatform.backend.common.ModerationStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,11 +12,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminReviewResponse {
+public class ReviewDetailsResponse {
     private UUID id;
     private String comment;
     private Integer engineRating;
@@ -29,8 +32,8 @@ public class AdminReviewResponse {
     private Integer priceQualityRating;
     private Integer failureFreeRating;
     private LocalDateTime reviewDate;
-    private Boolean isApproved;
+    private ModerationStatus status;
     private Long likesCount;
     private UsernameResponse usernameResponse;
-    private AdminCarInfoResponse carInfo;
+    private CarInfoResponse carInfo;
 }

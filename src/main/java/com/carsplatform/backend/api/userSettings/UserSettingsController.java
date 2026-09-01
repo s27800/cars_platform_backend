@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/user-settings")
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class UserSettingsController {
 
     private final UserSettingsService userSettingsService;
     private final UserSettingsMapper userSettingsMapper;
+
 
     @GetMapping
     @Operation(summary = "Get current user's settings")
@@ -35,8 +37,8 @@ public class UserSettingsController {
     @PutMapping
     @Operation(summary = "Update current user's settings")
     public ResponseEntity<UserSettingsResponse> updateCurrentUserSettings(
-            @Valid @RequestBody UpdateUserSettingsRequest request) {
-
+            @Valid @RequestBody UpdateUserSettingsRequest request
+    ) {
         UserSettings settings = userSettingsService.updateCurrentUserSettings(request);
 
         return ResponseEntity.ok(userSettingsMapper.toDto(settings));

@@ -23,8 +23,6 @@ class BrandsListMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = Brand.builder()
                 .id(UUID.randomUUID())
                 .name("Tesla")
@@ -42,22 +40,14 @@ class BrandsListMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             BrandsListResponse result = mapper.toDto(null);
-
-            // Verify result -> null is returned
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map only id and name")
         void toDto_ValidBrand_MapsIdAndName() {
-
-            // Map valid brand
             BrandsListResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> brand is mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("Tesla");

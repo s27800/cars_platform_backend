@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "body_type")
 @Data
@@ -19,6 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BodyType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

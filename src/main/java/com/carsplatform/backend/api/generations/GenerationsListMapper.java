@@ -5,14 +5,13 @@ import com.carsplatform.backend.api.models.Model;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Mapper(componentModel = "spring")
 public interface GenerationsListMapper {
-    GenerationsListMapper INSTANCE = Mappers.getMapper(GenerationsListMapper.class);
 
     default GenerationsListResponse toDto(Generation generation) {
         if (generation == null)

@@ -22,19 +22,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+/**
+ * Registration and login.
+ *
+ * Passwords are hashed with BCrypt before they are saved. Failed logins are counted by
+ * {@link LoginAttemptService}, which blocks the account for a while once there have been too
+ * many failed attempts, so the endpoint cannot be used to guess passwords.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class AuthenticationService {
+
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final LoginAttemptService loginAttemptService;
 
-    public AuthenticationResponse loginUser(LoginRequest loginRequest) {
 
-        // Account not locked validation
+    public AuthenticationResponse loginUser(LoginRequest loginRequest) {
         loginAttemptService.assertNotBlocked(loginRequest.getUsername());
 
         Authentication authentication;
@@ -47,9 +55,8 @@ public class AuthenticationService {
                     )
             );
         } catch (AuthenticationException ex) {
-
-            // Save failed attempt
             loginAttemptService.loginFailed(loginRequest.getUsername());
+
             throw ex;
         }
 
@@ -89,11 +96,8 @@ public class AuthenticationService {
                 .build();
 
         user.setUserSettings(settings);
-
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest(registerRequest.getUsername(), registerRequest.getPassword());
-
-        return loginUser(loginRequest);
+        return loginUser(new LoginRequest(registerRequest.getUsername(), registerRequest.getPassword()));
     }
 }

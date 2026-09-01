@@ -51,8 +51,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("generates valid JWT token for authenticated user")
         void generateToken_ValidUser_ReturnsValidToken() {
-
-            // Create authentication
             UserPrincipal userPrincipal = new UserPrincipal(
                     UUID.randomUUID(),
                     "testuser",
@@ -65,10 +63,8 @@ class JwtTokenProviderTest {
                     userPrincipal, null, userPrincipal.getAuthorities()
             );
 
-            // Generate JWT token
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Verify token is correct
             assertThat(token).isNotNull();
             assertThat(token).isNotEmpty();
             assertThat(token.split("\\.")).hasSize(3); // JWT has 3 parts
@@ -77,8 +73,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("generates token with correct user ID as subject")
         void generateToken_ValidUser_ContainsCorrectUserId() {
-
-            // Create authentication
             UUID userId = UUID.randomUUID();
 
             UserPrincipal userPrincipal = new UserPrincipal(
@@ -93,10 +87,8 @@ class JwtTokenProviderTest {
                     userPrincipal, null, userPrincipal.getAuthorities()
             );
 
-            // Generate JWT token
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Verify token contains correct user ID
             UUID extractedUserId = jwtTokenProvider.getUserIdFromJWT(token);
 
             assertThat(extractedUserId).isEqualTo(userId);
@@ -111,8 +103,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("extracts user ID from valid token")
         void getUserIdFromJWT_ValidToken_ReturnsUserId() {
-
-            // Generate authentication and token
             UUID expectedUserId = UUID.randomUUID();
             UserPrincipal userPrincipal = new UserPrincipal(
                     expectedUserId,
@@ -128,7 +118,6 @@ class JwtTokenProviderTest {
 
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Verify user ID can be extracted from token
             UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
 
             assertThat(userId).isEqualTo(expectedUserId);
@@ -143,8 +132,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("returns true for valid token")
         void validateToken_ValidToken_ReturnsTrue() {
-
-            // Generate authentication and token
             UserPrincipal userPrincipal = new UserPrincipal(
                     UUID.randomUUID(),
                     "testuser",
@@ -157,7 +144,6 @@ class JwtTokenProviderTest {
             );
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Verify token is valid
             boolean isValid = jwtTokenProvider.validateToken(token);
 
             assertThat(isValid).isTrue();
@@ -166,8 +152,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("returns false for expired token")
         void validateToken_ExpiredToken_ReturnsFalse() {
-
-            // Generate expired token
             SecretKey key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
 
             String expiredToken = Jwts.builder()
@@ -177,7 +161,6 @@ class JwtTokenProviderTest {
                     .signWith(key, SignatureAlgorithm.HS512)
                     .compact();
 
-            // Verify token is invalid due to expiration
             boolean isValid = jwtTokenProvider.validateToken(expiredToken);
 
             assertThat(isValid).isFalse();
@@ -186,11 +169,8 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("returns false for malformed token")
         void validateToken_MalformedToken_ReturnsFalse() {
-
-            // Generate malformed token
             String malformedToken = "not.a.valid.jwt.token";
 
-            // Verify token is invalid due to being malformed
             boolean isValid = jwtTokenProvider.validateToken(malformedToken);
 
             assertThat(isValid).isFalse();
@@ -199,8 +179,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("returns false for token with invalid signature")
         void validateToken_InvalidSignature_ReturnsFalse() {
-
-            // Generate token with different secret key to simulate invalid signature
             String differentSecret = "aDifferentSecretKeyThatIsAlsoAtLeast64BytesLongForTheHS512Algorithm12345678";
             SecretKey differentKey = Keys.hmacShaKeyFor(differentSecret.getBytes());
 
@@ -211,7 +189,6 @@ class JwtTokenProviderTest {
                     .signWith(differentKey, SignatureAlgorithm.HS512)
                     .compact();
 
-            // Verify token is invalid due to signature not matching the expected secret
             boolean isValid = jwtTokenProvider.validateToken(tokenWithDifferentKey);
 
             assertThat(isValid).isFalse();
@@ -220,22 +197,16 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("returns false for empty token")
         void validateToken_EmptyToken_ReturnsFalse() {
-
-            // Validate empty token
             boolean isValid = jwtTokenProvider.validateToken("");
 
-            // Verify token is invalid due to being empty
             assertThat(isValid).isFalse();
         }
 
         @Test
         @DisplayName("returns false for null token")
         void validateToken_NullToken_ReturnsFalse() {
-
-            // Validate null token
             boolean isValid = jwtTokenProvider.validateToken(null);
 
-            // Verify token is invalid due to being null
             assertThat(isValid).isFalse();
         }
     }
@@ -248,14 +219,11 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("rejects a secret shorter than the 64 bytes required by HS512")
         void signingKey_TooShortSecret_ThrowsException() {
-
-            // Create provider with a too short secret
             JwtTokenProvider providerWithShortSecret = new JwtTokenProvider();
 
             ReflectionTestUtils.setField(providerWithShortSecret, "jwtSecret", "tooShortSecret");
             ReflectionTestUtils.setField(providerWithShortSecret, "jwtExpirationInMs", JWT_EXPIRATION_MS);
 
-            // Verify configuration is rejected
             assertThatThrownBy(providerWithShortSecret::validateConfiguration)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("at least 64 bytes");
@@ -264,8 +232,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("signs the secret as UTF-8 regardless of the platform encoding")
         void signingKey_NonAsciiSecret_UsesUtf8() {
-
-            // Create provider with a secret containing non-ASCII characters
             String nonAsciiSecret = "zażółćGęśląJaźńSekretnyKluczDoPodpisywaniaTokenówJWTwAplikacjiCars";
 
             JwtTokenProvider providerWithNonAsciiSecret = new JwtTokenProvider();
@@ -287,7 +253,6 @@ class JwtTokenProviderTest {
 
             String token = providerWithNonAsciiSecret.generateToken(authentication);
 
-            // Verify the token is verifiable with a key built explicitly from the UTF-8 bytes
             SecretKey utf8Key = Keys.hmacShaKeyFor(nonAsciiSecret.getBytes(StandardCharsets.UTF_8));
 
             assertThatCode(() -> Jwts.parserBuilder().setSigningKey(utf8Key).build().parseClaimsJws(token))
@@ -297,7 +262,6 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("handles an expiration longer than Integer.MAX_VALUE milliseconds")
         void generateToken_ExpirationBeyondIntRange_ReturnsFutureExpiry() {
-
             long thirtyDaysInMs = 30L * 24 * 60 * 60 * 1000;
 
             JwtTokenProvider providerWithLongExpiration = new JwtTokenProvider();
@@ -319,7 +283,6 @@ class JwtTokenProviderTest {
 
             String token = providerWithLongExpiration.generateToken(authentication);
 
-            // Verify the expiration date lies in the future
             Date expiration = Jwts.parserBuilder()
                     .setSigningKey(Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8)))
                     .build()

@@ -8,8 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class CarsPlatformBackendApplicationTests {
+
     @Test
     void contextLoads() {
-        // Verify that the application context loads successfully
     }
 }

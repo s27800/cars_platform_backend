@@ -39,8 +39,6 @@ class TagServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test tags
         testTag1 = TestDataFactory.defaultTag()
                 .id(UUID.randomUUID())
                 .name("Electric")
@@ -60,8 +58,6 @@ class TagServiceTest {
         @Test
         @DisplayName("should return list of all tags")
         void getAllTags_TagsExist_ReturnsList() {
-
-            // Create test tags
             CarTagResponse response1 = CarTagResponse.builder()
                     .id(UUID.randomUUID())
                     .name("Electric")
@@ -72,15 +68,11 @@ class TagServiceTest {
                     .name("Hybrid")
                     .build();
 
-            // Prepare mocks
             when(repository.findAll()).thenReturn(List.of(testTag1, testTag2));
             when(mapper.toDto(testTag1)).thenReturn(response1);
             when(mapper.toDto(testTag2)).thenReturn(response2);
 
-            // Get all tags
             List<CarTagResponse> result = tagService.getAllTags();
-
-            // Verify results -> all tags are returned
             assertThat(result).hasSize(2);
             assertThat(result).extracting(CarTagResponse::getName)
                     .containsExactly("Electric", "Hybrid");
@@ -91,14 +83,9 @@ class TagServiceTest {
         @Test
         @DisplayName("should return empty list when no tags exist")
         void getAllTags_NoTags_ReturnsEmptyList() {
-
-            // Prepare mocks
             when(repository.findAll()).thenReturn(Collections.emptyList());
 
-            // Get all tags
             List<CarTagResponse> result = tagService.getAllTags();
-
-            // Verify results -> empty list is returned
             assertThat(result).isEmpty();
             verify(repository).findAll();
         }

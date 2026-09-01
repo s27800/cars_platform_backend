@@ -2,6 +2,7 @@ package com.carsplatform.backend.api.generations;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.models.Model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "generation")
 @Data
@@ -20,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Generation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

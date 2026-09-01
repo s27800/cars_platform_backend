@@ -24,8 +24,6 @@ class OutsideDimensionsMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test outside dimensions
         testOutsideDimensions = TestDataFactory.defaultOutsideDimensions()
                 .id(UUID.randomUUID())
                 .length(4584)
@@ -50,22 +48,15 @@ class OutsideDimensionsMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarOutsideDimensionsResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidOutsideDimensions_MapsAllFields() {
-
-            // Map valid outside dimensions
             CarOutsideDimensionsResponse result = mapper.toDto(testOutsideDimensions);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testOutsideDimensions.getId());
             assertThat(result.getLength()).isEqualTo(4584);
@@ -85,8 +76,6 @@ class OutsideDimensionsMapperTest {
         @Test
         @DisplayName("should handle null optional fields")
         void toDto_OutsideDimensionsWithNulls_MapsNullFields() {
-
-            // Create outside dimensions with only required fields
             OutsideDimensions minimalDimensions = OutsideDimensions.builder()
                     .id(UUID.randomUUID())
                     .length(4500)
@@ -94,10 +83,8 @@ class OutsideDimensionsMapperTest {
                     .width(1800)
                     .build();
 
-            // Map minimal outside dimensions
             CarOutsideDimensionsResponse result = mapper.toDto(minimalDimensions);
 
-            // Verify null optional fields are handled correctly
             assertThat(result.getLength()).isEqualTo(4500);
             assertThat(result.getWidthWithMirrors()).isNull();
         }

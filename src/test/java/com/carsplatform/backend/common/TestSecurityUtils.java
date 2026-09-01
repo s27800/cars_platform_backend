@@ -26,16 +26,20 @@ import java.util.UUID;
 /**
  * Utility class for security-related test operations.
  */
-
 public final class TestSecurityUtils {
 
     private static final String TEST_JWT_SECRET = loadJwtSecret();
-    private static final int TOKEN_EXPIRATION_MS = 3600000; // = 1 hour in milliseconds
+    private static final int TOKEN_EXPIRATION_MS = 3600000; // 1 hour
+
+
+    private TestSecurityUtils() {
+    }
+
 
     private static String loadJwtSecret() {
         try (
-            InputStream input = TestSecurityUtils.class.getClassLoader()
-            .getResourceAsStream("application-test.properties")
+                InputStream input = TestSecurityUtils.class.getClassLoader()
+                        .getResourceAsStream("application-test.properties")
         ) {
             if (input == null)
                 throw new IllegalStateException("application-test.properties not found");
@@ -52,8 +56,6 @@ public final class TestSecurityUtils {
             throw new IllegalStateException("Failed to load JWT secret from application-test.properties", e);
         }
     }
-
-    private TestSecurityUtils() {}
 
     public static String generateToken(UUID userId) {
         Date now = new Date();
@@ -75,13 +77,13 @@ public final class TestSecurityUtils {
 
     public static String generateExpiredToken(UUID userId) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() - 1000); // = now - 1 second
+        Date expiryDate = new Date(now.getTime() - 1000); // already expired
 
         SecretKey key = Keys.hmacShaKeyFor(TEST_JWT_SECRET.getBytes());
 
         return Jwts.builder()
                 .setSubject(userId.toString())
-                .setIssuedAt(new Date(now.getTime() - 7200000)) // = now - 2 hours
+                .setIssuedAt(new Date(now.getTime() - 7200000)) // issued 2 hours ago
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();

@@ -1,6 +1,6 @@
 package com.carsplatform.backend.api.fuelReportLikes;
 
-import com.carsplatform.backend.api.fuelReportLikes.dtos.FuelReportLikeResponse;
+import com.carsplatform.backend.common.LikeResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,33 +15,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/likes/fuel-report")
 @RequiredArgsConstructor
 @Tag(name = "Fuel Report Likes", description = "API for managing fuel report likes")
 @SecurityRequirement(name = "bearerAuth")
 public class FuelReportLikeController {
+
     private final FuelReportLikeService fuelReportLikeService;
+
 
     @PostMapping("/{fuelReportId}")
     @Operation(summary = "Toggle like for a fuel report")
-    public ResponseEntity<FuelReportLikeResponse> toggleLike(
+    public ResponseEntity<LikeResponse> toggleLike(
             @PathVariable UUID fuelReportId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        return ResponseEntity.ok(
-                fuelReportLikeService.toggleLike(fuelReportId, userDetails.getUsername())
-        );
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return ResponseEntity.ok(fuelReportLikeService.toggleLike(fuelReportId, userDetails.getUsername()));
     }
 
     @GetMapping("/{fuelReportId}/status")
     @Operation(summary = "Get like status and count for a fuel report")
-    public ResponseEntity<FuelReportLikeResponse> getLikeStatus(
+    public ResponseEntity<LikeResponse> getLikeStatus(
             @PathVariable UUID fuelReportId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        return ResponseEntity.ok(
-                fuelReportLikeService.getLikeStatus(fuelReportId, userDetails.getUsername())
-        );
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return ResponseEntity.ok(fuelReportLikeService.getLikeStatus(fuelReportId, userDetails.getUsername()));
     }
 }

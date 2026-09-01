@@ -10,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class TagService {
+
     private final TagRepository repository;
     private final TagMapper mapper;
+
 
     @Transactional(readOnly = true)
     public List<CarTagResponse> getAllTags() {

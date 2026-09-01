@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CarDetailsResponse {
     private UUID id;

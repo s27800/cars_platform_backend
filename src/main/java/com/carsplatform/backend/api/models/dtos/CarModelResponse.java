@@ -7,7 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CarModelResponse {
     private UUID id;
     private String name;

@@ -15,26 +15,29 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "API for authentication")
 public class AuthenticationController {
+
     private final AuthenticationService authenticationService;
+
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate existing user")
     public ResponseEntity<AuthenticationResponse> loginUser(
-            @Valid @RequestBody LoginRequest loginRequest) {
-
+            @Valid @RequestBody LoginRequest loginRequest
+    ) {
         return ResponseEntity.ok(authenticationService.loginUser(loginRequest));
     }
 
     @PostMapping("/register")
     @Operation(summary = "Register new user")
     public ResponseEntity<AuthenticationResponse> registerUser(
-            @Valid @RequestBody RegisterRequest registerRequest) {
-
+            @Valid @RequestBody RegisterRequest registerRequest
+    ) {
         return new ResponseEntity<>(authenticationService.registerUser(registerRequest), HttpStatus.CREATED);
     }
 }

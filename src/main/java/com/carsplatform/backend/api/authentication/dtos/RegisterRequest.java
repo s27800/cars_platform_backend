@@ -10,8 +10,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegisterRequest {
+
     @NotBlank(message = "Username is required")
     @Size(max = 50, message = "Username cannot exceed 50 characters")
     private String username;

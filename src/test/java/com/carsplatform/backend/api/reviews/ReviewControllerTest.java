@@ -9,6 +9,7 @@ import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.reviews.dtos.CreateReviewRequest;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.MockMvcTestBase;
 import com.carsplatform.backend.common.TestDataFactory;
 
@@ -46,36 +47,26 @@ class ReviewControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .name("3 Series")
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .name("E90")
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .name("320i")
                 .build();
@@ -88,7 +79,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Register user and get token
         String username = "reviewuser" + System.currentTimeMillis();
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -108,7 +98,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Create approved test review
         testReview = Review.builder()
                 .user(testUser)
                 .car(testCar)
@@ -124,13 +113,12 @@ class ReviewControllerTest extends MockMvcTestBase {
                 .maintenanceRating(4)
                 .priceQualityRating(4)
                 .failureFreeRating(4)
-                .isApproved(true)
+                .status(ModerationStatus.APPROVED)
                 .reviewDate(LocalDateTime.now())
                 .build();
 
         entityManager.persist(testReview);
 
-        // Save
         entityManager.flush();
     }
 
@@ -142,8 +130,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns reviews for car (public endpoint)")
         void getReviews_ExistingCar_Returns200() throws Exception {
-
-            // Perform GET request and verify response -> returns 200 OK with reviews for the car
             performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
@@ -153,8 +139,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns reviews with user info")
         void getReviews_ExistingCar_IncludesUserInfo() throws Exception {
-
-            // Perform GET request and verify response -> reviews include user info
             performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].usernameResponse.username").exists());
@@ -163,8 +147,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns paginated results")
         void getReviews_WithPagination_ReturnsPaginated() throws Exception {
-
-            // Perform GET request and verify response -> returns paginated results
             performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId() + "?page=0&size=5")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.pageable.pageNumber").value(0))
@@ -174,8 +156,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns empty for car with no reviews")
         void getReviews_NoReviews_ReturnsEmpty() throws Exception {
-
-            // Create a new car with no reviews
             Brand brand = TestDataFactory.createBrand("Audi");
             entityManager.persist(brand);
 
@@ -200,7 +180,6 @@ class ReviewControllerTest extends MockMvcTestBase {
 
             entityManager.flush();
 
-            // Perform GET request and verify response -> returns empty for car with no reviews
             performGetNoAuth(REVIEW_BASE_URL + "/" + carWithoutReviews.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isEmpty());
@@ -215,8 +194,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns average ratings for car (public endpoint)")
         void getAverageRatings_ExistingCar_Returns200() throws Exception {
-
-            // Perform GET request and verify response -> returns average ratings for car
             performGetNoAuth(REVIEW_BASE_URL + "/" + testCar.getId() + "/average-ratings")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.avgEngineRating").isNumber())
@@ -232,8 +209,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("creates review when authenticated")
         void createReview_Authenticated_Returns201() throws Exception {
-
-            // Create a new user and get token for authentication
             String newUsername = "newreviewer" + System.currentTimeMillis();
 
             RegisterRequest newUserRequest = RegisterRequest.builder()
@@ -252,7 +227,6 @@ class ReviewControllerTest extends MockMvcTestBase {
 
             String newUserToken = objectMapper.readTree(response).get("accessToken").asText();
 
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This is a great test car review comment")
                     .engineRating(5)
@@ -268,7 +242,6 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .failureFreeRating(4)
                     .build();
 
-            // Perform POST request and verify response -> returns 201 Created
             performPostWithAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request, newUserToken)
                     .andExpect(status().isCreated());
         }
@@ -276,8 +249,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void createReview_NotAuthenticated_Returns401() throws Exception {
-
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This review should not be created")
                     .engineRating(5)
@@ -293,7 +264,6 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .failureFreeRating(4)
                     .build();
 
-            // Perform POST request and verify response -> returns 401 Unauthorized
             performPostNoAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request)
                     .andExpect(status().isUnauthorized());
         }
@@ -301,8 +271,6 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when comment is too short")
         void createReview_CommentTooShort_Returns400() throws Exception {
-
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Short")
                     .engineRating(5)
@@ -318,7 +286,6 @@ class ReviewControllerTest extends MockMvcTestBase {
                     .failureFreeRating(4)
                     .build();
 
-            // Perform POST request and verify response -> returns 400 Bad Request
             performPostWithAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -326,14 +293,11 @@ class ReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when ratings are missing")
         void createReview_MissingRatings_Returns400() throws Exception {
-
-            // Create valid request with missing rating fields
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("This is a valid length comment for testing purposes")
                     .engineRating(5)
                     .build();
 
-            // Perform POST request and verify response -> returns 400 Bad Request
             performPostWithAuth(REVIEW_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest());
         }

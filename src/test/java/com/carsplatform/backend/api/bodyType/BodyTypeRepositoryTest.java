@@ -37,14 +37,11 @@ class BodyTypeRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
         entityManager.persist(testBodyType);
 
-        // Save
         entityManager.flush();
     }
 
@@ -56,11 +53,7 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns body type when exists")
         void findById_ExistingBodyType_ReturnsBodyType() {
-
-            // Find existing body type
             Optional<BodyType> result = bodyTypeRepository.findById(testBodyType.getId());
-
-            // Verify result -> body type found with correct name
             assertThat(result).isPresent();
             assertThat(result.get().getName()).isEqualTo("Sedan");
         }
@@ -68,11 +61,7 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns empty when body type does not exist")
         void findById_NonExistingBodyType_ReturnsEmpty() {
-
-            // Find non-existing body type
             Optional<BodyType> result = bodyTypeRepository.findById(UUID.randomUUID());
-
-            // Verify result -> body type not found
             assertThat(result).isEmpty();
         }
     }
@@ -85,8 +74,6 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns all body types")
         void findAll_MultipleBodyTypes_ReturnsAllBodyTypes() {
-
-            // Create additional body types
             BodyType hatchback = TestDataFactory.createBodyType("Hatchback");
             BodyType suv = TestDataFactory.createBodyType("SUV");
             BodyType coupe = TestDataFactory.createBodyType("Coupe");
@@ -97,10 +84,7 @@ class BodyTypeRepositoryTest {
 
             entityManager.flush();
 
-            // Find all body types
             List<BodyType> result = bodyTypeRepository.findAll();
-
-            // Verify result -> all body types found with correct names
             assertThat(result).hasSize(4);
             assertThat(result).extracting(BodyType::getName)
                     .containsExactlyInAnyOrder("Sedan", "Hatchback", "SUV", "Coupe");
@@ -115,17 +99,12 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("persists new body type")
         void save_NewBodyType_PersistsBodyType() {
-
-            // Create new body type
             BodyType newBodyType = TestDataFactory.defaultBodyType()
                     .name("Kombi")
                     .build();
 
-            // Save new body type
             BodyType saved = bodyTypeRepository.save(newBodyType);
             entityManager.flush();
-
-            // Verify result -> new body type saved with correct name
             assertThat(saved.getId()).isNotNull();
             BodyType found = entityManager.find(BodyType.class, saved.getId());
             assertThat(found.getName()).isEqualTo("Kombi");
@@ -134,16 +113,12 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("updates existing body type")
         void save_ExistingBodyType_UpdatesBodyType() {
-
-            // Update existing body type
             testBodyType.setName("Sedan Sport");
 
             bodyTypeRepository.save(testBodyType);
 
             entityManager.flush();
             entityManager.clear();
-
-            // Verify result -> existing body type updated with correct name
             BodyType found = entityManager.find(BodyType.class, testBodyType.getId());
 
             assertThat(found.getName()).isEqualTo("Sedan Sport");
@@ -158,12 +133,8 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("removes body type")
         void delete_ExistingBodyType_RemovesBodyType() {
-
-            // Remove existing body type
             bodyTypeRepository.delete(testBodyType);
             entityManager.flush();
-
-            // Verify result -> body type removed
             BodyType found = entityManager.find(BodyType.class, testBodyType.getId());
 
             assertThat(found).isNull();
@@ -178,17 +149,12 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns correct number")
         void count_MultipleBodyTypes_ReturnsCorrectCount() {
-
-            // Create additional body type
             BodyType bodyType2 = TestDataFactory.createBodyType("Hatchback");
 
             entityManager.persist(bodyType2);
             entityManager.flush();
 
-            // Count body types
             long count = bodyTypeRepository.count();
-
-            // Verify result -> correct number of body types returned
             assertThat(count).isEqualTo(2);
         }
     }
@@ -201,22 +167,14 @@ class BodyTypeRepositoryTest {
         @Test
         @DisplayName("returns true for existing body type")
         void existsById_ExistingBodyType_ReturnsTrue() {
-
-            // Check if body type exists by ID
             boolean exists = bodyTypeRepository.existsById(testBodyType.getId());
-
-            // Verify result -> body type exists
             assertThat(exists).isTrue();
         }
 
         @Test
         @DisplayName("returns false for non-existing body type")
         void existsById_NonExistingBodyType_ReturnsFalse() {
-
-            // Check if body type exists by ID
             boolean exists = bodyTypeRepository.existsById(UUID.randomUUID());
-
-            // Verify result -> body type does not exist
             assertThat(exists).isFalse();
         }
     }

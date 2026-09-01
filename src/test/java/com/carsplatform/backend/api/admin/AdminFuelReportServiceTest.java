@@ -1,14 +1,16 @@
 package com.carsplatform.backend.api.admin;
 
-import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
 import com.carsplatform.backend.api.bodyType.BodyType;
 import com.carsplatform.backend.api.brands.Brand;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
+import com.carsplatform.backend.api.fuelReports.FuelReportDetailsMapper;
 import com.carsplatform.backend.api.fuelReports.FuelReportRepository;
+import com.carsplatform.backend.api.fuelReports.dtos.FuelReportDetailsResponse;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
@@ -45,7 +47,7 @@ class AdminFuelReportServiceTest {
     private FuelReportRepository fuelReportRepository;
 
     @Mock
-    private AdminFuelReportMapper adminFuelReportMapper;
+    private FuelReportDetailsMapper fuelReportDetailsMapper;
 
     @InjectMocks
     private AdminFuelReportService adminFuelReportService;
@@ -56,41 +58,27 @@ class AdminFuelReportServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test fuel report
         testFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
                 .id(UUID.randomUUID())
-                .isApproved(false)
+                .status(ModerationStatus.PENDING)
                 .build();
     }
 
@@ -102,44 +90,32 @@ class AdminFuelReportServiceTest {
         @Test
         @DisplayName("should return pending fuel reports page")
         void getPendingFuelReports_ReturnsPendingFuelReports() {
-
-            // Create pageable and mock data
             Pageable pageable = PageRequest.of(0, 10);
             Page<FuelReport> fuelReportPage = new PageImpl<>(List.of(testFuelReport));
-            Page<AdminFuelReportResponse> expectedResponse = new PageImpl<>(List.of(mock(AdminFuelReportResponse.class)));
+            Page<FuelReportDetailsResponse> expectedResponse = new PageImpl<>(List.of(mock(FuelReportDetailsResponse.class)));
 
-            // Mock repository and mapper
             when(fuelReportRepository.findAllPending(pageable)).thenReturn(fuelReportPage);
-            when(adminFuelReportMapper.toDtoList(fuelReportPage)).thenReturn(expectedResponse);
+            when(fuelReportDetailsMapper.toDtoList(fuelReportPage)).thenReturn(expectedResponse);
 
-            // Get pending fuel reports
-            Page<AdminFuelReportResponse> result = adminFuelReportService.getPendingFuelReports(pageable);
-
-            // Verify results -> pending fuel reports page is returned with correct content
+            Page<FuelReportDetailsResponse> result = adminFuelReportService.getPendingFuelReports(pageable);
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
 
             verify(fuelReportRepository).findAllPending(pageable);
-            verify(adminFuelReportMapper).toDtoList(fuelReportPage);
+            verify(fuelReportDetailsMapper).toDtoList(fuelReportPage);
         }
 
         @Test
         @DisplayName("should return empty page when no pending fuel reports")
         void getPendingFuelReports_NoPendingFuelReports_ReturnsEmptyPage() {
-
-            // Create pageable and mock data
             Pageable pageable = PageRequest.of(0, 10);
             Page<FuelReport> emptyPage = Page.empty();
-            Page<AdminFuelReportResponse> emptyResponse = Page.empty();
+            Page<FuelReportDetailsResponse> emptyResponse = Page.empty();
 
-            // Mock repository and mapper
             when(fuelReportRepository.findAllPending(pageable)).thenReturn(emptyPage);
-            when(adminFuelReportMapper.toDtoList(emptyPage)).thenReturn(emptyResponse);
+            when(fuelReportDetailsMapper.toDtoList(emptyPage)).thenReturn(emptyResponse);
 
-            // Get pending fuel reports
-            Page<AdminFuelReportResponse> result = adminFuelReportService.getPendingFuelReports(pageable);
-
-            // Verify results -> empty page is returned
+            Page<FuelReportDetailsResponse> result = adminFuelReportService.getPendingFuelReports(pageable);
             assertThat(result).isNotNull();
             assertThat(result.getContent()).isEmpty();
 
@@ -155,50 +131,40 @@ class AdminFuelReportServiceTest {
         @Test
         @DisplayName("should approve fuel report when fuel report exists")
         void approveFuelReport_FuelReportExists_ApprovesFuelReport() {
-
-            // Mock repository
             when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
             when(fuelReportRepository.save(any(FuelReport.class))).thenReturn(testFuelReport);
 
-            // Approve fuel report
             adminFuelReportService.approveFuelReport(testFuelReport.getId(), true);
-
-            // Verify results -> fuel report is approved
             ArgumentCaptor<FuelReport> fuelReportCaptor = ArgumentCaptor.forClass(FuelReport.class);
 
             verify(fuelReportRepository).save(fuelReportCaptor.capture());
 
             FuelReport savedFuelReport = fuelReportCaptor.getValue();
 
-            assertThat(savedFuelReport.getIsApproved()).isTrue();
+            assertThat(savedFuelReport.getStatus()).isEqualTo(ModerationStatus.APPROVED);
         }
 
         @Test
-        @DisplayName("should delete fuel report when approve is false")
-        void approveFuelReport_ApproveFalse_DeletesFuelReport() {
-
-            // Mock repository
+        @DisplayName("should set status to REJECTED when approve is false")
+        void approveFuelReport_ApproveFalse_SetsStatusRejected() {
             when(fuelReportRepository.findById(testFuelReport.getId())).thenReturn(Optional.of(testFuelReport));
-            doNothing().when(fuelReportRepository).delete(any(FuelReport.class));
 
-            // Reject fuel report
             adminFuelReportService.approveFuelReport(testFuelReport.getId(), false);
+            ArgumentCaptor<FuelReport> fuelReportCaptor = ArgumentCaptor.forClass(FuelReport.class);
+            verify(fuelReportRepository).save(fuelReportCaptor.capture());
+            verify(fuelReportRepository, never()).delete(any());
 
-            // Verify results -> fuel report is deleted
-            verify(fuelReportRepository).delete(testFuelReport);
-            verify(fuelReportRepository, never()).save(any());
+            FuelReport savedFuelReport = fuelReportCaptor.getValue();
+            assertThat(savedFuelReport.getStatus()).isEqualTo(ModerationStatus.REJECTED);
         }
 
         @Test
         @DisplayName("should throw ResourceNotFoundException when fuel report not found")
         void approveFuelReport_FuelReportNotFound_ThrowsException() {
-
-            // Mock repository
             UUID nonExistentId = UUID.randomUUID();
-            
+
             when(fuelReportRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-            // Approve fuel report and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> adminFuelReportService.approveFuelReport(nonExistentId, true))
                     .isInstanceOf(ResourceNotFoundException.class);
 

@@ -16,7 +16,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -32,8 +31,6 @@ class BrandMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test data for car
         testBrand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .name("BMW")
@@ -45,8 +42,6 @@ class BrandMapperTest {
         Model model = TestDataFactory.defaultModel(testBrand).id(UUID.randomUUID()).build();
         Generation generation = TestDataFactory.defaultGeneration(model).id(UUID.randomUUID()).build();
         BodyType bodyType = TestDataFactory.defaultBodyType().id(UUID.randomUUID()).build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .images(new LinkedHashSet<>())
@@ -62,22 +57,14 @@ class BrandMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarBrandResponse result = mapper.toDto(null);
-
-            // Verify result -> null is returned
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidBrand_MapsAllFields() {
-
-            // Map valid brand
             CarBrandResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("BMW");
@@ -95,22 +82,14 @@ class BrandMapperTest {
         @Test
         @DisplayName("should return null when car is null")
         void map_NullCar_ReturnsNull() {
-
-            // Map null car
             CarBrandResponse result = mapper.map(null);
-
-            // Verify result -> null is returned
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should extract brand from car's generation->model->brand")
         void map_ValidCar_ExtractsBrand() {
-
-            // Map valid car
             CarBrandResponse result = mapper.map(testCar);
-
-            // Verify result -> brand fields are extracted correctly
             assertThat(result).isNotNull();
             assertThat(result.getName()).isEqualTo("BMW");
         }

@@ -35,7 +35,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
@@ -65,7 +64,6 @@ class AuthenticationServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .build();
@@ -84,23 +82,17 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("should return AuthenticationResponse with token when credentials are valid")
         void login_ValidCredentials_ReturnsJwtToken() {
-
-            // Create valid login request
             LoginRequest loginRequest = new LoginRequest("testuser", "password123");
 
             UserPrincipal userPrincipal = UserPrincipal.create(testUser);
             Authentication authentication = mock(Authentication.class);
 
-            // Mock authentication manager and token provider behavior
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(authentication);
             when(authentication.getPrincipal()).thenReturn(userPrincipal);
             when(tokenProvider.generateToken(authentication)).thenReturn("jwt-token-123");
 
-            // Login user
             AuthenticationResponse response = authenticationService.loginUser(loginRequest);
-
-            // Verify results -> response is valid
             assertThat(response).isNotNull();
             assertThat(response.getAccessToken()).isEqualTo("jwt-token-123");
             assertThat(response.getUserId()).isEqualTo(testUser.getId());
@@ -110,41 +102,31 @@ class AuthenticationServiceTest {
             verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
             verify(tokenProvider).generateToken(authentication);
 
-            // Verify the failure counter is cleared after a successful login
             verify(loginAttemptService).loginSucceeded("testuser");
         }
 
         @Test
         @DisplayName("should throw BadCredentialsException when credentials are invalid")
         void login_InvalidCredentials_ThrowsException() {
-
-            // Create invalid login request
             LoginRequest loginRequest = new LoginRequest("testuser", "wrongPassword");
 
-            // Mock authentication manager behavior
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenThrow(new BadCredentialsException("Bad credentials"));
 
-            // Login user and verify results -> BadCredentialsException is thrown
             assertThatThrownBy(() -> authenticationService.loginUser(loginRequest))
                     .isInstanceOf(BadCredentialsException.class);
 
-            // Verify the failed attempt is counted towards the brute force limit
             verify(loginAttemptService).loginFailed("testuser");
         }
 
         @Test
         @DisplayName("should not authenticate at all when the account is temporarily locked")
         void login_BlockedAccount_ThrowsWithoutAuthenticating() {
-
-            // Create login request for a locked account
             LoginRequest loginRequest = new LoginRequest("testuser", "password123");
 
-            // Mock login attempt service to report the account as blocked
             doThrow(new TooManyLoginAttemptsException(900))
                     .when(loginAttemptService).assertNotBlocked("testuser");
 
-            // Login user and verify results -> TooManyLoginAttemptsException is thrown
             assertThatThrownBy(() -> authenticationService.loginUser(loginRequest))
                     .isInstanceOf(TooManyLoginAttemptsException.class);
 
@@ -154,8 +136,6 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("should return isAdmin=true for admin user")
         void login_AdminUser_ReturnsIsAdminTrue() {
-
-            // Create admin user and valid login request
             User adminUser = TestDataFactory.adminUser()
                     .id(UUID.randomUUID())
                     .build();
@@ -165,16 +145,12 @@ class AuthenticationServiceTest {
             UserPrincipal adminPrincipal = UserPrincipal.create(adminUser);
             Authentication authentication = mock(Authentication.class);
 
-            // Mock authentication manager and token provider behavior
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(authentication);
             when(authentication.getPrincipal()).thenReturn(adminPrincipal);
             when(tokenProvider.generateToken(authentication)).thenReturn("admin-jwt-token");
 
-            // Login admin user
             AuthenticationResponse response = authenticationService.loginUser(loginRequest);
-
-            // Verify results -> response is valid
             assertThat(response.getIsAdmin()).isTrue();
             assertThat(response.getUsername()).isEqualTo("admin");
         }
@@ -188,8 +164,6 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("should create user and return token when data is valid")
         void register_ValidData_CreatesUserAndReturnsToken() {
-
-            // Create valid register request
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("newuser")
                     .email("newuser@example.com")
@@ -198,12 +172,10 @@ class AuthenticationServiceTest {
                     .lastName("User")
                     .build();
 
-            // Mock user repository behavior
             when(userRepository.existsByUsername("newuser")).thenReturn(false);
             when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
             when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-            // Create user
             User savedUser = User.builder()
                     .id(UUID.randomUUID())
                     .username("newuser")
@@ -217,24 +189,18 @@ class AuthenticationServiceTest {
             UserPrincipal userPrincipal = UserPrincipal.create(savedUser);
             Authentication authentication = mock(Authentication.class);
 
-            // Mock authentication manager and token provider behavior
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(authentication);
             when(authentication.getPrincipal()).thenReturn(userPrincipal);
             when(tokenProvider.generateToken(authentication)).thenReturn("new-user-jwt-token");
 
-            // Register user
             AuthenticationResponse response = authenticationService.registerUser(registerRequest);
-
-            // Verify results -> response is valid
             assertThat(response).isNotNull();
             assertThat(response.getAccessToken()).isEqualTo("new-user-jwt-token");
 
-            // Verify user was saved
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
             verify(userRepository).save(userCaptor.capture());
 
-            // Verify captured user has correct data
             User capturedUser = userCaptor.getValue();
 
             assertThat(capturedUser.getUsername()).isEqualTo("newuser");
@@ -248,8 +214,6 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("should throw ResourceAlreadyExistsException when username exists")
         void register_DuplicateUsername_ThrowsException() {
-
-            // Create register request
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("existinguser")
                     .email("new@example.com")
@@ -258,10 +222,8 @@ class AuthenticationServiceTest {
                     .lastName("User")
                     .build();
 
-            // Mock user repository behavior
             when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
-            // Register user and verify results -> ResourceAlreadyExistsException is thrown
             assertThatThrownBy(() -> authenticationService.registerUser(registerRequest))
                     .isInstanceOf(ResourceAlreadyExistsException.class);
 
@@ -271,8 +233,6 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("should throw ResourceAlreadyExistsException when email exists")
         void register_DuplicateEmail_ThrowsException() {
-
-            // Create register request
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("newuser")
                     .email("existing@example.com")
@@ -281,11 +241,9 @@ class AuthenticationServiceTest {
                     .lastName("User")
                     .build();
 
-            // Mock user repository behavior
             when(userRepository.existsByUsername("newuser")).thenReturn(false);
             when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
-            // Register user and verify results -> ResourceAlreadyExistsException is thrown
             assertThatThrownBy(() -> authenticationService.registerUser(registerRequest))
                     .isInstanceOf(ResourceAlreadyExistsException.class);
 

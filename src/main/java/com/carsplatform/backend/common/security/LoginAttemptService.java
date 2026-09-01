@@ -23,6 +23,7 @@ public class LoginAttemptService {
 
     private final Map<String, FailedAttempts> attemptsByUsername = new ConcurrentHashMap<>();
 
+
     public LoginAttemptService(
             @Value("${app.security.login.max-attempts}") int maxAttempts,
             @Value("${app.security.login.lockout-minutes}") long lockoutMinutes
@@ -33,7 +34,7 @@ public class LoginAttemptService {
 
 
     /**
-     * Throws error if the account is locked.
+     * Throws {@link TooManyLoginAttemptsException} if the account is currently locked.
      */
     public void assertNotBlocked(String username) {
         FailedAttempts attempts = attemptsByUsername.get(key(username));
@@ -46,10 +47,6 @@ public class LoginAttemptService {
             throw new TooManyLoginAttemptsException(Duration.between(now, attempts.expiresAt()).getSeconds());
     }
 
-
-    /**
-     * Records a failed login attempt for the given username.
-     */
     public void loginFailed(String username) {
         Instant now = Instant.now();
 
@@ -68,7 +65,9 @@ public class LoginAttemptService {
     }
 
 
-    // Used for tests
+    /**
+     * Clears the counters. Only needed so that tests do not leak lockouts into each other.
+     */
     public void reset() {
         attemptsByUsername.clear();
     }

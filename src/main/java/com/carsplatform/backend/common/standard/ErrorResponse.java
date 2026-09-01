@@ -7,7 +7,15 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+/**
+ * Body of every error the API returns. {@code errors} is filled in only for validation
+ * failures and maps a field name to the message describing what is wrong with it.
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
     private int status;
     private String message;

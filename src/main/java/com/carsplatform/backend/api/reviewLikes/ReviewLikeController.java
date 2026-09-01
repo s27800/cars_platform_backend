@@ -1,6 +1,6 @@
-package com.carsplatform.backend.api.likes;
+package com.carsplatform.backend.api.reviewLikes;
 
-import com.carsplatform.backend.api.likes.dtos.LikeResponse;
+import com.carsplatform.backend.common.LikeResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,33 +15,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
-@RequestMapping("/api/likes")
+@RequestMapping("/api/likes/review")
 @RequiredArgsConstructor
-@Tag(name = "Likes", description = "API for managing review likes")
+@Tag(name = "Review Likes", description = "API for managing review likes")
 @SecurityRequirement(name = "bearerAuth")
-public class LikeController {
-    private final LikeService likeService;
+public class ReviewLikeController {
+
+    private final ReviewLikeService reviewLikeService;
+
 
     @PostMapping("/{reviewId}")
     @Operation(summary = "Toggle like for a review")
     public ResponseEntity<LikeResponse> toggleLike(
             @PathVariable UUID reviewId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        return ResponseEntity.ok(
-                likeService.toggleLike(reviewId, userDetails.getUsername())
-        );
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return ResponseEntity.ok(reviewLikeService.toggleLike(reviewId, userDetails.getUsername()));
     }
 
     @GetMapping("/{reviewId}/status")
     @Operation(summary = "Get like status and count for a review")
     public ResponseEntity<LikeResponse> getLikeStatus(
             @PathVariable UUID reviewId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        return ResponseEntity.ok(
-                likeService.getLikeStatus(reviewId, userDetails.getUsername())
-        );
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return ResponseEntity.ok(reviewLikeService.getLikeStatus(reviewId, userDetails.getUsername()));
     }
 }

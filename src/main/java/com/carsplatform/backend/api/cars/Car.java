@@ -13,6 +13,7 @@ import com.carsplatform.backend.api.performances.Performance;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.tags.Tag;
 import com.carsplatform.backend.api.transmissions.Transmission;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -27,6 +28,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+
+/**
+ * A single car variant in the catalogue, for example "BMW 320i 2020 Sedan".
+ *
+ * Following the database schema, the technical data sits in separate entities behind
+ * one-to-one relations: engine, chassis, transmission, performance and the two sets of
+ * dimensions. Collections pointing back to this entity are left out of toString, equals and
+ * hashCode, otherwise Lombok walks the whole object graph.
+ */
 @Entity
 @Table(name = "car")
 @Data
@@ -34,6 +44,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Car {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

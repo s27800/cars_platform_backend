@@ -1,4 +1,4 @@
-package com.carsplatform.backend.api.likes;
+package com.carsplatform.backend.api.reviewLikes;
 
 import com.carsplatform.backend.api.authentication.dtos.RegisterRequest;
 import com.carsplatform.backend.api.bodyType.BodyType;
@@ -9,6 +9,7 @@ import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.MockMvcTestBase;
 import com.carsplatform.backend.common.TestDataFactory;
 
@@ -27,10 +28,10 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@DisplayName("LikeController Integration Tests")
-class LikeControllerTest extends MockMvcTestBase {
+@DisplayName("ReviewLikeController Integration Tests")
+class ReviewLikeControllerTest extends MockMvcTestBase {
 
-    private static final String LIKE_BASE_URL = "/api/likes";
+    private static final String LIKE_BASE_URL = "/api/likes/review";
     private static final String AUTH_BASE_URL = "/api/auth";
 
     @Autowired
@@ -45,8 +46,6 @@ class LikeControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test car data
         Brand brand = TestDataFactory.defaultBrand().name("BMW").build();
         entityManager.persist(brand);
 
@@ -67,18 +66,15 @@ class LikeControllerTest extends MockMvcTestBase {
         entityManager.persist(car.getInsideDimensions());
         entityManager.persist(car.getOutsideDimensions());
         entityManager.persist(car);
-
-        // Create test user and authenticate
         String username = "likeuser" + System.currentTimeMillis();
         RegisterRequest registerRequest = RegisterRequest.builder()
                 .username(username)
                 .email(username + "@example.com")
                 .password("Password123!")
-                .firstName("Like")
+                .firstName("ReviewLike")
                 .lastName("User")
                 .build();
 
-        // Register user and get token
         String response = performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                 .andExpect(status().isCreated())
                 .andReturn()
@@ -87,8 +83,6 @@ class LikeControllerTest extends MockMvcTestBase {
 
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
-
-        // Create test review
         testReview = Review.builder()
                 .user(testUser)
                 .car(car)
@@ -104,25 +98,22 @@ class LikeControllerTest extends MockMvcTestBase {
                 .maintenanceRating(4)
                 .priceQualityRating(4)
                 .failureFreeRating(4)
-                .isApproved(true)
+                .status(ModerationStatus.APPROVED)
                 .reviewDate(LocalDateTime.now())
                 .build();
         entityManager.persist(testReview);
 
-        // Save
         entityManager.flush();
     }
 
 
     @Nested
-    @DisplayName("POST /api/likes/{reviewId}")
+    @DisplayName("POST /api/likes/review/{reviewId}")
     class ToggleLikeTests {
 
         @Test
         @DisplayName("toggles like when authenticated")
         void toggleLike_Authenticated_Returns200() throws Exception {
-
-            // Perform post request to toggle like and verify results -> like status is toggled
             performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.liked").isBoolean())
@@ -132,8 +123,6 @@ class LikeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void toggleLike_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform post request to toggle like without authentication and verify results -> 403 is returned
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                             .post(LIKE_BASE_URL + "/" + testReview.getId())
@@ -144,8 +133,6 @@ class LikeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("toggles like status on repeated calls")
         void toggleLike_RepeatedCalls_TogglesStatus() throws Exception {
-
-            // Toggle like (like)
             String firstResponse = performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andReturn()
@@ -154,14 +141,11 @@ class LikeControllerTest extends MockMvcTestBase {
 
             boolean firstLiked = objectMapper.readTree(firstResponse).get("liked").asBoolean();
 
-            // Toggle like again (dislike)
             String secondResponse = performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
-
-            // Verify results -> like status is toggled
             boolean secondLiked = objectMapper.readTree(secondResponse).get("liked").asBoolean();
 
             assert firstLiked != secondLiked;
@@ -170,14 +154,12 @@ class LikeControllerTest extends MockMvcTestBase {
 
 
     @Nested
-    @DisplayName("GET /api/likes/{reviewId}/status")
+    @DisplayName("GET /api/likes/review/{reviewId}/status")
     class GetLikeStatusTests {
 
         @Test
         @DisplayName("returns like status when authenticated")
         void getLikeStatus_Authenticated_Returns200() throws Exception {
-
-            // Perform get request to retrieve like status and verify results -> like status is returned
             performGetWithAuth(LIKE_BASE_URL + "/" + testReview.getId() + "/status", userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.liked").isBoolean())
@@ -187,8 +169,6 @@ class LikeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getLikeStatus_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform get request to retrieve like status without authentication and verify results -> 403 is returned
             performGetNoAuth(LIKE_BASE_URL + "/" + testReview.getId() + "/status")
                     .andExpect(status().isUnauthorized());
         }
@@ -196,12 +176,9 @@ class LikeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns correct like count")
         void getLikeStatus_WithLikes_ReturnsCorrectCount() throws Exception {
-
-            // Like the review
             performPostWithAuthNoBody(LIKE_BASE_URL + "/" + testReview.getId(), userToken)
                     .andExpect(status().isOk());
 
-            // Perform get request to retrieve like status and verify results -> correct like count is returned
             performGetWithAuth(LIKE_BASE_URL + "/" + testReview.getId() + "/status", userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.liked").value(true))

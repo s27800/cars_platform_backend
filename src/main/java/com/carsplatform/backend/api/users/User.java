@@ -2,9 +2,10 @@ package com.carsplatform.backend.api.users;
 
 import com.carsplatform.backend.api.dataProposal.DataProposal;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
-import com.carsplatform.backend.api.likes.Like;
+import com.carsplatform.backend.api.reviewLikes.ReviewLike;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.userSettings.UserSettings;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "users")
 @Data
@@ -24,6 +26,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")
@@ -86,7 +89,7 @@ public class User {
     @EqualsAndHashCode.Exclude
     @JsonIgnore
     @Builder.Default
-    private List<Like> likes = new ArrayList<>();
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

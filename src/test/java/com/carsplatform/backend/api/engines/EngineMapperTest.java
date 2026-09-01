@@ -24,8 +24,6 @@ class EngineMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test engine
         testEngine = TestDataFactory.defaultEngine()
                 .id(UUID.randomUUID())
                 .engineCode("2.0 TSI")
@@ -53,22 +51,15 @@ class EngineMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarEngineResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidEngine_MapsAllFields() {
-
-            // Map valid engine
             CarEngineResponse result = mapper.toDto(testEngine);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testEngine.getId());
             assertThat(result.getEngineCode()).isEqualTo("2.0 TSI");
@@ -90,18 +81,14 @@ class EngineMapperTest {
         @Test
         @DisplayName("should handle null optional fields")
         void toDto_EngineWithNullFields_MapsNullFields() {
-
-            // Create minimal engine with null optional fields
             Engine minimalEngine = Engine.builder()
                     .id(UUID.randomUUID())
                     .engineCode(null)
                     .turbo(null)
                     .build();
 
-            // Map minimal engine
             CarEngineResponse result = mapper.toDto(minimalEngine);
 
-            // Verify null fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(minimalEngine.getId());
             assertThat(result.getEngineCode()).isNull();

@@ -32,8 +32,6 @@ class UserControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Register user and get token for authenticated tests
         RegisterRequest registerRequest = RegisterRequest.builder()
                 .username("testuser" + System.currentTimeMillis())
                 .email("testuser" + System.currentTimeMillis() + "@example.com")
@@ -50,7 +48,6 @@ class UserControllerTest extends MockMvcTestBase {
 
         userToken = objectMapper.readTree(response).get("accessToken").asText();
 
-        // Get user ID from token
         User user = userRepository.findByUsername(registerRequest.getUsername()).orElseThrow();
         userId = user.getId();
     }
@@ -63,8 +60,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns user profile when authenticated")
         void getCurrentUserProfile_Authenticated_Returns200() throws Exception {
-
-            // Perform request with valid token -> verify response is 200 and contains user profile data
             performGetWithAuth(USER_BASE_URL + "/me", userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.firstName").value("Test"))
@@ -76,8 +71,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getCurrentUserProfile_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform request without authentication -> verify response is 403
             performGetNoAuth(USER_BASE_URL + "/me")
                     .andExpect(status().isUnauthorized());
         }
@@ -85,8 +78,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 with invalid token")
         void getCurrentUserProfile_InvalidToken_Returns401() throws Exception {
-
-            // Perform request with invalid token -> verify response is 403
             performGetWithAuth(USER_BASE_URL + "/me", "invalid.token.here")
                     .andExpect(status().isUnauthorized());
         }
@@ -94,11 +85,8 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 with expired token")
         void getCurrentUserProfile_ExpiredToken_Returns401() throws Exception {
-
-            // Generate expired token
             String expiredToken = TestSecurityUtils.generateExpiredToken(userId);
 
-            // Perform request with expired token -> verify response is 403
             performGetWithAuth(USER_BASE_URL + "/me", expiredToken)
                     .andExpect(status().isUnauthorized());
         }
@@ -112,15 +100,12 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("updates user profile successfully")
         void updateUserProfile_ValidData_Returns200() throws Exception {
-
-            // Create request with updated profile data
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName("Updated")
                     .lastName("Name")
                     .email("updated" + System.currentTimeMillis() + "@example.com")
                     .build();
 
-            // Perform request with valid token -> verify response is 200 and contains updated profile data
             performPutWithAuth(USER_BASE_URL + "/me", request, userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.firstName").value("Updated"))
@@ -130,13 +115,10 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void updateUserProfile_NotAuthenticated_Returns401() throws Exception {
-
-            // Create request with updated profile data
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName("Updated")
                     .build();
 
-            // Perform request without authentication -> verify response is 403
             performPutNoAuth(USER_BASE_URL + "/me", request)
                     .andExpect(status().isUnauthorized());
         }
@@ -144,13 +126,10 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when email format is invalid")
         void updateUserProfile_InvalidEmail_Returns400() throws Exception {
-
-            // Create request with invalid email format
             UserModifyRequest request = UserModifyRequest.builder()
                     .email("invalid-email")
                     .build();
 
-            // Perform request with invalid email format -> verify response is 400
             performPutWithAuth(USER_BASE_URL + "/me", request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -158,8 +137,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 409 when email already exists")
         void updateUserProfile_DuplicateEmail_Returns409() throws Exception {
-
-            // Create another user
             String existingEmail = "existing" + System.currentTimeMillis() + "@example.com";
             RegisterRequest otherUser = RegisterRequest.builder()
                     .username("otheruser" + System.currentTimeMillis())
@@ -169,16 +146,13 @@ class UserControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            // Perform POST request and verify response is 201 Created
             performPostNoAuth(AUTH_BASE_URL + "/register", otherUser)
                     .andExpect(status().isCreated());
 
-            // Create request with email that already exists
             UserModifyRequest request = UserModifyRequest.builder()
                     .email(existingEmail)
                     .build();
 
-            // Perform request with email that already exists -> verify response is 409
             performPutWithAuth(USER_BASE_URL + "/me", request, userToken)
                     .andExpect(status().isConflict());
         }
@@ -192,14 +166,11 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("changes password successfully with correct current password")
         void changePassword_ValidData_Returns200() throws Exception {
-
-            // Create request with correct data
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
                     .currentPassword("TestPassword123!")
                     .newPassword("NewPassword456!")
                     .build();
 
-            // Perform request with valid token -> verify response is 200
             performPostWithAuth(USER_BASE_URL + "/me/change-password", request, userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
@@ -209,14 +180,11 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void changePassword_NotAuthenticated_Returns401() throws Exception {
-
-            // Create request with correct data
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
                     .currentPassword("OldPassword")
                     .newPassword("NewPassword123!")
                     .build();
 
-            // Perform request without authentication -> verify response is 403
             performPostNoAuth(USER_BASE_URL + "/me/change-password", request)
                     .andExpect(status().isUnauthorized());
         }
@@ -224,14 +192,11 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when current password is incorrect")
         void changePassword_WrongCurrentPassword_Returns400() throws Exception {
-
-            // Create request with incorrect current password
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
                     .currentPassword("WrongPassword123!")
                     .newPassword("NewPassword456!")
                     .build();
 
-            // Perform request with incorrect current password -> verify response is 400
             performPostWithAuth(USER_BASE_URL + "/me/change-password", request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -239,14 +204,11 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when new password is too short")
         void changePassword_NewPasswordTooShort_Returns400() throws Exception {
-
-            // Create request with new invalid password
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
                     .currentPassword("TestPassword123!")
                     .newPassword("short")
                     .build();
 
-            // Perform request with new invalid password -> verify response is 400
             performPostWithAuth(USER_BASE_URL + "/me/change-password", request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -254,14 +216,11 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when required fields are empty")
         void changePassword_EmptyFields_Returns400() throws Exception {
-
-            // Create request with empty fields
             UserChangePasswordRequest request = UserChangePasswordRequest.builder()
                     .currentPassword("")
                     .newPassword("")
                     .build();
 
-            // Perform request with empty fields -> verify response is 400
             performPostWithAuth(USER_BASE_URL + "/me/change-password", request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -275,8 +234,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns data proposals when authenticated")
         void getUserDataProposals_Authenticated_Returns200() throws Exception {
-
-            // Perform GET request with authentication and verify results -> 200 OK is returned
             performGetWithAuth(USER_BASE_URL + "/me/data-proposals", userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray());
@@ -285,8 +242,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getUserDataProposals_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform GET request without authentication and verify results -> 401 Unauthorized is returned
             performGetNoAuth(USER_BASE_URL + "/me/data-proposals")
                     .andExpect(status().isUnauthorized());
         }
@@ -294,8 +249,6 @@ class UserControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns paginated results")
         void getUserDataProposals_WithPagination_ReturnsPaginated() throws Exception {
-
-            // Perform GET request with pagination parameters and verify results -> 200 OK is returned
             performGetWithAuth(USER_BASE_URL + "/me/data-proposals?page=0&size=5", userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.pageable.pageNumber").value(0))

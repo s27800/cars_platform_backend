@@ -1,8 +1,10 @@
 package com.carsplatform.backend.api.admin;
 
-import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
+import com.carsplatform.backend.api.fuelReports.FuelReportDetailsMapper;
 import com.carsplatform.backend.api.fuelReports.FuelReportRepository;
+import com.carsplatform.backend.api.fuelReports.dtos.FuelReportDetailsResponse;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -14,18 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+
+/**
+ * Moderation of fuel reports. A report only counts towards the average consumption
+ * shown on the car page once it has been approved here.
+ */
 @Service
 @RequiredArgsConstructor
 public class AdminFuelReportService {
 
     private final FuelReportRepository fuelReportRepository;
-    private final AdminFuelReportMapper adminFuelReportMapper;
+    private final FuelReportDetailsMapper fuelReportDetailsMapper;
+
 
     @Transactional(readOnly = true)
-    public Page<AdminFuelReportResponse> getPendingFuelReports(Pageable pageable) {
-        return adminFuelReportMapper.toDtoList(
-                fuelReportRepository.findAllPending(pageable)
-        );
+    public Page<FuelReportDetailsResponse> getPendingFuelReports(Pageable pageable) {
+        return fuelReportDetailsMapper.toDtoList(fuelReportRepository.findAllPending(pageable));
     }
 
     @Transactional
@@ -33,11 +39,11 @@ public class AdminFuelReportService {
         FuelReport fuelReport = fuelReportRepository.findById(fuelReportId)
                 .orElseThrow(() -> new ResourceNotFoundException("FuelReport", "id", fuelReportId));
 
-        if (approve) {
-            fuelReport.setIsApproved(true);
-            fuelReportRepository.save(fuelReport);
-        } else {
-            fuelReportRepository.delete(fuelReport);
-        }
+        if (approve)
+            fuelReport.setStatus(ModerationStatus.APPROVED);
+        else
+            fuelReport.setStatus(ModerationStatus.REJECTED);
+
+        fuelReportRepository.save(fuelReport);
     }
 }

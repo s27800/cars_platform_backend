@@ -38,7 +38,7 @@ src/main/java/com/carsplatform/backend/
 │   ├── fuelReports/                        # Raporty zużycia paliwa
 │   ├── generations/                        # Generacje modeli
 │   ├── insideDimensions/                   # Wymiary wewnętrzne
-│   ├── likes/                              # Polubienia samochodów
+│   ├── likes/                              # Polubienia recenzji
 │   ├── models/                             # Modele samochodów
 │   ├── outsideDimensions/                  # Wymiary zewnętrzne
 │   ├── performances/                       # Osiągi
@@ -96,12 +96,11 @@ src/main/java/com/carsplatform/backend/
 | POST | `/api/fuel-reports` | Dodanie raportu 🔒 |
 | POST | `/api/fuel-report-likes/{id}` | Polubienie raportu 🔒 |
 
-### Polubienia
+### Polubienia recenzji
 | Metoda | Endpoint | Opis |
 |--------|----------|------|
-| GET | `/api/likes` | Polubione samochody użytkownika 🔒 |
-| POST | `/api/likes/{carId}` | Dodanie do polubionych 🔒 |
-| DELETE | `/api/likes/{carId}` | Usunięcie z polubionych 🔒 |
+| POST | `/api/likes/review/{reviewId}` | Polubienie/odlubienie recenzji 🔒 |
+| GET | `/api/likes/review/{reviewId}/status` | Status polubienia recenzji 🔒 |
 
 ### Administracja
 | Metoda | Endpoint | Opis |
@@ -129,9 +128,9 @@ src/main/java/com/carsplatform/backend/
 CREATE DATABASE cars_platform_db;
 ```
 
-2. Wykonaj skrypty inicjalizujące (z katalogu głównego projektu):
-   - `skrypt bazy danych PostgreSQL.txt` - schemat bazy
-   - `skrypt dodawania danych PostgreSQL.txt` - dane początkowe
+2. Wykonaj skrypty inicjalizujące (z katalogu `docker/init/`):
+   - `01-schema.sql` - schemat bazy danych
+   - `02-test-data.sql` - dane testowe
 
 ### Uruchomienie lokalne
 

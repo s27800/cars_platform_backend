@@ -29,19 +29,13 @@ class GenerationsListMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(brand)
                 .id(UUID.randomUUID())
                 .generations(new ArrayList<>())
                 .build();
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
                 .id(UUID.randomUUID())
                 .name("G20")
@@ -56,22 +50,14 @@ class GenerationsListMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             GenerationsListResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map id and name correctly")
         void toDto_ValidGeneration_MapsAllFields() {
-
-            // Map valid generation
             GenerationsListResponse result = mapper.toDto(testGeneration);
-
-            // Verify results -> correct id and name are mapped
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testGeneration.getId());
             assertThat(result.getName()).isEqualTo("G20");
@@ -86,42 +72,28 @@ class GenerationsListMapperTest {
         @Test
         @DisplayName("should return null when model is null")
         void map_NullModel_ReturnsNull() {
-
-            // Map null model
             List<GenerationsListResponse> result = mapper.map(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should return empty list when model has no generations")
         void map_ModelWithNoGenerations_ReturnsEmptyList() {
-
-            // Set model with empty generations list
             testModel.setGenerations(new ArrayList<>());
 
-            // Map model
             List<GenerationsListResponse> result = mapper.map(testModel);
-
-            // Verify result is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("should map all generations from model")
         void map_ModelWithGenerations_MapsAllGenerations() {
-
-            // Create model with multiple generations
             Generation gen1 = TestDataFactory.defaultGeneration(testModel).id(UUID.randomUUID()).name("Gen I").build();
             Generation gen2 = TestDataFactory.defaultGeneration(testModel).id(UUID.randomUUID()).name("Gen II").build();
 
             testModel.setGenerations(List.of(gen1, gen2));
 
-            // Map model
             List<GenerationsListResponse> result = mapper.map(testModel);
-
-            // Verify results -> all generations mapped correctly
             assertThat(result).hasSize(2);
             assertThat(result).extracting(GenerationsListResponse::getName)
                     .containsExactly("Gen I", "Gen II");

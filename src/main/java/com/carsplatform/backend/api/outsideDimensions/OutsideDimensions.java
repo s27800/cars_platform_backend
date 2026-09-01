@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.outsideDimensions;
 
 import com.carsplatform.backend.api.cars.Car;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import lombok.ToString;
 
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "outside_dimensions")
 @Data
@@ -21,6 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutsideDimensions {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

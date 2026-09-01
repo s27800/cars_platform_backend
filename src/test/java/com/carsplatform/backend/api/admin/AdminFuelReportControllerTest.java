@@ -10,6 +10,7 @@ import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.MockMvcTestBase;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,36 +49,26 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("Toyota")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .name("Camry")
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .name("XV70")
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .name("Camry 2.5")
                 .build();
@@ -90,7 +81,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Register regular user and get token
         String username = "fueluser" + System.currentTimeMillis();
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -110,7 +100,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Register admin user and get token
         String adminUsername = "adminfuel" + System.currentTimeMillis();
 
         RegisterRequest adminRegisterRequest = RegisterRequest.builder()
@@ -130,18 +119,15 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         adminToken = objectMapper.readTree(adminResponse).get("accessToken").asText();
         adminUser = userRepository.findByUsername(adminUsername).orElseThrow();
 
-        // Make the admin user an admin
         adminUser.setIsAdmin(true);
         userRepository.save(adminUser);
 
-        // Create pending fuel report
         pendingFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
-                .isApproved(false)
+                .status(ModerationStatus.PENDING)
                 .build();
 
         entityManager.persist(pendingFuelReport);
 
-        // Save
         entityManager.flush();
     }
 
@@ -153,13 +139,11 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns pending fuel reports when admin is authenticated")
         void getPendingFuelReports_Admin_ReturnsPendingFuelReports() throws Exception {
-
-            // Perform GET request with admin authentication and verify response -> returns 200 OK and contains pending fuel report details
             performGetWithAuth(ADMIN_FUEL_REPORTS_BASE_URL + "/pending", adminToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
-                    .andExpect(jsonPath("$.content[0].isApproved").value(false))
+                    .andExpect(jsonPath("$.content[0].status").value("PENDING"))
                     .andExpect(jsonPath("$.content[0].carInfo").exists())
                     .andExpect(jsonPath("$.content[0].carInfo.brandName").value("Toyota"));
         }
@@ -167,8 +151,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when regular user tries to access")
         void getPendingFuelReports_RegularUser_Returns403() throws Exception {
-
-            // Perform GET request with regular user authentication and verify response -> returns 403 Forbidden
             performGetWithAuth(ADMIN_FUEL_REPORTS_BASE_URL + "/pending", userToken)
                     .andExpect(status().isForbidden());
         }
@@ -176,8 +158,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getPendingFuelReports_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform GET request without authentication and verify response -> returns 401 Unauthorized
             performGetNoAuth(ADMIN_FUEL_REPORTS_BASE_URL + "/pending")
                     .andExpect(status().isUnauthorized());
         }
@@ -191,13 +171,10 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("approves fuel report when admin is authenticated")
         void approveFuelReport_Admin_ApprovesFuelReport() throws Exception {
-
-            // Perform GET request with admin authentication to verify pending fuel report exists and verify response -> returns 200 OK and contains pending fuel report details
             performGetWithAuth(ADMIN_FUEL_REPORTS_BASE_URL + "/pending", adminToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
 
-            // Perform PATCH request with admin authentication to approve the fuel report and verify response -> returns 204 No Content
             performPatchWithAuthNoBody(
                     ADMIN_FUEL_REPORTS_BASE_URL + "/" + pendingFuelReport.getId() + "/approve?approve=true",
                     adminToken
@@ -207,8 +184,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("rejects fuel report when admin sets approve to false")
         void rejectFuelReport_Admin_RejectsFuelReport() throws Exception {
-
-            // Perform PATCH request with admin authentication to reject the fuel report and verify response -> returns 204 No Content
             performPatchWithAuthNoBody(
                     ADMIN_FUEL_REPORTS_BASE_URL + "/" + pendingFuelReport.getId() + "/approve?approve=false",
                     adminToken
@@ -218,8 +193,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when regular user tries to approve")
         void approveFuelReport_RegularUser_Returns403() throws Exception {
-
-            // Perform PATCH request with regular user authentication to approve the fuel report and verify response -> returns 403 Forbidden
             performPatchWithAuthNoBody(
                     ADMIN_FUEL_REPORTS_BASE_URL + "/" + pendingFuelReport.getId() + "/approve?approve=true",
                     userToken
@@ -229,8 +202,6 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void approveFuelReport_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform PATCH request without authentication to approve the fuel report and verify response -> returns 401 Unauthorized
             performPatchNoAuthNoBody(ADMIN_FUEL_REPORTS_BASE_URL + "/" + pendingFuelReport.getId() + "/approve?approve=true")
                     .andExpect(status().isUnauthorized());
         }
@@ -238,11 +209,8 @@ class AdminFuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when fuel report does not exist")
         void approveFuelReport_FuelReportNotFound_Returns404() throws Exception {
-            
-            // Generate random UUID that doesn't exist
             String nonExistentId = UUID.randomUUID().toString();
 
-            // Perform PATCH request for non-existent fuel report and verify response -> returns 404 Not Found
             performPatchWithAuthNoBody(
                     ADMIN_FUEL_REPORTS_BASE_URL + "/" + nonExistentId + "/approve?approve=true",
                     adminToken

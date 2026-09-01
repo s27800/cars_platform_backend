@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.carImages;
 
 import com.carsplatform.backend.api.cars.Car;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.*;
 
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "car_image")
 @Data
@@ -17,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarImage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

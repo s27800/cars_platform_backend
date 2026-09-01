@@ -1,6 +1,6 @@
 package com.carsplatform.backend.api.admin;
 
-import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
+import com.carsplatform.backend.api.fuelReports.dtos.FuelReportDetailsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/admin/fuel-reports")
 @RequiredArgsConstructor
@@ -27,9 +28,10 @@ public class AdminFuelReportController {
 
     private final AdminFuelReportService adminFuelReportService;
 
+
     @GetMapping("/pending")
     @Operation(summary = "Get all pending fuel reports waiting for approval")
-    public ResponseEntity<Page<AdminFuelReportResponse>> getPendingFuelReports(Pageable pageable) {
+    public ResponseEntity<Page<FuelReportDetailsResponse>> getPendingFuelReports(Pageable pageable) {
         return ResponseEntity.ok(adminFuelReportService.getPendingFuelReports(pageable));
     }
 
@@ -38,8 +40,8 @@ public class AdminFuelReportController {
     public ResponseEntity<Void> approveFuelReport(
             @Parameter(description = "ID of the fuel report") @PathVariable UUID id,
             @Parameter(description = "Whether to approve (true) or reject (false) the fuel report")
-            @RequestParam boolean approve) {
-
+            @RequestParam boolean approve
+    ) {
         adminFuelReportService.approveFuelReport(id, approve);
 
         return ResponseEntity.noContent().build();

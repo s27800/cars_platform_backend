@@ -40,19 +40,13 @@ class GenerationDetailsMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
                 .id(UUID.randomUUID())
                 .name("E90")
@@ -68,22 +62,14 @@ class GenerationDetailsMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             GenerationDetailsResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map generation basic fields correctly")
         void toDto_ValidGeneration_MapsBasicFields() {
-
-            // Map valid generation
             GenerationDetailsResponse result = mapper.toDto(testGeneration);
-
-            // Verify result is mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testGeneration.getId());
             assertThat(result.getName()).isEqualTo("E90");
@@ -92,11 +78,8 @@ class GenerationDetailsMapperTest {
         @Test
         @DisplayName("should map model correctly")
         void toDto_ValidGeneration_MapsModel() {
-
-            // Map valid generation
             GenerationDetailsResponse result = mapper.toDto(testGeneration);
 
-            // Verify model is mapped correctly
             assertThat(result.getModel()).isNotNull();
             assertThat(result.getModel().getId()).isEqualTo(testModel.getId());
             assertThat(result.getModel().getName()).isEqualTo("3 Series");
@@ -105,11 +88,8 @@ class GenerationDetailsMapperTest {
         @Test
         @DisplayName("should map brand correctly")
         void toDto_ValidGeneration_MapsBrand() {
-
-            // Map valid generation
             GenerationDetailsResponse result = mapper.toDto(testGeneration);
 
-            // Verify brand is mapped correctly
             assertThat(result.getBrand()).isNotNull();
             assertThat(result.getBrand().getId()).isEqualTo(testBrand.getId());
             assertThat(result.getBrand().getName()).isEqualTo("Test Brand");
@@ -118,22 +98,15 @@ class GenerationDetailsMapperTest {
         @Test
         @DisplayName("should map empty cars list")
         void toDto_GenerationWithNoCars_MapsEmptyList() {
-
-            // Set up generation with empty cars list
             testGeneration.setCars(List.of());
 
-            // Map valid generation with no cars
             GenerationDetailsResponse result = mapper.toDto(testGeneration);
-
-            // Verify result -> generation with empty cars list is returned
             assertThat(result.getCars()).isNotNull().isEmpty();
         }
 
         @Test
         @DisplayName("should map cars list with nested data")
         void toDto_GenerationWithCars_MapsCarsList() {
-
-            // Create test car with engine, transmission and body type
             Engine engine = TestDataFactory.defaultEngine()
                     .id(UUID.randomUUID())
                     .engineType("Petrol")
@@ -160,13 +133,9 @@ class GenerationDetailsMapperTest {
                     .tags(new HashSet<>())
                     .build();
 
-            // Add car to generation
             testGeneration.setCars(List.of(car));
 
-            // Map generation containing cars
             GenerationDetailsResponse result = mapper.toDto(testGeneration);
-
-            // Verify result -> correct cars list with engine, transmission and body type data is returned
             assertThat(result.getCars()).hasSize(1);
             assertThat(result.getCars().get(0).getName()).isEqualTo("320i");
             assertThat(result.getCars().get(0).getEngine()).isNotNull();

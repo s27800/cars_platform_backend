@@ -5,15 +5,14 @@ import com.carsplatform.backend.api.models.dtos.ModelsListResponse;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Mapper(componentModel = "spring")
 public interface ModelsListMapper {
-    ModelsListMapper INSTANCE = Mappers.getMapper(ModelsListMapper.class);
 
     default ModelsListResponse toDto(Model model) {
         if (model == null)

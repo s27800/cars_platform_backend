@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-@Data @Builder
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BrandDetailsResponse {

@@ -7,6 +7,7 @@ import com.carsplatform.backend.api.fuelReports.dtos.FuelReportResponse;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -43,45 +44,31 @@ class FuelReportMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .username("reporter")
                 .build();
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test fuel report
         testFuelReport = TestDataFactory.defaultFuelReport(testUser, testCar)
                 .id(UUID.randomUUID())
                 .fuelConsumption(new BigDecimal("7.8"))
                 .comment("Good fuel economy")
                 .reportDate(LocalDateTime.of(2024, 1, 15, 10, 30))
-                .isApproved(true)
+                .status(ModerationStatus.APPROVED)
                 .build();
     }
 
@@ -93,38 +80,26 @@ class FuelReportMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             FuelReportResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidFuelReport_MapsAllFields() {
-
-            // Map valid fuel report
             FuelReportResponse result = mapper.toDto(testFuelReport);
-
-            // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testFuelReport.getId());
             assertThat(result.getFuelConsumption()).isEqualByComparingTo(new BigDecimal("7.8"));
             assertThat(result.getComment()).isEqualTo("Good fuel economy");
             assertThat(result.getReportDate()).isEqualTo(LocalDateTime.of(2024, 1, 15, 10, 30));
-            assertThat(result.getIsApproved()).isTrue();
+            assertThat(result.getStatus()).isEqualTo(ModerationStatus.APPROVED);
         }
 
         @Test
         @DisplayName("should map user to usernameResponse")
         void toDto_FuelReportWithUser_MapsUsernameResponse() {
-
-            // Map fuel report with user
             FuelReportResponse result = mapper.toDto(testFuelReport);
-
-            // Verify result -> usernameResponse is mapped correctly
             assertThat(result.getUsernameResponse()).isNotNull();
             assertThat(result.getUsernameResponse().getUsername()).isEqualTo("reporter");
         }
@@ -132,14 +107,9 @@ class FuelReportMapperTest {
         @Test
         @DisplayName("should handle null user")
         void toDto_FuelReportWithNullUser_HandlesGracefully() {
-
-            // Set user to null
             testFuelReport.setUser(null);
 
-            // Map fuel report with null user
             FuelReportResponse result = mapper.toDto(testFuelReport);
-
-            // Verify result -> usernameResponse is null
             assertThat(result).isNotNull();
             assertThat(result.getUsernameResponse()).isNull();
         }
@@ -153,33 +123,22 @@ class FuelReportMapperTest {
         @Test
         @DisplayName("should return null when page is null")
         void toDtoList_NullPage_ReturnsNull() {
-
-            // Map null page
             Page<FuelReportResponse> result = mapper.toDtoList(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map empty page")
         void toDtoList_EmptyPage_ReturnsEmptyPage() {
-
-            // Set up empty page
             Page<FuelReport> emptyPage = Page.empty();
 
-            // Map empty page
             Page<FuelReportResponse> result = mapper.toDtoList(emptyPage);
-
-            // Verify result -> page is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("should map page with fuel reports")
         void toDtoList_PageWithReports_MapsAllReports() {
-
-            // Set up fuel reports
             FuelReport report1 = TestDataFactory.defaultFuelReport(testUser, testCar)
                     .id(UUID.randomUUID())
                     .fuelConsumption(new BigDecimal("7.5"))
@@ -196,10 +155,7 @@ class FuelReportMapperTest {
                     2
             );
 
-            // Map page with fuel reports
             Page<FuelReportResponse> result = mapper.toDtoList(reportPage);
-
-            // Verify result -> all reports are mapped correctly
             assertThat(result.getContent()).hasSize(2);
             assertThat(result.getContent().get(0).getFuelConsumption()).isEqualByComparingTo(new BigDecimal("7.5"));
             assertThat(result.getContent().get(1).getFuelConsumption()).isEqualByComparingTo(new BigDecimal("8.2"));

@@ -24,8 +24,6 @@ class ChassisMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test chassis
         testChassis = TestDataFactory.defaultChassis()
                 .id(UUID.randomUUID())
                 .basicRims("17\"")
@@ -48,22 +46,15 @@ class ChassisMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarChassisResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidChassis_MapsAllFields() {
-
-            // Map valid chassis
             CarChassisResponse result = mapper.toDto(testChassis);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testChassis.getId());
             assertThat(result.getBasicRims()).isEqualTo("17\"");
@@ -81,18 +72,14 @@ class ChassisMapperTest {
         @Test
         @DisplayName("should handle null optional fields")
         void toDto_ChassisWithNulls_MapsNullFields() {
-
-            // Create minimal chassis with null optional fields
             Chassis minimalChassis = Chassis.builder()
                     .id(UUID.randomUUID())
                     .basicRims("17\"")
                     .optionalRims(null)
                     .build();
 
-            // Map minimal chassis
             CarChassisResponse result = mapper.toDto(minimalChassis);
 
-            // Verify null optional fields are handled correctly
             assertThat(result.getBasicRims()).isEqualTo("17\"");
             assertThat(result.getOptionalRims()).isNull();
         }

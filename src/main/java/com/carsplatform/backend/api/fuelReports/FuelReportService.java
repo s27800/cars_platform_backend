@@ -1,11 +1,10 @@
 package com.carsplatform.backend.api.fuelReports;
 
-import com.carsplatform.backend.api.admin.AdminFuelReportMapper;
-import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.cars.CarRepository;
 import com.carsplatform.backend.api.fuelReports.dtos.AverageFuelConsumptionResponse;
 import com.carsplatform.backend.api.fuelReports.dtos.CreateFuelReportRequest;
+import com.carsplatform.backend.api.fuelReports.dtos.FuelReportDetailsResponse;
 import com.carsplatform.backend.api.fuelReports.dtos.FuelReportResponse;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
@@ -23,42 +22,46 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
+
+/**
+ * Fuel consumption reported by users.
+ *
+ * The same user may add several reports for one car, for example for city and motorway
+ * driving. Only approved reports are averaged, and with none of them the endpoint answers with
+ * an empty body instead of a zero, so that the UI never shows an invented "0 l/100km".
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class FuelReportService {
+
     private final FuelReportRepository fuelReportRepository;
     private final AverageFuelConsumptionMapper averageFuelConsumptionMapper;
     private final FuelReportMapper fuelReportMapper;
     private final CreateFuelReportMapper createFuelReportMapper;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
-    private final AdminFuelReportMapper adminFuelReportMapper;
+    private final FuelReportDetailsMapper fuelReportDetailsMapper;
+
 
     @Transactional(readOnly = true)
     public AverageFuelConsumptionResponse getAverageFuelConsumptionForCar(UUID carId) {
         Optional<BigDecimal> avgConsumption = fuelReportRepository.findAverageFuelConsumptionForCarId(carId);
 
-        return averageFuelConsumptionMapper.toDto(
-                avgConsumption.orElse(null)
-        );
+        return averageFuelConsumptionMapper.toDto(avgConsumption.orElse(null));
     }
 
     @Transactional(readOnly = true)
     public Page<FuelReportResponse> getFuelReportsForCarId(UUID carId, Pageable pageable) {
-        return fuelReportMapper.toDtoList(
-                fuelReportRepository.findByCarIdAndIsApprovedTrue(carId, pageable)
-        );
+        return fuelReportMapper.toDtoList(fuelReportRepository.findAllApprovedByCarId(carId, pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<AdminFuelReportResponse> getFuelReportsForUser(String username, Pageable pageable) {
+    public Page<FuelReportDetailsResponse> getFuelReportsForUser(String username, Pageable pageable) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        return adminFuelReportMapper.toDtoList(
-                fuelReportRepository.findAllByUserId(user.getId(), pageable)
-        );
+        return fuelReportDetailsMapper.toDtoList(fuelReportRepository.findAllByUserId(user.getId(), pageable));
     }
 
     @Transactional
@@ -69,7 +72,7 @@ public class FuelReportService {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", carId));
 
-        FuelReport report = createFuelReportMapper.toDto(request);
+        FuelReport report = createFuelReportMapper.toEntity(request);
 
         report.setCar(car);
         report.setUser(user);

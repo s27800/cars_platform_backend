@@ -5,11 +5,10 @@ import com.carsplatform.backend.api.models.dtos.CarModelResponse;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+
 
 @Mapper(componentModel = "spring")
 public interface ModelMapper {
-    ModelMapper INSTANCE = Mappers.getMapper(ModelMapper.class);
 
     CarModelResponse toDto(Model model);
 

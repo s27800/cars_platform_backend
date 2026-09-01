@@ -11,6 +11,7 @@ public class TooManyLoginAttemptsException extends RuntimeException {
 
     private final long secondsUntilUnlock;
 
+
     public TooManyLoginAttemptsException(long secondsUntilUnlock) {
         super("Too many failed login attempts. Try again in " + Math.max(1, secondsUntilUnlock / 60) + " minute(s).");
         this.secondsUntilUnlock = secondsUntilUnlock;

@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data @Builder
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GenerationsListResponse {

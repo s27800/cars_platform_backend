@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 @OpenAPIDefinition(
@@ -22,4 +24,5 @@ import org.springframework.context.annotation.Configuration;
         description = "JWT token authentication. Obtain a token via POST /api/auth/login"
 )
 public class OpenApiConfig {
+
 }

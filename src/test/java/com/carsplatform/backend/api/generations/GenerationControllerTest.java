@@ -38,16 +38,12 @@ class GenerationControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .models(new java.util.ArrayList<>())
                 .build();
 
         entityManager.persist(testBrand);
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .name("3 Series")
                 .generations(new java.util.ArrayList<>())
@@ -55,8 +51,6 @@ class GenerationControllerTest extends MockMvcTestBase {
 
         testBrand.getModels().add(testModel);
         entityManager.persist(testModel);
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
                 .name("E90")
                 .cars(new java.util.ArrayList<>())
@@ -64,15 +58,11 @@ class GenerationControllerTest extends MockMvcTestBase {
 
         testModel.getGenerations().add(testGeneration);
         entityManager.persist(testGeneration);
-
-        // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(testBodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(testGeneration, testBodyType)
                 .name("320i")
                 .build();
@@ -87,7 +77,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Save
         entityManager.flush();
     }
 
@@ -99,8 +88,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns generation details when exists (public endpoint)")
         void getGenerationById_ExistingGeneration_ReturnsDetails() throws Exception {
-
-            // Perform GET request and verify results -> 200 OK with correct generation details
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("E90"))
@@ -110,8 +97,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns generation with cars")
         void getGenerationById_ExistingGeneration_IncludesCars() throws Exception {
-
-            // Perform GET request and verify results -> correct cars included
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.cars", hasSize(greaterThanOrEqualTo(1))))
@@ -121,8 +106,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns generation with id field")
         void getGenerationById_ExistingGeneration_IncludesIdField() throws Exception {
-
-            // Perform GET request and verify results -> correct id field
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(testGeneration.getId().toString()))
@@ -132,8 +115,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns generation with model data")
         void getGenerationById_ExistingGeneration_IncludesModel() throws Exception {
-
-            // Perform GET request and verify results -> model is included
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.model").exists())
@@ -144,8 +125,6 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns generation with brand data")
         void getGenerationById_ExistingGeneration_IncludesBrand() throws Exception {
-
-            // Perform GET request and verify results -> brand is included
             performGetNoAuth(GENERATION_BASE_URL + "/" + testGeneration.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.brand").exists())
@@ -156,11 +135,8 @@ class GenerationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when generation does not exist")
         void getGenerationById_NonExistingGeneration_Returns404() throws Exception {
-
-            // Use random UUID that doesn't exist
             String nonExistentId = UUID.randomUUID().toString();
 
-            // Perform GET request for non-existing ID and verify results -> 404 Not Found
             performGetNoAuth(GENERATION_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }

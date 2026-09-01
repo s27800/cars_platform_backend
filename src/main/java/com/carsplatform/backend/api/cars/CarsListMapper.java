@@ -10,19 +10,22 @@ import com.carsplatform.backend.api.transmissions.CarsListTransmissionMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {
+
+@Mapper(
+    componentModel = "spring",
+    uses = {
         CarsListEngineMapper.class,
         CarsListBodyTypeMapper.class,
         CarsListTransmissionMapper.class
-})
+    }
+)
 public interface CarsListMapper {
-    CarsListMapper INSTANCE = Mappers.getMapper(CarsListMapper.class);
 
     @Mapping(target = "engine", qualifiedByName = "toDto")
     @Mapping(target = "bodyType", qualifiedByName = "toDto")
@@ -53,7 +56,9 @@ public interface CarsListMapper {
 
     @Named("extractMainImage")
     default String extractMainImage(Car car) {
-        if (car.getImages() == null || car.getImages().isEmpty()) return null;
+        if (car.getImages() == null || car.getImages().isEmpty())
+            return null;
+
         return car.getImages().stream()
                 .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
                 .findFirst()

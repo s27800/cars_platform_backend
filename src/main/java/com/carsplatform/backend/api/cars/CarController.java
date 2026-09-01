@@ -18,18 +18,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/cars")
 @RequiredArgsConstructor
 @Tag(name = "Cars", description = "API for managing cars")
 @SecurityRequirement(name = "bearerAuth")
 public class CarController {
+
     private final CarService carService;
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Get detailed information about a car")
-    public ResponseEntity<CarDetailsResponse> getCarDetailsById(@Parameter(description = "ID of the car to retrieve") @PathVariable UUID id) {
+    public ResponseEntity<CarDetailsResponse> getCarDetailsById(
+            @Parameter(description = "ID of the car to retrieve") @PathVariable UUID id
+    ) {
         CarDetailsResponse carDetailsResponse = carService.getCarDetailsForCarId(id);
+
         return ResponseEntity.ok(carDetailsResponse);
     }
 
@@ -57,7 +63,6 @@ public class CarController {
             @RequestParam(required = false) Double maxFuelConsumptionMixed,
             Pageable pageable
     ) {
-
         Page<CarsListResponse> response = carService.searchCars(
                 search, brandIds, modelIds, generationIds, bodyTypeIds,
                 tagIds, minDisplacement, maxDisplacement, engineTypes,
@@ -69,11 +74,14 @@ public class CarController {
     }
 
     @GetMapping("/{id}/similar")
-    @Operation(summary = "Get similar cars",
-            description = "Returns cars similar to the specified car based on tags, brand, or body type")
+    @Operation(
+            summary = "Get similar cars",
+            description = "Returns cars similar to the specified car based on tags, brand, or body type"
+    )
     public ResponseEntity<List<CarsListResponse>> getSimilarCars(
             @Parameter(description = "ID of the car") @PathVariable UUID id,
-            @RequestParam(defaultValue = "4") int limit) {
+            @RequestParam(defaultValue = "4") int limit
+    ) {
         return ResponseEntity.ok(carService.findSimilarCars(id, limit));
     }
 }

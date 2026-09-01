@@ -25,8 +25,6 @@ class PerformanceMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test performance
         testPerformance = TestDataFactory.defaultPerformance()
                 .id(UUID.randomUUID())
                 .maxSpeed(250)
@@ -50,22 +48,15 @@ class PerformanceMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null performance
             CarPerformanceResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidPerformance_MapsAllFields() {
-
-            // Map valid performance
             CarPerformanceResponse result = mapper.toDto(testPerformance);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testPerformance.getId());
             assertThat(result.getMaxSpeed()).isEqualTo(250);
@@ -83,18 +74,14 @@ class PerformanceMapperTest {
         @Test
         @DisplayName("should handle null optional fields")
         void toDto_PerformanceWithNulls_MapsNullFields() {
-
-            // Create performance without optional fields
             Performance minimalPerformance = Performance.builder()
                     .id(UUID.randomUUID())
                     .maxSpeed(200)
                     .acceleration0100(null)
                     .build();
 
-            // Map minimal performance
             CarPerformanceResponse result = mapper.toDto(minimalPerformance);
 
-            // Verify null optional fields are handled correctly
             assertThat(result.getMaxSpeed()).isEqualTo(200);
             assertThat(result.getAcceleration0100()).isNull();
         }

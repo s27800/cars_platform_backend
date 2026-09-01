@@ -1,7 +1,8 @@
-package com.carsplatform.backend.api.likes;
+package com.carsplatform.backend.api.reviewLikes;
 
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.users.User;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -13,16 +14,20 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+
 @Entity
-@Table(name = "likes",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "review_id"}, name = "uk_user_review_like")
-        })
+@Table(
+    name = "review_likes",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_review_like", columnNames = {"user_id", "review_id"})
+    }
+)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class ReviewLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")
