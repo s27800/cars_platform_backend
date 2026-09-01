@@ -28,16 +28,12 @@ class ModelsListMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = Brand.builder()
                 .id(UUID.randomUUID())
                 .name("BMW")
                 .country("Germany")
                 .models(new ArrayList<>())
                 .build();
-
-        // Create test model
         testModel = Model.builder()
                 .id(UUID.randomUUID())
                 .name("3 Series")
@@ -55,28 +51,19 @@ class ModelsListMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             ModelsListResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map id, name and generationsCount")
         void toDto_ValidModel_MapsIdNameAndGenerationsCount() {
-
-            // Add generations to test model
             Generation gen1 = Generation.builder().id(UUID.randomUUID()).name("E90").model(testModel).build();
             Generation gen2 = Generation.builder().id(UUID.randomUUID()).name("F30").model(testModel).build();
 
             testModel.setGenerations(List.of(gen1, gen2));
 
-            // Map valid model
             ModelsListResponse result = mapper.toDto(testModel);
-
-            // Verify result is mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testModel.getId());
             assertThat(result.getName()).isEqualTo("3 Series");
@@ -86,11 +73,8 @@ class ModelsListMapperTest {
         @Test
         @DisplayName("should return 0 generations count when model has no generations")
         void toDto_ModelWithNoGenerations_ReturnsZeroCount() {
-
-            // Map model with empty generations
             ModelsListResponse result = mapper.toDto(testModel);
 
-            // Verify generationsCount is 0
             assertThat(result).isNotNull();
             assertThat(result.getGenerationsCount()).isEqualTo(0);
         }
@@ -104,47 +88,32 @@ class ModelsListMapperTest {
         @Test
         @DisplayName("should return empty list when brand is null")
         void map_NullBrand_ReturnsEmptyList() {
-
-            // Map null brand
             List<ModelsListResponse> result = mapper.map(null);
-
-            // Verify result is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("should return empty list when brand has no models")
         void map_BrandWithNoModels_ReturnsEmptyList() {
-
-            // Set empty models list for brand
             testBrand.setModels(new ArrayList<>());
 
-            // Map brand with no models
             List<ModelsListResponse> result = mapper.map(testBrand);
-
-            // Verify result is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("should map all models from brand with generationsCount")
         void map_BrandWithModels_MapsAllModels() {
-
-            // Create test models with generations
             Model model1 = Model.builder().id(UUID.randomUUID()).name("3 Series").generations(new ArrayList<>()).build();
             Model model2 = Model.builder().id(UUID.randomUUID()).name("5 Series").generations(new ArrayList<>()).build();
             Model model3 = Model.builder().id(UUID.randomUUID()).name("X5").generations(new ArrayList<>()).build();
 
-            // Add generations to model1
             model1.getGenerations().add(Generation.builder().id(UUID.randomUUID()).name("E90").build());
             model1.getGenerations().add(Generation.builder().id(UUID.randomUUID()).name("F30").build());
 
             testBrand.setModels(List.of(model1, model2, model3));
 
-            // Map brand with models
             List<ModelsListResponse> result = mapper.map(testBrand);
-
-            // Verify result -> all models are mapped correctly
             assertThat(result).hasSize(3);
             assertThat(result).extracting(ModelsListResponse::getName)
                     .containsExactly("3 Series", "5 Series", "X5");

@@ -19,13 +19,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Turns exceptions thrown anywhere in the controllers into one uniform {@link ErrorResponse}.
+ *
+ * Anything unexpected is logged with its stack trace but answered with a generic message, so
+ * that nothing about the internals of the application reaches the client.
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

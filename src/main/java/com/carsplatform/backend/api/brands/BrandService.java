@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class BrandService {
@@ -20,6 +21,7 @@ public class BrandService {
     private final BrandRepository brandRepository;
     private final BrandsListMapper brandsListMapper;
     private final BrandDetailsMapper brandDetailsMapper;
+
 
     @Transactional(readOnly = true)
     public List<BrandsListResponse> getAllBrands() {

@@ -45,8 +45,6 @@ class BrandServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .name("BMW")
@@ -63,8 +61,6 @@ class BrandServiceTest {
         @Test
         @DisplayName("should return list of all brands")
         void getAllBrands_BrandsExist_ReturnsList() {
-
-            // Create additional brand and expected responses
             Brand brand2 = TestDataFactory.defaultBrand()
                     .id(UUID.randomUUID())
                     .name("Mercedes")
@@ -79,15 +75,11 @@ class BrandServiceTest {
                     .name("Mercedes")
                     .build();
 
-            // Mock repository and mapper behavior
             when(brandRepository.findAll()).thenReturn(List.of(testBrand, brand2));
             when(brandsListMapper.toDto(testBrand)).thenReturn(response1);
             when(brandsListMapper.toDto(brand2)).thenReturn(response2);
 
-            // Get all brands
             List<BrandsListResponse> result = brandService.getAllBrands();
-
-            // Verify results -> correct number of brands and fields are correct
             assertThat(result).hasSize(2);
             assertThat(result).extracting(BrandsListResponse::getName)
                     .containsExactly("BMW", "Mercedes");
@@ -98,14 +90,9 @@ class BrandServiceTest {
         @Test
         @DisplayName("should return empty list when no brands exist")
         void getAllBrands_NoBrands_ReturnsEmptyList() {
-
-            // Mock repository to return empty list
             when(brandRepository.findAll()).thenReturn(Collections.emptyList());
 
-            // Get all brands
             List<BrandsListResponse> result = brandService.getAllBrands();
-
-            // Verify results -> empty list is returned
             assertThat(result).isEmpty();
             verify(brandRepository).findAll();
         }
@@ -119,8 +106,6 @@ class BrandServiceTest {
         @Test
         @DisplayName("should return brand details when brand exists")
         void getBrandDetailsById_BrandExists_ReturnsDetails() {
-
-            // Create expected response
             UUID testUuid = UUID.randomUUID();
 
             BrandDetailsResponse expectedResponse = BrandDetailsResponse.builder()
@@ -130,14 +115,10 @@ class BrandServiceTest {
                     .foundedYear(1916)
                     .build();
 
-            // Mock repository and mapper behavior
             when(brandRepository.findById(testBrand.getId())).thenReturn(Optional.of(testBrand));
             when(brandDetailsMapper.toDto(testBrand)).thenReturn(expectedResponse);
 
-            // Get brand details by ID
             BrandDetailsResponse result = brandService.getBrandDetailsById(testBrand.getId());
-
-            // Verify results -> correct brand details are returned
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testUuid);
             assertThat(result.getName()).isEqualTo("BMW");
@@ -151,13 +132,10 @@ class BrandServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when brand does not exist")
         void getBrandDetailsById_BrandNotFound_ThrowsException() {
-
-            // Mock repository to return empty optional
             UUID nonExistentId = UUID.randomUUID();
-            
+
             when(brandRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-            // Get brand details by ID and verify -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> brandService.getBrandDetailsById(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 

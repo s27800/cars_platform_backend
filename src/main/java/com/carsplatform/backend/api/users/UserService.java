@@ -19,6 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+
+/**
+ * User profiles, and at the same time the {@link UserDetailsService} that Spring Security
+ * calls to load a user during login and on every request carrying a JWT.
+ *
+ * Deleting an account takes the reviews, fuel reports, proposals and likes with it through
+ * the cascades declared on the relations.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,6 +35,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -59,13 +68,16 @@ public class UserService implements UserDetailsService {
     public void updateUserProfile(UserModifyRequest userModifyRequest) throws ResourceAlreadyExistsException {
         User currentUser = getCurrentUser();
 
-        if (!currentUser.getEmail().equals(userModifyRequest.getEmail())
-                && userRepository.existsByEmail(userModifyRequest.getEmail()))
+        if (
+                !currentUser.getEmail().equals(userModifyRequest.getEmail())
+                && userRepository.existsByEmail(userModifyRequest.getEmail())
+        )
             throw new ResourceAlreadyExistsException("Email", userModifyRequest.getEmail());
 
         userMapper.updateEntityFromDto(userModifyRequest, currentUser);
 
         log.info("Profile updated for user: {}", currentUser.getUsername());
+
         userRepository.save(currentUser);
     }
 

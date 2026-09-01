@@ -10,6 +10,8 @@ import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.MockMvcTestBase;
+import com.carsplatform.backend.common.ModerationStatus;
+import com.carsplatform.backend.common.ProposalCategory;
 import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.TestSecurityUtils;
 
@@ -48,36 +50,26 @@ class DataProposalControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .name("3 Series")
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .name("E90")
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .name("320i")
                 .build();
@@ -90,7 +82,6 @@ class DataProposalControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Register user and get token
         String username = "proposaluser" + System.currentTimeMillis();
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -109,20 +100,17 @@ class DataProposalControllerTest extends MockMvcTestBase {
 
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
-
-        // Create test proposal
         testProposal = new DataProposal();
 
         testProposal.setUser(testUser);
         testProposal.setCar(testCar);
-        testProposal.setCategory("engine");
+        testProposal.setCategory(ProposalCategory.ENGINE);
         testProposal.setComment("Engine power correction");
-        testProposal.setStatus(DataProposalStatus.PENDING);
+        testProposal.setStatus(ModerationStatus.PENDING);
         testProposal.setCreatedAt(LocalDateTime.now());
 
         entityManager.persist(testProposal);
 
-        // Save
         entityManager.flush();
     }
 
@@ -134,15 +122,12 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("creates data proposal when authenticated")
         void createProposal_Authenticated_Returns201() throws Exception {
-
-            // Create request with valid proposal data
             CreateDataProposalRequest request = new CreateDataProposalRequest();
 
-            request.setCategory("engine");
+            request.setCategory(ProposalCategory.ENGINE);
             request.setComment("Proposed engine power update");
             request.setProposedValues(Map.of("maxPower", 225));
 
-            // Perform POST request with authentication and verify results -> 201 Created is returned
             performPostWithAuth(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isCreated());
         }
@@ -150,14 +135,11 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void createProposal_NotAuthenticated_Returns401() throws Exception {
-
-            // Create request without authentication
             CreateDataProposalRequest request = new CreateDataProposalRequest();
 
-            request.setCategory("engine");
+            request.setCategory(ProposalCategory.ENGINE);
             request.setProposedValues(Map.of("maxPower", 225));
 
-            // Perform POST request without authentication and verify results -> 401 Unauthorized is returned
             performPostNoAuth(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request)
                     .andExpect(status().isUnauthorized());
         }
@@ -165,13 +147,10 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when proposed values are empty")
         void createProposal_EmptyValues_Returns400() throws Exception {
-
-            // Create request with empty proposed values
             CreateDataProposalRequest request = new CreateDataProposalRequest();
-            request.setCategory("engine");
+            request.setCategory(ProposalCategory.ENGINE);
             request.setProposedValues(Map.of());
 
-            // Perform POST request with authentication and verify results -> 400 Bad Request is returned
             performPostWithAuth(DATA_PROPOSAL_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -185,8 +164,6 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getPendingProposals_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform GET request without authentication and verify results -> 401 Unauthorized is returned
             performGetNoAuth(DATA_PROPOSAL_BASE_URL + "/pending")
                     .andExpect(status().isUnauthorized());
         }
@@ -194,8 +171,6 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when authenticated as regular user")
         void getPendingProposals_RegularUser_Returns403() throws Exception {
-
-            // Perform GET request with authentication as regular user and verify results -> 403 Forbidden is returned
             performGetWithAuth(DATA_PROPOSAL_BASE_URL + "/pending", userToken)
                     .andExpect(status().isForbidden());
         }
@@ -203,17 +178,15 @@ class DataProposalControllerTest extends MockMvcTestBase {
 
 
     @Nested
-    @DisplayName("PATCH /api/data-proposals/resolve/{id}")
+    @DisplayName("PATCH /api/data-proposals/{id}/resolve")
     class ResolveProposalTests {
 
         @Test
         @DisplayName("returns 401 when not authenticated")
         void resolveProposal_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform PATCH request without authentication and verify results -> 401 Unauthorized is returned
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                            .patch(DATA_PROPOSAL_BASE_URL + "/resolve/" + testProposal.getId() + "?approve=true")
+                            .patch(DATA_PROPOSAL_BASE_URL + "/" + testProposal.getId() + "/resolve?approve=true")
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
             ).andExpect(status().isUnauthorized());
         }
@@ -221,11 +194,9 @@ class DataProposalControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when authenticated as regular user")
         void resolveProposal_RegularUser_Returns403() throws Exception {
-
-            // Perform PATCH request with authentication as regular user and verify results -> 403 Forbidden is returned
             mockMvc.perform(
                     org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                            .patch(DATA_PROPOSAL_BASE_URL + "/resolve/" + testProposal.getId() + "?approve=true")
+                            .patch(DATA_PROPOSAL_BASE_URL + "/" + testProposal.getId() + "/resolve?approve=true")
                             .header("Authorization", TestSecurityUtils.bearerToken(userToken))
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
             ).andExpect(status().isForbidden());

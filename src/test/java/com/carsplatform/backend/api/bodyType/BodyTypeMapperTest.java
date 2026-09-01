@@ -24,7 +24,6 @@ class BodyTypeMapperTest {
 
     @BeforeEach
     void setUp() {
-        // Create test body type
         testBodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .name("Sedan")
@@ -39,22 +38,14 @@ class BodyTypeMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarBodyTypeResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map id and name correctly")
         void toDto_ValidBodyType_MapsAllFields() {
-
-            // Map valid body type
             CarBodyTypeResponse result = mapper.toDto(testBodyType);
-
-            // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testBodyType.getId());
             assertThat(result.getName()).isEqualTo("Sedan");
@@ -63,8 +54,6 @@ class BodyTypeMapperTest {
         @Test
         @DisplayName("should map different body types")
         void toDto_DifferentBodyTypes_MapsCorrectly() {
-
-            // Create different body types
             BodyType suv = TestDataFactory.defaultBodyType()
                     .id(UUID.randomUUID())
                     .name("SUV")
@@ -75,11 +64,8 @@ class BodyTypeMapperTest {
                     .name("Hatchback")
                     .build();
 
-            // Map different body types
             CarBodyTypeResponse suvResult = mapper.toDto(suv);
             CarBodyTypeResponse hatchbackResult = mapper.toDto(hatchback);
-
-            // Verify results -> body types mapped correctly
             assertThat(suvResult.getName()).isEqualTo("SUV");
             assertThat(hatchbackResult.getName()).isEqualTo("Hatchback");
         }

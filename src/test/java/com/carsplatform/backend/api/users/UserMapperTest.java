@@ -25,8 +25,6 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .username("testuser")
@@ -45,22 +43,15 @@ class UserMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toResponseDto_NullInput_ReturnsNull() {
-
-            // Map null input
             UserResponse result = userMapper.toResponseDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toResponseDto_ValidUser_MapsAllFields() {
-
-            // Map valid user
             UserResponse result = userMapper.toResponseDto(testUser);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testUser.getId());
             assertThat(result.getUsername()).isEqualTo("testuser");
@@ -73,16 +64,12 @@ class UserMapperTest {
         @Test
         @DisplayName("should map admin user correctly")
         void toResponseDto_AdminUser_MapsIsAdminTrue() {
-
-            // Create admin user
             User adminUser = TestDataFactory.adminUser()
                     .id(UUID.randomUUID())
                     .build();
 
-            // Map admin user
             UserResponse result = userMapper.toResponseDto(adminUser);
 
-            // Verify isAdmin is true
             assertThat(result.getIsAdmin()).isTrue();
         }
     }
@@ -95,18 +82,14 @@ class UserMapperTest {
         @Test
         @DisplayName("should update entity fields from DTO")
         void updateEntityFromDto_ValidRequest_UpdatesEntity() {
-
-            // Create request with updated fields
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName("UpdatedFirst")
                     .lastName("UpdatedLast")
                     .email("updated@example.com")
                     .build();
 
-            // Update entity
             userMapper.updateEntityFromDto(request, testUser);
 
-            // Verify updated fields are correct
             assertThat(testUser.getFirstName()).isEqualTo("UpdatedFirst");
             assertThat(testUser.getLastName()).isEqualTo("UpdatedLast");
             assertThat(testUser.getEmail()).isEqualTo("updated@example.com");
@@ -116,18 +99,14 @@ class UserMapperTest {
         @Test
         @DisplayName("should handle null values in request")
         void updateEntityFromDto_NullFieldsInRequest_UpdatesToNull() {
-
-            // Create request without null fields
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName(null)
                     .lastName(null)
                     .email(null)
                     .build();
 
-            // Update entity with null fields in request
             userMapper.updateEntityFromDto(request, testUser);
 
-            // Verify fields are updated to null
             assertThat(testUser.getFirstName()).isNull();
             assertThat(testUser.getLastName()).isNull();
             assertThat(testUser.getEmail()).isNull();

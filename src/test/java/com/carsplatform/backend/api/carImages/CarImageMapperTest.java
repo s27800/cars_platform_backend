@@ -32,8 +32,6 @@ class CarImageMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test car and image
         Brand brand = TestDataFactory.defaultBrand().id(UUID.randomUUID()).build();
         Model model = TestDataFactory.defaultModel(brand).id(UUID.randomUUID()).build();
         Generation generation = TestDataFactory.defaultGeneration(model).id(UUID.randomUUID()).build();
@@ -60,22 +58,15 @@ class CarImageMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarImageResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidCarImage_MapsAllFields() {
-
-            // Map valid car image
             CarImageResponse result = mapper.toDto(testImage);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testImage.getId());
             assertThat(result.getImageUrl()).isEqualTo("https://example.com/car-image.jpg");
@@ -85,14 +76,10 @@ class CarImageMapperTest {
         @Test
         @DisplayName("should map non-main image correctly")
         void toDto_NonMainImage_MapsIsMainFalse() {
-
-            // Set image as non-main
             testImage.setIsMain(false);
 
-            // Map non-main image
             CarImageResponse result = mapper.toDto(testImage);
 
-            // Verify isMain is false
             assertThat(result.getIsMain()).isFalse();
         }
     }
@@ -105,30 +92,20 @@ class CarImageMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDtoList_NullInput_ReturnsNull() {
-
-            // Map null input
             List<CarImageResponse> result = mapper.toDtoList(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should return empty list when input is empty")
         void toDtoList_EmptyList_ReturnsEmptyList() {
-
-            // Map empty list
             List<CarImageResponse> result = mapper.toDtoList(new LinkedHashSet<>());
-
-            // Verify result is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("should map all images correctly")
         void toDtoList_ListWithImages_MapsAllImages() {
-
-            // Create list of car images
             CarImage image1 = CarImage.builder()
                     .id(UUID.randomUUID())
                     .imageUrl("https://example.com/image1.jpg")
@@ -145,10 +122,8 @@ class CarImageMapperTest {
 
             List<CarImage> images = List.of(image1, image2);
 
-            // Map list of car images
             List<CarImageResponse> result = mapper.toDtoList(images);
 
-            // Verify all car images are mapped correctly
             assertThat(result).hasSize(2);
             assertThat(result.get(0).getImageUrl()).isEqualTo("https://example.com/image1.jpg");
             assertThat(result.get(0).getIsMain()).isTrue();

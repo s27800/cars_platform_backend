@@ -18,17 +18,28 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+/**
+ * Read-only access to the car catalogue.
+ *
+ * Every filter of {@link #searchCars} is optional; a null value simply means no condition on
+ * that field, which lets the frontend build the query out of whatever the user picked.
+ * {@link #findSimilarCars} looks for cars sharing the brand, the body type or a tag, and the
+ * limit is already applied in SQL so only the ids that are really needed are fetched.
+ */
 @Service
 @RequiredArgsConstructor
 public class CarService {
+
     private final CarRepository carRepository;
     private final CarDetailsMapper carDetailsMapper;
     private final CarsListMapper carsListMapper;
 
+
     @Transactional(readOnly = true)
     public CarDetailsResponse getCarDetailsForCarId(UUID id) throws ResourceNotFoundException {
-        Car car = carRepository.findByIdWithDetails(id).orElseThrow(
-                () -> new ResourceNotFoundException("Car", "id", id));
+        Car car = carRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));
 
         return carDetailsMapper.toDto(car);
     }
@@ -56,7 +67,6 @@ public class CarService {
             Double maxFuelConsumptionMixed,
             Pageable pageable
     ) throws ResourceNotFoundException {
-
         Page<Car> cars = carRepository.searchCars(
                 search, brandIds, modelIds, generationIds, bodyTypeIds,
                 tagIds, minDisplacement, maxDisplacement, engineTypes,

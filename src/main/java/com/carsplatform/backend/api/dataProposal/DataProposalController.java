@@ -1,11 +1,12 @@
 package com.carsplatform.backend.api.dataProposal;
 
 import com.carsplatform.backend.api.dataProposal.dtos.CreateDataProposalRequest;
-
 import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/data-proposals")
 @RequiredArgsConstructor
@@ -30,13 +32,14 @@ public class DataProposalController {
 
     private final DataProposalService dataProposalService;
 
+
     @PostMapping("/{carId}")
     @Operation(summary = "Create new data change proposal")
     public ResponseEntity<Void> createDataProposal(
             @PathVariable UUID carId,
             @RequestBody @Valid CreateDataProposalRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         dataProposalService.createDataProposal(carId, userDetails.getUsername(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -49,14 +52,14 @@ public class DataProposalController {
         return ResponseEntity.ok(dataProposalService.getPendingDataProposals(pageable));
     }
 
-    @PatchMapping("/resolve/{id}")
+    @PatchMapping("/{id}/resolve")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Resolve pending data proposal")
     public ResponseEntity<Void> resolveProposal(
             @PathVariable UUID id,
             @RequestParam boolean approve,
-            @RequestParam(required = false) String adminComment) {
-
+            @RequestParam(required = false) String adminComment
+    ) {
         dataProposalService.resolveDataProposal(id, approve, adminComment);
 
         return ResponseEntity.noContent().build();

@@ -40,8 +40,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("registers user successfully with valid data")
         void register_ValidData_Returns201WithToken() throws Exception {
-
-            // Create register request with valid data
             RegisterRequest request = RegisterRequest.builder()
                     .username("newuser")
                     .email("newuser@example.com")
@@ -50,7 +48,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("Doe")
                     .build();
 
-            // Perform POST request and verify response is 201 Created with access token
             performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.accessToken").isNotEmpty())
@@ -60,8 +57,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 409 when username already exists")
         void register_DuplicateUsername_Returns409() throws Exception {
-
-            // Create register request with valid data
             RegisterRequest firstRequest = RegisterRequest.builder()
                     .username("duplicateuser")
                     .email("first@example.com")
@@ -70,11 +65,9 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            // Perform POST request and verify response is 201 Created
             performPostNoAuth(AUTH_BASE_URL + "/register", firstRequest)
                     .andExpect(status().isCreated());
 
-            // Create register request with same username but different email
             RegisterRequest secondRequest = RegisterRequest.builder()
                     .username("duplicateuser")
                     .email("second@example.com")
@@ -83,7 +76,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            // Perform POST request and verify response is 409 Conflict
             performPostNoAuth(AUTH_BASE_URL + "/register", secondRequest)
                     .andExpect(status().isConflict());
         }
@@ -91,8 +83,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 409 when email already exists")
         void register_DuplicateEmail_Returns409() throws Exception {
-
-            // Create register request with valid data
             RegisterRequest firstRequest = RegisterRequest.builder()
                     .username("user1")
                     .email("duplicate@example.com")
@@ -101,11 +91,9 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            // Perform POST request and verify response is 201 Created
             performPostNoAuth(AUTH_BASE_URL + "/register", firstRequest)
                     .andExpect(status().isCreated());
 
-            // Create register request with different username but same email
             RegisterRequest secondRequest = RegisterRequest.builder()
                     .username("user2")
                     .email("duplicate@example.com")
@@ -114,7 +102,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("User")
                     .build();
 
-            // Perform POST request and verify response is 409 Conflict
             performPostNoAuth(AUTH_BASE_URL + "/register", secondRequest)
                     .andExpect(status().isConflict());
         }
@@ -122,15 +109,12 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when required fields are missing")
         void register_MissingFields_Returns400() throws Exception {
-
-            // Create register request with missing required fields
             RegisterRequest request = RegisterRequest.builder()
                     .username("")
                     .email("")
                     .password("")
                     .build();
 
-            // Perform POST request and verify response is 400 Bad Request
             performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isBadRequest());
         }
@@ -138,8 +122,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when email format is invalid")
         void register_InvalidEmailFormat_Returns400() throws Exception {
-
-            // Create register request with invalid email format
             RegisterRequest request = RegisterRequest.builder()
                     .username("validuser")
                     .email("invalid-email")
@@ -148,7 +130,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .lastName("Doe")
                     .build();
 
-            // Perform POST request and verify response is 400 Bad Request
             performPostNoAuth(AUTH_BASE_URL + "/register", request)
                     .andExpect(status().isBadRequest());
         }
@@ -162,8 +143,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("logs in user successfully with valid credentials")
         void login_ValidCredentials_Returns200WithToken() throws Exception {
-
-            // Register user
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("loginuser")
                     .email("loginuser@example.com")
@@ -175,13 +154,11 @@ class AuthenticationControllerTest extends MockMvcTestBase {
             performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                     .andExpect(status().isCreated());
 
-            // Create login request with same credentials
             LoginRequest loginRequest = LoginRequest.builder()
                     .username("loginuser")
                     .password("Password123!")
                     .build();
 
-            // Perform POST request and verify response is 200 OK with access token
             performPostNoAuth(AUTH_BASE_URL + "/login", loginRequest)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.accessToken").isNotEmpty())
@@ -191,14 +168,11 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when username does not exist")
         void login_NonExistingUser_Returns401() throws Exception {
-
-            // Create login request with non-existing username
             LoginRequest request = LoginRequest.builder()
                     .username("nonexistentuser")
                     .password("Password123!")
                     .build();
 
-            // Perform POST request and verify response is 401 Unauthorized
             performPostNoAuth(AUTH_BASE_URL + "/login", request)
                     .andExpect(status().isUnauthorized());
         }
@@ -206,8 +180,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when password is incorrect")
         void login_WrongPassword_Returns401() throws Exception {
-
-            // Register user
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("wrongpwduser")
                     .email("wrongpwd@example.com")
@@ -219,13 +191,11 @@ class AuthenticationControllerTest extends MockMvcTestBase {
             performPostNoAuth(AUTH_BASE_URL + "/register", registerRequest)
                     .andExpect(status().isCreated());
 
-            // Create login request with incorrect password
             LoginRequest loginRequest = LoginRequest.builder()
                     .username("wrongpwduser")
                     .password("WrongPassword123!")
                     .build();
 
-            // Perform POST request and verify response is 401 Unauthorized
             performPostNoAuth(AUTH_BASE_URL + "/login", loginRequest)
                     .andExpect(status().isUnauthorized());
         }
@@ -233,8 +203,6 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 429 after too many failed login attempts")
         void login_TooManyFailedAttempts_Returns429() throws Exception {
-
-            // Register user
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username("bruteforceuser")
                     .email("bruteforce@example.com")
@@ -251,22 +219,20 @@ class AuthenticationControllerTest extends MockMvcTestBase {
                     .password("WrongPassword123!")
                     .build();
 
-            // Exhaust the limit of failed attempts
             for (int attempt = 0; attempt < 5; attempt++)
                 performPostNoAuth(AUTH_BASE_URL + "/login", wrongPassword)
                         .andExpect(status().isUnauthorized());
 
-            // Verify the next attempt is refused before the credentials are even checked
             performPostNoAuth(AUTH_BASE_URL + "/login", wrongPassword)
                     .andExpect(status().isTooManyRequests())
                     .andExpect(header().exists("Retry-After"));
 
-            // Verify the lock applies to the correct password as well
             LoginRequest correctPassword = LoginRequest.builder()
                     .username("bruteforceuser")
                     .password("CorrectPassword123!")
                     .build();
 
+            // The lockout holds even for the right password, otherwise it could be brute-forced through
             performPostNoAuth(AUTH_BASE_URL + "/login", correctPassword)
                     .andExpect(status().isTooManyRequests());
         }
@@ -274,14 +240,11 @@ class AuthenticationControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when credentials are empty")
         void login_EmptyCredentials_Returns400() throws Exception {
-
-            // Create login request with empty credentials
             LoginRequest request = LoginRequest.builder()
                     .username("")
                     .password("")
                     .build();
 
-            // Perform POST request and verify response is 400 Bad Request
             performPostNoAuth(AUTH_BASE_URL + "/login", request)
                     .andExpect(status().isBadRequest());
         }

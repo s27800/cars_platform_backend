@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/body-types")
 @RequiredArgsConstructor
 @Tag(name = "Body Types", description = "Api for managing body types")
 public class BodyTypeController {
+
     private final BodyTypeService service;
+
 
     @GetMapping
     @Operation(summary = "Get all available body types")

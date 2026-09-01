@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/generations")
 @RequiredArgsConstructor
@@ -23,11 +24,12 @@ public class GenerationController {
 
     private final GenerationService service;
 
+
     @GetMapping("/{id}")
     @Operation(summary = "Get generation details with a list of cars")
     public ResponseEntity<GenerationDetailsResponse> getGenerationDetailsById(
-            @Parameter(description = "ID of the generation") @PathVariable UUID id) {
-
+            @Parameter(description = "ID of the generation") @PathVariable UUID id
+    ) {
         GenerationDetailsResponse generation = service.getGenerationDetailsById(id);
 
         return ResponseEntity.ok(generation);

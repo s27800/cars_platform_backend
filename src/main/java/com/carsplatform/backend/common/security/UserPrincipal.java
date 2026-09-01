@@ -13,6 +13,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+
+/**
+ * The {@link User} entity as Spring Security sees it. Admins get ROLE_ADMIN, everyone else
+ * ROLE_USER.
+ */
 @Data
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
@@ -23,21 +28,16 @@ public class UserPrincipal implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
+
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = user.getIsAdmin() != null && user.getIsAdmin()
             ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
             : List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return new UserPrincipal(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getPassword(),
-            authorities
-        );
+        return new UserPrincipal(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
     }
 
-    public boolean isAdmin(){
+    public boolean isAdmin() {
         return getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 

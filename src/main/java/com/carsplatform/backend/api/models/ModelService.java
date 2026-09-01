@@ -10,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
 public class ModelService {
+
     private final ModelRepository repository;
     private final ModelDetailsMapper mapper;
+
 
     @Transactional(readOnly = true)
     public ModelDetailsResponse getModelDetailsById(UUID modelId) {

@@ -32,15 +32,11 @@ class BrandControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .models(new java.util.ArrayList<>())
                 .build();
         entityManager.persist(testBrand);
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .name("3 Series")
                 .description("Compact executive car")
@@ -49,7 +45,6 @@ class BrandControllerTest extends MockMvcTestBase {
         testBrand.getModels().add(testModel);
         entityManager.persist(testModel);
 
-        // Save
         entityManager.flush();
     }
 
@@ -61,8 +56,6 @@ class BrandControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns list of all brands (public endpoint)")
         void getAllBrands_ReturnsAllBrands() throws Exception {
-
-            // Perform GET request and verify results -> correct status and returns list of brands
             performGetNoAuth(BRAND_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -72,8 +65,6 @@ class BrandControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns brand with correct fields")
         void getAllBrands_ReturnsBrandWithCorrectFields() throws Exception {
-
-            // Perform GET request and verify results -> correct status and brands contain correct fields
             performGetNoAuth(BRAND_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'BMW')]").exists())
@@ -89,8 +80,6 @@ class BrandControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns brand details when exists (public endpoint)")
         void getBrandById_ExistingBrand_Returns200() throws Exception {
-
-            // Perform GET request and verify results -> correct status and returns brand details
             performGetNoAuth(BRAND_BASE_URL + "/" + testBrand.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("BMW"))
@@ -100,8 +89,6 @@ class BrandControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns brand with models")
         void getBrandById_ExistingBrand_IncludesModels() throws Exception {
-
-            // Perform GET request and verify results -> correct status and brand includes models
             performGetNoAuth(BRAND_BASE_URL + "/" + testBrand.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.models", hasSize(greaterThanOrEqualTo(1))))
@@ -111,11 +98,8 @@ class BrandControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when brand does not exist")
         void getBrandById_NonExistingBrand_Returns404() throws Exception {
-
-            // Use random UUID that doesn't exist
             String nonExistentId = UUID.randomUUID().toString();
 
-            // Perform GET request and verify results -> 404 brand does not exist
             performGetNoAuth(BRAND_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }

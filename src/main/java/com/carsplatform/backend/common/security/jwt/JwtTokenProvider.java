@@ -14,13 +14,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
+
+/**
+ * Issues and verifies JWTs. The token carries the user id as its subject and expires after
+ * {@code app.jwt.expiration-in-ms}.
+ *
+ * HS512 needs a key of at least 64 bytes, so a secret that is too short stops the application
+ * on startup rather than quietly weakening every signature.
+ */
 @Component
 @Slf4j
 public class JwtTokenProvider {
+
+    /** Minimum key length required by the HMAC-SHA512 algorithm. */
     private static final int MIN_SECRET_LENGTH_IN_BYTES = 64;
 
     @Value("${app.jwt.secret}")
@@ -84,10 +95,12 @@ public class JwtTokenProvider {
     public boolean validateToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
+
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             log.debug("Rejected JWT token: {}", ex.getMessage());
         }
+
         return false;
     }
 }

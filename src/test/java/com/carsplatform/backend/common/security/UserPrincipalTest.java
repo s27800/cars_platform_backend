@@ -26,8 +26,6 @@ class UserPrincipalTest {
         @Test
         @DisplayName("should create UserPrincipal with ROLE_USER for regular user")
         void create_RegularUser_HasRoleUser() {
-
-            // Create regular user
             User user = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .username("testuser")
@@ -36,10 +34,8 @@ class UserPrincipalTest {
                     .isAdmin(false)
                     .build();
 
-            // Create UserPrincipal
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify UserPrincipal has correct data and ROLE_USER authority
             assertThat(principal).isNotNull();
             assertThat(principal.getId()).isEqualTo(user.getId());
             assertThat(principal.getUsername()).isEqualTo("testuser");
@@ -56,8 +52,6 @@ class UserPrincipalTest {
         @Test
         @DisplayName("should create UserPrincipal with ROLE_ADMIN for admin user")
         void create_AdminUser_HasRoleAdmin() {
-
-            // Create admin user
             User adminUser = TestDataFactory.adminUser()
                     .id(UUID.randomUUID())
                     .username("admin")
@@ -66,10 +60,8 @@ class UserPrincipalTest {
                     .isAdmin(true)
                     .build();
 
-            // Create UserPrincipal
             UserPrincipal principal = UserPrincipal.create(adminUser);
 
-            // Verify UserPrincipal has correct data and ROLE_ADMIN authority
             assertThat(principal).isNotNull();
             assertThat(principal.getId()).isEqualTo(adminUser.getId());
             assertThat(principal.getUsername()).isEqualTo("admin");
@@ -84,17 +76,13 @@ class UserPrincipalTest {
         @Test
         @DisplayName("should treat null isAdmin as regular user")
         void create_NullIsAdmin_TreatedAsRegularUser() {
-
-            // Create user with null isAdmin
             User user = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .isAdmin(null)
                     .build();
 
-            // Create UserPrincipal
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify UserPrincipal has ROLE_USER authority
             Collection<? extends GrantedAuthority> authorities = principal.getAuthorities();
 
             assertThat(authorities).hasSize(1);
@@ -111,8 +99,6 @@ class UserPrincipalTest {
         @Test
         @DisplayName("should return true when user has ROLE_ADMIN")
         void isAdmin_AdminUser_ReturnsTrue() {
-
-            // Create admin user principal
             User adminUser = TestDataFactory.adminUser()
                     .id(UUID.randomUUID())
                     .isAdmin(true)
@@ -120,15 +106,12 @@ class UserPrincipalTest {
 
             UserPrincipal principal = UserPrincipal.create(adminUser);
 
-            // Verify isAdmin returns true
             assertThat(principal.isAdmin()).isTrue();
         }
 
         @Test
         @DisplayName("should return false when user has ROLE_USER")
         void isAdmin_RegularUser_ReturnsFalse() {
-
-            // Create regular user principal
             User user = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .isAdmin(false)
@@ -136,7 +119,6 @@ class UserPrincipalTest {
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify isAdmin returns false
             assertThat(principal.isAdmin()).isFalse();
         }
     }
@@ -149,60 +131,46 @@ class UserPrincipalTest {
         @Test
         @DisplayName("isAccountNonExpired should return true")
         void isAccountNonExpired_ReturnsTrue() {
-
-            // Create user principal
             User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify isAccountNonExpired returns true
             assertThat(principal.isAccountNonExpired()).isTrue();
         }
 
         @Test
         @DisplayName("isAccountNonLocked should return true")
         void isAccountNonLocked_ReturnsTrue() {
-
-            // Create user principal
             User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify isAccountNonLocked returns true
             assertThat(principal.isAccountNonLocked()).isTrue();
         }
 
         @Test
         @DisplayName("isCredentialsNonExpired should return true")
         void isCredentialsNonExpired_ReturnsTrue() {
-
-            // Create user principal
             User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify isCredentialsNonExpired returns true
             assertThat(principal.isCredentialsNonExpired()).isTrue();
         }
 
         @Test
         @DisplayName("isEnabled should return true")
         void isEnabled_ReturnsTrue() {
-
-            // Create user principal
             User user = TestDataFactory.defaultUser().id(UUID.randomUUID()).build();
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify isEnabled returns true
             assertThat(principal.isEnabled()).isTrue();
         }
 
         @Test
         @DisplayName("getPassword should return user password")
         void getPassword_ReturnsUserPassword() {
-
-            // Create user principal with specific password
             User user = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .password("mySecretPassword")
@@ -210,15 +178,12 @@ class UserPrincipalTest {
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify getPassword returns correct password
             assertThat(principal.getPassword()).isEqualTo("mySecretPassword");
         }
 
         @Test
         @DisplayName("getUsername should return user username")
         void getUsername_ReturnsUserUsername() {
-
-            // Create user principal with specific username
             User user = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .username("specificUsername")
@@ -226,7 +191,6 @@ class UserPrincipalTest {
 
             UserPrincipal principal = UserPrincipal.create(user);
 
-            // Verify getUsername returns correct username
             assertThat(principal.getUsername()).isEqualTo("specificUsername");
         }
     }

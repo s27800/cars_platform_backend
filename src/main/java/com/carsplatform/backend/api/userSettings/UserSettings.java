@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.userSettings;
 
 import com.carsplatform.backend.api.users.User;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "user_settings")
 @Data
@@ -20,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSettings {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

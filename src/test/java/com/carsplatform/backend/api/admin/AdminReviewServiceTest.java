@@ -1,14 +1,16 @@
 package com.carsplatform.backend.api.admin;
 
-import com.carsplatform.backend.api.admin.dtos.AdminReviewResponse;
 import com.carsplatform.backend.api.bodyType.BodyType;
 import com.carsplatform.backend.api.brands.Brand;
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.reviews.Review;
+import com.carsplatform.backend.api.reviews.ReviewDetailsMapper;
 import com.carsplatform.backend.api.reviews.ReviewRepository;
+import com.carsplatform.backend.api.reviews.dtos.ReviewDetailsResponse;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 
@@ -45,7 +47,7 @@ class AdminReviewServiceTest {
     private ReviewRepository reviewRepository;
 
     @Mock
-    private AdminReviewMapper adminReviewMapper;
+    private ReviewDetailsMapper reviewDetailsMapper;
 
     @InjectMocks
     private AdminReviewService adminReviewService;
@@ -56,41 +58,27 @@ class AdminReviewServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test review
         testReview = TestDataFactory.defaultReview(testUser, testCar)
                 .id(UUID.randomUUID())
-                .isApproved(false)
+                .status(ModerationStatus.PENDING)
                 .build();
     }
 
@@ -102,44 +90,32 @@ class AdminReviewServiceTest {
         @Test
         @DisplayName("should return pending reviews page")
         void getPendingReviews_ReturnsPendingReviews() {
-
-            // Create pageable and mock data
             Pageable pageable = PageRequest.of(0, 10);
             Page<Review> reviewPage = new PageImpl<>(List.of(testReview));
-            Page<AdminReviewResponse> expectedResponse = new PageImpl<>(List.of(mock(AdminReviewResponse.class)));
+            Page<ReviewDetailsResponse> expectedResponse = new PageImpl<>(List.of(mock(ReviewDetailsResponse.class)));
 
-            // Mock repository and mapper
             when(reviewRepository.findAllPending(pageable)).thenReturn(reviewPage);
-            when(adminReviewMapper.toDtoList(reviewPage)).thenReturn(expectedResponse);
+            when(reviewDetailsMapper.toDtoList(reviewPage)).thenReturn(expectedResponse);
 
-            // Get pending reviews
-            Page<AdminReviewResponse> result = adminReviewService.getPendingReviews(pageable);
-
-            // Verify results -> pending reviews page is returned with correct content
+            Page<ReviewDetailsResponse> result = adminReviewService.getPendingReviews(pageable);
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
 
             verify(reviewRepository).findAllPending(pageable);
-            verify(adminReviewMapper).toDtoList(reviewPage);
+            verify(reviewDetailsMapper).toDtoList(reviewPage);
         }
 
         @Test
         @DisplayName("should return empty page when no pending reviews")
         void getPendingReviews_NoPendingReviews_ReturnsEmptyPage() {
-
-            // Create pageable and mock data
             Pageable pageable = PageRequest.of(0, 10);
             Page<Review> emptyPage = Page.empty();
-            Page<AdminReviewResponse> emptyResponse = Page.empty();
+            Page<ReviewDetailsResponse> emptyResponse = Page.empty();
 
-            // Mock repository and mapper
             when(reviewRepository.findAllPending(pageable)).thenReturn(emptyPage);
-            when(adminReviewMapper.toDtoList(emptyPage)).thenReturn(emptyResponse);
+            when(reviewDetailsMapper.toDtoList(emptyPage)).thenReturn(emptyResponse);
 
-            // Get pending reviews
-            Page<AdminReviewResponse> result = adminReviewService.getPendingReviews(pageable);
-
-            // Verify results -> empty page is returned
+            Page<ReviewDetailsResponse> result = adminReviewService.getPendingReviews(pageable);
             assertThat(result).isNotNull();
             assertThat(result.getContent()).isEmpty();
 
@@ -155,49 +131,39 @@ class AdminReviewServiceTest {
         @Test
         @DisplayName("should approve review when review exists")
         void approveReview_ReviewExists_ApprovesReview() {
-
-            // Mock repository
             when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
             when(reviewRepository.save(any(Review.class))).thenReturn(testReview);
 
-            // Approve review
             adminReviewService.approveReview(testReview.getId(), true);
-
-            // Verify results -> review is approved
             ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
 
             verify(reviewRepository).save(reviewCaptor.capture());
 
             Review savedReview = reviewCaptor.getValue();
 
-            assertThat(savedReview.getIsApproved()).isTrue();
+            assertThat(savedReview.getStatus()).isEqualTo(ModerationStatus.APPROVED);
         }
 
         @Test
-        @DisplayName("should delete review when approve is false")
-        void approveReview_ApproveFalse_DeletesReview() {
-
-            // Mock repository
+        @DisplayName("should set status to REJECTED when approve is false")
+        void approveReview_ApproveFalse_SetsStatusRejected() {
             when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
-            doNothing().when(reviewRepository).delete(any(Review.class));
 
-            // Reject review
             adminReviewService.approveReview(testReview.getId(), false);
+            ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
+            verify(reviewRepository).save(reviewCaptor.capture());
+            verify(reviewRepository, never()).delete(any());
 
-            // Verify results -> review is deleted
-            verify(reviewRepository).delete(testReview);
-            verify(reviewRepository, never()).save(any());
+            Review savedReview = reviewCaptor.getValue();
+            assertThat(savedReview.getStatus()).isEqualTo(ModerationStatus.REJECTED);
         }
 
         @Test
         @DisplayName("should throw ResourceNotFoundException when review not found")
         void approveReview_ReviewNotFound_ThrowsException() {
-
-            // Mock repository
             UUID nonExistentId = UUID.randomUUID();
             when(reviewRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-            // Approve review and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> adminReviewService.approveReview(nonExistentId, true))
                     .isInstanceOf(ResourceNotFoundException.class);
 

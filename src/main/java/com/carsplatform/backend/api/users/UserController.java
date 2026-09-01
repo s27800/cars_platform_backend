@@ -1,15 +1,15 @@
 package com.carsplatform.backend.api.users;
 
-import com.carsplatform.backend.api.admin.dtos.AdminFuelReportResponse;
-import com.carsplatform.backend.api.admin.dtos.AdminReviewResponse;
 import com.carsplatform.backend.api.dataProposal.DataProposalService;
 import com.carsplatform.backend.api.dataProposal.dtos.GetDataProposalsResponse;
 import com.carsplatform.backend.api.fuelReports.FuelReportService;
+import com.carsplatform.backend.api.fuelReports.dtos.FuelReportDetailsResponse;
 import com.carsplatform.backend.api.reviews.ReviewService;
+import com.carsplatform.backend.api.reviews.dtos.ReviewDetailsResponse;
 import com.carsplatform.backend.api.users.dtos.UserChangePasswordRequest;
 import com.carsplatform.backend.api.users.dtos.UserModifyRequest;
-import com.carsplatform.backend.common.standard.SimpleResponse;
 import com.carsplatform.backend.api.users.dtos.UserResponse;
+import com.carsplatform.backend.common.standard.SimpleResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,6 +26,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class UserController {
     private final ReviewService reviewService;
     private final FuelReportService fuelReportService;
     private final DataProposalService dataProposalService;
+
 
     @GetMapping("/me")
     @Operation(summary = "Get current user's profile information")
@@ -58,8 +60,10 @@ public class UserController {
 
     @PostMapping("/me/change-password")
     @Operation(summary = "Change current user's password")
-    public ResponseEntity<SimpleResponse> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
-        userService.changeUserPassword(userChangePasswordRequest);
+    public ResponseEntity<SimpleResponse> changePassword(
+            @Valid @RequestBody UserChangePasswordRequest changePasswordRequest
+    ) {
+        userService.changeUserPassword(changePasswordRequest);
 
         return ResponseEntity.ok(SimpleResponse.builder()
                 .message("Password changed successfully.")
@@ -69,19 +73,19 @@ public class UserController {
 
     @GetMapping("/me/reviews")
     @Operation(summary = "Get current user's reviews")
-    public ResponseEntity<Page<AdminReviewResponse>> getUserReviews(
+    public ResponseEntity<Page<ReviewDetailsResponse>> getUserReviews(
             @AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-
+            Pageable pageable
+    ) {
         return ResponseEntity.ok(reviewService.getReviewsForUser(userDetails.getUsername(), pageable));
     }
 
     @GetMapping("/me/fuel-reports")
     @Operation(summary = "Get current user's fuel reports")
-    public ResponseEntity<Page<AdminFuelReportResponse>> getUserFuelReports(
+    public ResponseEntity<Page<FuelReportDetailsResponse>> getUserFuelReports(
             @AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-
+            Pageable pageable
+    ) {
         return ResponseEntity.ok(fuelReportService.getFuelReportsForUser(userDetails.getUsername(), pageable));
     }
 
@@ -89,8 +93,8 @@ public class UserController {
     @Operation(summary = "Get current user's data proposals")
     public ResponseEntity<Page<GetDataProposalsResponse>> getUserDataProposals(
             @AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-
+            Pageable pageable
+    ) {
         return ResponseEntity.ok(dataProposalService.getUserDataProposals(userDetails.getUsername(), pageable));
     }
 

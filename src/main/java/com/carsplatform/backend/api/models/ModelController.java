@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/models")
 @RequiredArgsConstructor
@@ -23,11 +24,12 @@ public class ModelController {
 
     private final ModelService service;
 
+
     @GetMapping("/{id}")
     @Operation(summary = "Get model details with a list of generations")
     public ResponseEntity<ModelDetailsResponse> getModelsByBrandId(
-            @Parameter(description = "ID of the model") @PathVariable UUID id) {
-
+            @Parameter(description = "ID of the model") @PathVariable UUID id
+    ) {
         ModelDetailsResponse model = service.getModelDetailsById(id);
 
         return ResponseEntity.ok(model);

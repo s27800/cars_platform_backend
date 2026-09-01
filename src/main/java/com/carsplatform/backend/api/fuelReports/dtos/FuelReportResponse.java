@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.fuelReports.dtos;
 
 import com.carsplatform.backend.api.users.dtos.UsernameResponse;
+import com.carsplatform.backend.common.ModerationStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class FuelReportResponse {
     private BigDecimal fuelConsumption;
     private String comment;
     private LocalDateTime reportDate;
-    private Boolean isApproved;
+    private ModerationStatus status;
     private Long likesCount;
     private UsernameResponse usernameResponse;
 }

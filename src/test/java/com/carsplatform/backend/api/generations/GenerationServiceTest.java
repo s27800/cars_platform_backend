@@ -43,20 +43,14 @@ class GenerationServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .name("BMW")
                 .build();
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .id(UUID.randomUUID())
                 .name("3 Series")
                 .build();
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
                 .id(UUID.randomUUID())
                 .name("G20")
@@ -71,8 +65,6 @@ class GenerationServiceTest {
         @Test
         @DisplayName("should return generation details when generation exists")
         void getGenerationDetailsById_GenerationExists_ReturnsDetails() {
-
-            // Create expected response
             UUID testUuid = UUID.randomUUID();
 
             GenerationDetailsResponse expectedResponse = GenerationDetailsResponse.builder()
@@ -80,14 +72,10 @@ class GenerationServiceTest {
                     .name("G20")
                     .build();
 
-            // Mock repository and mapper behavior
             when(repository.findById(testGeneration.getId())).thenReturn(Optional.of(testGeneration));
             when(mapper.toDto(testGeneration)).thenReturn(expectedResponse);
 
-            // Get generation details by ID
             GenerationDetailsResponse result = generationService.getGenerationDetailsById(testGeneration.getId());
-
-            // Verify results -> correct response is returned
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testUuid);
             assertThat(result.getName()).isEqualTo("G20");
@@ -99,13 +87,10 @@ class GenerationServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when generation does not exist")
         void getGenerationDetailsById_GenerationNotFound_ThrowsException() {
-
-            // Mock repository
             UUID nonExistentId = UUID.randomUUID();
-            
+
             when(repository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-            // Get generation details by ID and verify results -> ResourceNotFoundException thrown
             assertThatThrownBy(() -> generationService.getGenerationDetailsById(nonExistentId))
                     .isInstanceOf(ResourceNotFoundException.class);
 

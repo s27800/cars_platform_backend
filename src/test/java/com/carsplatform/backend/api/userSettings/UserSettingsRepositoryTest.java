@@ -38,19 +38,14 @@ class UserSettingsRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .username("settingsuser")
                 .email("settingsuser@example.com")
                 .build();
         entityManager.persist(testUser);
-
-        // Create test settings
         testSettings = TestDataFactory.defaultUserSettings(testUser).build();
         entityManager.persist(testSettings);
 
-        // Save
         entityManager.flush();
     }
 
@@ -62,11 +57,7 @@ class UserSettingsRepositoryTest {
         @Test
         @DisplayName("returns settings when user exists")
         void findByUserId_ExistingUser_ReturnsSettings() {
-
-            // Find settings by user ID
             Optional<UserSettings> result = userSettingsRepository.findByUserId(testUser.getId());
-
-            // Verify results -> settings are returned with correct theme
             assertThat(result).isPresent();
             assertThat(result.get().getTheme()).isEqualTo("light");
         }
@@ -74,11 +65,7 @@ class UserSettingsRepositoryTest {
         @Test
         @DisplayName("returns empty when user does not exist")
         void findByUserId_NonExistingUser_ReturnsEmpty() {
-
-            // Find settings by non-existing user ID
             Optional<UserSettings> result = userSettingsRepository.findByUserId(UUID.randomUUID());
-
-            // Verify results -> empty is returned
             assertThat(result).isEmpty();
         }
     }
@@ -91,8 +78,6 @@ class UserSettingsRepositoryTest {
         @Test
         @DisplayName("updates theme successfully")
         void save_UpdateTheme_UpdatesSuccessfully() {
-
-            // Update theme to dark
             testSettings.setTheme("dark");
 
             UserSettings saved = userSettingsRepository.save(testSettings);
@@ -100,10 +85,7 @@ class UserSettingsRepositoryTest {
             entityManager.flush();
             entityManager.clear();
 
-            // Find settings by ID
             Optional<UserSettings> result = userSettingsRepository.findById(saved.getId());
-
-            // Verify results -> theme is updated
             assertThat(result).isPresent();
             assertThat(result.get().getTheme()).isEqualTo("dark");
         }

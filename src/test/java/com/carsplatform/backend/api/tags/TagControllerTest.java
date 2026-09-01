@@ -29,8 +29,6 @@ class TagControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() {
-
-        // Create test tags
         testTag1 = TestDataFactory.defaultTag()
                 .name("Sport")
                 .build();
@@ -41,7 +39,6 @@ class TagControllerTest extends MockMvcTestBase {
                 .build();
         entityManager.persist(testTag2);
 
-        // Save
         entityManager.flush();
     }
 
@@ -53,8 +50,6 @@ class TagControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns list of all tags (public endpoint)")
         void getAllTags_ReturnsAllTags() throws Exception {
-
-            // Perform GET request and verify results -> list of all tags is returned
             performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -64,8 +59,6 @@ class TagControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns tags with correct fields")
         void getAllTags_ReturnsTagsWithCorrectFields() throws Exception {
-
-            // Perform GET request and verify results -> tags with correct fields are returned
             performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'Sport')]").exists())
@@ -77,12 +70,9 @@ class TagControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns empty list when no tags exist")
         void getAllTags_NoTags_ReturnsEmptyList() throws Exception {
-
-            // Delete all tags
             entityManager.createQuery("DELETE FROM Tag").executeUpdate();
             entityManager.flush();
 
-            // Perform GET request and verify results -> empty list is returned
             performGetNoAuth(TAG_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())

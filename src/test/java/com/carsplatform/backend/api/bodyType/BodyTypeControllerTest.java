@@ -29,8 +29,6 @@ class BodyTypeControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() {
-
-        // Create test body types
         testBodyType1 = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
@@ -43,7 +41,6 @@ class BodyTypeControllerTest extends MockMvcTestBase {
 
         entityManager.persist(testBodyType2);
 
-        // Save
         entityManager.flush();
     }
 
@@ -55,8 +52,6 @@ class BodyTypeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns list of all body types (public endpoint)")
         void getAllBodyTypes_ReturnsAllBodyTypes() throws Exception {
-
-            // Perform GET request and verify response is 200 OK with list of body types
             performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -66,8 +61,6 @@ class BodyTypeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns body types with correct fields")
         void getAllBodyTypes_ReturnsBodyTypesWithCorrectFields() throws Exception {
-
-            // Perform GET request and verify response is 200 OK with body types having correct fields
             performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[?(@.name == 'Sedan')]").exists())
@@ -79,13 +72,10 @@ class BodyTypeControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns empty list when no body types exist")
         void getAllBodyTypes_NoBodyTypes_ReturnsEmptyList() throws Exception {
-
-            // Delete all body types and related data
             entityManager.createQuery("DELETE FROM Car").executeUpdate();
             entityManager.createQuery("DELETE FROM BodyType").executeUpdate();
             entityManager.flush();
 
-            // Perform GET request and verify response is 200 OK with empty list
             performGetNoAuth(BODY_TYPE_BASE_URL)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())

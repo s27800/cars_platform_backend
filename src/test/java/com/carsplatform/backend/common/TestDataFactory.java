@@ -10,7 +10,7 @@ import com.carsplatform.backend.api.fuelReportLikes.FuelReportLike;
 import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.insideDimensions.InsideDimensions;
-import com.carsplatform.backend.api.likes.Like;
+import com.carsplatform.backend.api.reviewLikes.ReviewLike;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.outsideDimensions.OutsideDimensions;
 import com.carsplatform.backend.api.performances.Performance;
@@ -19,6 +19,7 @@ import com.carsplatform.backend.api.tags.Tag;
 import com.carsplatform.backend.api.transmissions.Transmission;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.userSettings.UserSettings;
+import com.carsplatform.backend.common.ModerationStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 /**
  * Factory class for creating test entities.
  */
-
 public final class TestDataFactory {
 
     private TestDataFactory() {
@@ -288,14 +288,14 @@ public final class TestDataFactory {
                 .maintenanceRating(3)
                 .priceQualityRating(4)
                 .failureFreeRating(4)
-                .isApproved(false);
+                .status(ModerationStatus.PENDING);
     }
 
 
     // ===== LIKE =====
 
-    public static Like.LikeBuilder defaultLike(User user, Review review) {
-        return Like.builder()
+    public static ReviewLike.ReviewLikeBuilder defaultReviewLike(User user, Review review) {
+        return ReviewLike.builder()
                 .user(user)
                 .review(review);
     }
@@ -318,7 +318,7 @@ public final class TestDataFactory {
                 .car(car)
                 .fuelConsumption(new BigDecimal("7.8"))
                 .comment("Test fuel consumption report.")
-                .isApproved(false);
+                .status(ModerationStatus.PENDING);
     }
 
 

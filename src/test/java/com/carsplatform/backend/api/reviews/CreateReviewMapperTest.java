@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.reviews;
 
 import com.carsplatform.backend.api.reviews.dtos.CreateReviewRequest;
+import com.carsplatform.backend.common.ModerationStatus;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,19 +24,13 @@ class CreateReviewMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void nullInput_ReturnsNull() {
-
-            // Map null input
-            Review result = mapper.toDto(null);
-
-            // Verify result is null
+            Review result = mapper.toEntity(null);
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all rating fields from request")
         void validRequest_MapsAllRatings() {
-
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Great car!")
                     .engineRating(5)
@@ -51,10 +46,8 @@ class CreateReviewMapperTest {
                     .failureFreeRating(4)
                     .build();
 
-            // Map valid input
-            Review result = mapper.toDto(request);
+            Review result = mapper.toEntity(request);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getComment()).isEqualTo("Great car!");
             assertThat(result.getEngineRating()).isEqualTo(5);
@@ -71,10 +64,8 @@ class CreateReviewMapperTest {
         }
 
         @Test
-        @DisplayName("should set isApproved to false")
-        void validRequest_SetsIsApprovedFalse() {
-
-            // Create valid request with all rating fields set
+        @DisplayName("should set status to PENDING")
+        void validRequest_SetsStatusPending() {
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Test comment")
                     .engineRating(4)
@@ -90,18 +81,14 @@ class CreateReviewMapperTest {
                     .failureFreeRating(4)
                     .build();
 
-            // Map valid input
-            Review result = mapper.toDto(request);
+            Review result = mapper.toEntity(request);
 
-            // Verify isApproved is set to false
-            assertThat(result.getIsApproved()).isFalse();
+            assertThat(result.getStatus()).isEqualTo(ModerationStatus.PENDING);
         }
 
         @Test
         @DisplayName("should set reviewDate to current time")
         void validRequest_SetsReviewDate() {
-
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Test comment")
                     .engineRating(4)
@@ -117,18 +104,14 @@ class CreateReviewMapperTest {
                     .failureFreeRating(4)
                     .build();
 
-            // Map valid input
-            Review result = mapper.toDto(request);
+            Review result = mapper.toEntity(request);
 
-            // Verify reviewDate is set to current time
             assertThat(result.getReviewDate()).isNotNull();
         }
 
         @Test
         @DisplayName("should ignore id, user and car fields")
         void validRequest_IgnoresIdUserCar() {
-
-            // Create valid request with all rating fields set
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Test comment")
                     .engineRating(4)
@@ -144,10 +127,8 @@ class CreateReviewMapperTest {
                     .failureFreeRating(4)
                     .build();
 
-            // Map valid input
-            Review result = mapper.toDto(request);
+            Review result = mapper.toEntity(request);
 
-            // Verify id, user, and car fields are ignored
             assertThat(result.getId()).isNull();
             assertThat(result.getUser()).isNull();
             assertThat(result.getCar()).isNull();

@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
 @Tag(name = "Tags", description = "Api for managing tags")
 public class TagController {
+
     private final TagService service;
+
 
     @GetMapping
     @Operation(summary = "Get all available tags")

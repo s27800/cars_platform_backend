@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Base class for MockMvc-based controller integration tests.
  * Provides common utilities for making HTTP requests with authentication.
  */
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

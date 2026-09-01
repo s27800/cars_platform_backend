@@ -2,6 +2,8 @@ package com.carsplatform.backend.api.reviews;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -17,6 +19,7 @@ import org.hibernate.annotations.Formula;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 @Entity
 @Table(
     name = "review",
@@ -29,6 +32,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")
@@ -106,11 +110,12 @@ public class Review {
     @Column(name = "review_date", updatable = false)
     private LocalDateTime reviewDate;
 
-    @Column(name = "is_approved")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
-    private Boolean isApproved = false;
+    private ModerationStatus status = ModerationStatus.PENDING;
 
-    @Formula("(SELECT COUNT(*) FROM likes l WHERE l.review_id = id)")
+    @Formula("(SELECT COUNT(*) FROM review_likes rl WHERE rl.review_id = id)")
     private Long likesCount;
 
     @PrePersist

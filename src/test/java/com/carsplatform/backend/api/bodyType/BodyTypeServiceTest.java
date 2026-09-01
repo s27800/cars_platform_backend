@@ -39,8 +39,6 @@ class BodyTypeServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test body types
         testBodyType1 = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .name("Sedan")
@@ -60,27 +58,21 @@ class BodyTypeServiceTest {
         @Test
         @DisplayName("should return list of all body types")
         void getAllBodyTypes_BodyTypesExist_ReturnsList() {
-
-            // Create expected response DTOs
             CarBodyTypeResponse response1 = CarBodyTypeResponse.builder()
                     .id(UUID.randomUUID())
                     .name("Sedan")
                     .build();
-                    
+
             CarBodyTypeResponse response2 = CarBodyTypeResponse.builder()
                     .id(UUID.randomUUID())
                     .name("SUV")
                     .build();
 
-            // Mock repository and mapper behavior
             when(repository.findAll()).thenReturn(List.of(testBodyType1, testBodyType2));
             when(mapper.toDto(testBodyType1)).thenReturn(response1);
             when(mapper.toDto(testBodyType2)).thenReturn(response2);
 
-            // Get all body types
             List<CarBodyTypeResponse> result = bodyTypeService.getAllBodyTypes();
-
-            // Verify result -> correct list of body types returned
             assertThat(result).hasSize(2);
             assertThat(result).extracting(CarBodyTypeResponse::getName)
                     .containsExactly("Sedan", "SUV");
@@ -91,14 +83,9 @@ class BodyTypeServiceTest {
         @Test
         @DisplayName("should return empty list when no body types exist")
         void getAllBodyTypes_NoBodyTypes_ReturnsEmptyList() {
-
-            // Mock repository behavior
             when(repository.findAll()).thenReturn(Collections.emptyList());
 
-            // Get all body types
             List<CarBodyTypeResponse> result = bodyTypeService.getAllBodyTypes();
-
-            // Verify result -> empty list returned
             assertThat(result).isEmpty();
             verify(repository).findAll();
         }

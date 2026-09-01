@@ -19,8 +19,10 @@ public final class SecurityErrorResponseWriter {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+
     private SecurityErrorResponseWriter() {
     }
+
 
     public static void write(HttpServletResponse response, int status, String message) throws IOException {
         response.setStatus(status);

@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.performances;
 
 import com.carsplatform.backend.api.cars.Car;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "performance")
 @Data
@@ -23,6 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Performance {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

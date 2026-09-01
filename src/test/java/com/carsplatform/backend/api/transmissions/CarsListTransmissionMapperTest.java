@@ -24,8 +24,6 @@ class CarsListTransmissionMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test transmission
         testTransmission = TestDataFactory.defaultTransmission()
                 .id(UUID.randomUUID())
                 .transmissionType("Automatic")
@@ -40,22 +38,15 @@ class CarsListTransmissionMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarsListTransmissionResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map only transmissionType")
         void toDto_ValidTransmission_MapsTransmissionType() {
-
-            // Map valid transmission
             CarsListTransmissionResponse result = mapper.toDto(testTransmission);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getTransmissionType()).isEqualTo("Automatic");
         }
@@ -63,16 +54,11 @@ class CarsListTransmissionMapperTest {
         @Test
         @DisplayName("should handle manual transmission")
         void toDto_ManualTransmission_MapsCorrectly() {
-
-            // Create manual transmission
             Transmission manual = Transmission.builder()
                     .transmissionType("Manual")
                     .build();
 
-            // Map manual transmission
             CarsListTransmissionResponse result = mapper.toDto(manual);
-
-            // Verify result is mapped correctly
             assertThat(result.getTransmissionType()).isEqualTo("Manual");
         }
     }

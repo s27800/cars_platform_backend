@@ -4,17 +4,17 @@ import com.carsplatform.backend.api.carImages.dtos.CarImageResponse;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Mapper(componentModel = "spring")
 public interface CarImageMapper {
-    CarImageMapper INSTANCE = Mappers.getMapper(CarImageMapper.class);
 
     CarImageResponse toDto(CarImage carImage);
+
 
     @Named("toDtoList")
     default List<CarImageResponse> toDtoList(Collection<CarImage> images) {

@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.engines;
 
 import com.carsplatform.backend.api.cars.Car;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -15,6 +16,7 @@ import lombok.ToString;
 
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "engine")
 @Data
@@ -22,6 +24,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Engine {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")

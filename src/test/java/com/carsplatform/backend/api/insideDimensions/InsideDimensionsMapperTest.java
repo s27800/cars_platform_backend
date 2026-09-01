@@ -24,8 +24,6 @@ class InsideDimensionsMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test inside dimensions
         testInsideDimensions = TestDataFactory.defaultInsideDimensions()
                 .id(UUID.randomUUID())
                 .heightFromSeatToRoofFront(1020)
@@ -47,22 +45,15 @@ class InsideDimensionsMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarInsideDimensionsResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all fields correctly")
         void toDto_ValidInsideDimensions_MapsAllFields() {
-
-            // Map valid inside dimensions
             CarInsideDimensionsResponse result = mapper.toDto(testInsideDimensions);
 
-            // Verify all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testInsideDimensions.getId());
             assertThat(result.getHeightFromSeatToRoofFront()).isEqualTo(1020);
@@ -78,17 +69,13 @@ class InsideDimensionsMapperTest {
         @Test
         @DisplayName("should handle null optional fields")
         void toDto_InsideDimensionsWithNulls_MapsNullFields() {
-
-            // Create inside dimensions with only required fields
             InsideDimensions minimalDimensions = InsideDimensions.builder()
                     .id(UUID.randomUUID())
                     .heightFromSeatToRoofFront(1000)
                     .build();
 
-            // Map minimal inside dimensions
             CarInsideDimensionsResponse result = mapper.toDto(minimalDimensions);
 
-            // Verify null optional fields are handled correctly
             assertThat(result.getId()).isEqualTo(minimalDimensions.getId());
             assertThat(result.getHeightFromSeatToRoofFront()).isEqualTo(1000);
             assertThat(result.getMaxTrunkSpace()).isNull();

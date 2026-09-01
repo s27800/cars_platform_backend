@@ -2,6 +2,8 @@ package com.carsplatform.backend.api.fuelReports;
 
 import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -18,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "fuel_report")
 @Data
@@ -25,6 +28,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FuelReport {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "UUID")
@@ -51,9 +55,10 @@ public class FuelReport {
     @Column(name = "report_date", updatable = false)
     private LocalDateTime reportDate;
 
-    @Column(name = "is_approved")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
-    private Boolean isApproved = false;
+    private ModerationStatus status = ModerationStatus.PENDING;
 
     @Formula("(SELECT COUNT(*) FROM fuel_report_likes frl WHERE frl.fuel_report_id = id)")
     private Long likesCount;

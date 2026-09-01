@@ -1,6 +1,6 @@
 package com.carsplatform.backend.api.admin;
 
-import com.carsplatform.backend.api.admin.dtos.AdminReviewResponse;
+import com.carsplatform.backend.api.reviews.dtos.ReviewDetailsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/admin/reviews")
 @RequiredArgsConstructor
@@ -27,9 +28,10 @@ public class AdminReviewController {
 
     private final AdminReviewService adminReviewService;
 
+
     @GetMapping("/pending")
     @Operation(summary = "Get all pending reviews waiting for approval")
-    public ResponseEntity<Page<AdminReviewResponse>> getPendingReviews(Pageable pageable) {
+    public ResponseEntity<Page<ReviewDetailsResponse>> getPendingReviews(Pageable pageable) {
         return ResponseEntity.ok(adminReviewService.getPendingReviews(pageable));
     }
 
@@ -38,8 +40,8 @@ public class AdminReviewController {
     public ResponseEntity<Void> approveReview(
             @Parameter(description = "ID of the review") @PathVariable UUID id,
             @Parameter(description = "Whether to approve (true) or reject (false) the review")
-            @RequestParam boolean approve) {
-
+            @RequestParam boolean approve
+    ) {
         adminReviewService.approveReview(id, approve);
 
         return ResponseEntity.noContent().build();

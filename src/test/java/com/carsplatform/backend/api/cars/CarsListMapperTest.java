@@ -43,41 +43,27 @@ class CarsListMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand().id(UUID.randomUUID()).build();
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand).id(UUID.randomUUID()).build();
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(model)
                 .id(UUID.randomUUID())
                 .name("E90")
                 .cars(List.of())
                 .build();
-
-        // Create test engine
         Engine engine = TestDataFactory.defaultEngine()
                 .id(UUID.randomUUID())
                 .engineType("Petrol")
                 .displacement(2000)
                 .maxPower(200)
                 .build();
-
-        // Create test transmission
         Transmission transmission = TestDataFactory.defaultTransmission()
                 .id(UUID.randomUUID())
                 .transmissionType("Automatic")
                 .build();
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .name("Sedan")
                 .build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(testGeneration, bodyType)
                 .id(UUID.randomUUID())
                 .name("320i")
@@ -96,22 +82,14 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             CarsListResponse result = mapper.toDto(null);
-
-            // Verify result is null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map car basic fields correctly")
         void toDto_ValidCar_MapsBasicFields() {
-
-            // Map valid car
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> all basic fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testCar.getId());
             assertThat(result.getName()).isEqualTo("320i");
@@ -120,11 +98,7 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should map nested engine data")
         void toDto_CarWithEngine_MapsEngineData() {
-
-            // Map valid car with engine
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> engine data is mapped correctly
             assertThat(result.getEngine()).isNotNull();
             assertThat(result.getEngine().getEngineType()).isEqualTo("Petrol");
             assertThat(result.getEngine().getDisplacement()).isEqualTo(2000);
@@ -134,11 +108,7 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should map nested transmission data")
         void toDto_CarWithTransmission_MapsTransmissionData() {
-
-            // Map valid car with transmission
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> transmission data is mapped correctly
             assertThat(result.getTransmission()).isNotNull();
             assertThat(result.getTransmission().getTransmissionType()).isEqualTo("Automatic");
         }
@@ -146,11 +116,7 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should map nested body type data")
         void toDto_CarWithBodyType_MapsBodyTypeData() {
-
-            // Map valid car with body type
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> body type data is mapped correctly
             assertThat(result.getBodyType()).isNotNull();
             assertThat(result.getBodyType().getName()).isEqualTo("Sedan");
         }
@@ -158,8 +124,6 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should extract main image URL")
         void toDto_CarWithMainImage_ExtractsMainImageUrl() {
-
-            // Create test images
             CarImage mainImage = new CarImage();
 
             mainImage.setId(UUID.randomUUID());
@@ -176,24 +140,16 @@ class CarsListMapperTest {
 
             testCar.setImages(new LinkedHashSet<>(List.of(secondaryImage, mainImage)));
 
-            // Map valid car with images
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> main image URL is extracted
             assertThat(result.getImageUrl()).isEqualTo("http://example.com/main.jpg");
         }
 
         @Test
         @DisplayName("should return null image URL when no images exist")
         void toDto_CarWithNoImages_ReturnsNullImageUrl() {
-
-            // Set no images
             testCar.setImages(new LinkedHashSet<>());
 
-            // Map valid car with no images
             CarsListResponse result = mapper.toDto(testCar);
-
-            // Verify results -> null image URL is returned
             assertThat(result.getImageUrl()).isNull();
         }
     }
@@ -206,15 +162,10 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should map generation to cars list")
         void map_Generation_MapsCarsToList() {
-
-            // Set generation for car
             testCar.setGeneration(testGeneration);
             testGeneration.setCars(List.of(testCar));
 
-            // Map generation to cars list
             List<CarsListResponse> result = mapper.map(testGeneration);
-
-            // Verify results -> cars list is mapped correctly
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getName()).isEqualTo("320i");
         }
@@ -222,25 +173,16 @@ class CarsListMapperTest {
         @Test
         @DisplayName("should return null when generation is null")
         void map_NullGeneration_ReturnsNull() {
-
-            // Map null generation to cars list
             List<CarsListResponse> result = mapper.map((Generation) null);
-
-            // Verify results -> null is returned
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map page of cars")
         void map_PageOfCars_MapsToPageOfResponses() {
-
-            // Create page of cars
             Page<Car> carsPage = new PageImpl<>(List.of(testCar), PageRequest.of(0, 10), 1);
 
-            // Map page of cars
             Page<CarsListResponse> result = mapper.map(carsPage);
-
-            // Verify results -> page is mapped correctly
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().get(0).getName()).isEqualTo("320i");
             assertThat(result.getTotalElements()).isEqualTo(1);

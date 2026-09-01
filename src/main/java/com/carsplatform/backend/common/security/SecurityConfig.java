@@ -30,6 +30,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * Security setup: no sessions, a JWT on every request, BCrypt for passwords and CORS limited
+ * to the origins listed in {@code app.cors.allowed-origins}.
+ *
+ * Browsing the catalogue and the authentication endpoints are open to everyone, everything
+ * under /api/admin needs the ADMIN role and the rest needs a logged-in user. Requests that
+ * fail those rules are answered by the two handlers below with the same JSON shape the
+ * controllers use, instead of the default Spring Security page.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
@@ -39,15 +49,17 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final List<String> allowedOrigins;
 
+
     public SecurityConfig(
-        @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
-        @Lazy UserDetailsService userDetailsService,
-        @Value("${app.cors.allowed-origins}") List<String> allowedOrigins
+            @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
+            @Lazy UserDetailsService userDetailsService,
+            @Value("${app.cors.allowed-origins}") List<String> allowedOrigins
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
         this.allowedOrigins = allowedOrigins;
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,13 +68,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-
-                        // Missing or invalid credentials
+                        // Not logged in
                         .authenticationEntryPoint((request, response, authException) ->
                                 SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED,
                                         "Authentication is required to access this resource."))
-
-                        // Invalid role
+                        // Logged in, but without the required role
                         .accessDeniedHandler((request, response, accessDeniedException) ->
                                 SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_FORBIDDEN,
                                         "You do not have permission to perform this action."))
@@ -78,15 +88,15 @@ public class SecurityConfig {
                                 "/configuration/ui",
                                 "/configuration/security",
                                 "/webjars/**",
-                                "/actuator/**"
+                                "/actuator/health"
                         ).permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/brands/**", "/api/models/**", "/api/generations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/brands/**", "/api/models/**", "/api/generations/**")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/body-types/**", "/api/tags/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**", "/api/fuel-reports/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/car-images/**").permitAll()
 
                         .requestMatchers("/api/users/**", "/api/user-settings/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**", "/api/fuel-reports/**").authenticated()
@@ -95,9 +105,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/likes/**").authenticated()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/brands/**", "/api/models/**", "/api/generations/**", "/api/cars/**", "/api/car-images/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/brands/**", "/api/models/**", "/api/generations/**", "/api/cars/**", "/api/car-images/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/brands/**", "/api/models/**", "/api/generations/**", "/api/cars/**", "/api/car-images/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -117,6 +124,7 @@ public class SecurityConfig {
         configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
@@ -130,6 +138,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 

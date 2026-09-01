@@ -34,15 +34,11 @@ class ModelControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(testBrand);
-
-        // Create test model
         testModel = TestDataFactory.defaultModel(testBrand)
                 .name("3 Series")
                 .description("Compact executive car")
@@ -50,8 +46,6 @@ class ModelControllerTest extends MockMvcTestBase {
                 .build();
 
         entityManager.persist(testModel);
-
-        // Create test generation
         testGeneration = TestDataFactory.defaultGeneration(testModel)
                 .name("E90")
                 .build();
@@ -59,7 +53,6 @@ class ModelControllerTest extends MockMvcTestBase {
         testModel.getGenerations().add(testGeneration);
         entityManager.persist(testGeneration);
 
-        // Save
         entityManager.flush();
     }
 
@@ -71,8 +64,6 @@ class ModelControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns model details when exists (public endpoint)")
         void getModelById_ExistingModel_Returns200() throws Exception {
-
-            // Perform GET request and verify response -> 200 OK with correct model details
             performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("3 Series"))
@@ -83,8 +74,6 @@ class ModelControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns model with generations")
         void getModelById_ExistingModel_IncludesGenerations() throws Exception {
-
-            // Perform GET request and verify response -> 200 OK with generations included
             performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.generations", hasSize(greaterThanOrEqualTo(1))))
@@ -94,8 +83,6 @@ class ModelControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns model with id field")
         void getModelById_ExistingModel_IncludesIdField() throws Exception {
-
-            // Perform GET request and verify response -> 200 OK with id field included
             performGetNoAuth(MODEL_BASE_URL + "/" + testModel.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(testModel.getId().toString()))
@@ -105,11 +92,8 @@ class ModelControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when model does not exist")
         void getModelById_NonExistingModel_Returns404() throws Exception {
-
-            // Use random UUID that doesn't exist
             String nonExistentId = UUID.randomUUID().toString();
 
-            // Perform GET request and verify response -> 404 Not Found
             performGetNoAuth(MODEL_BASE_URL + "/" + nonExistentId)
                     .andExpect(status().isNotFound());
         }

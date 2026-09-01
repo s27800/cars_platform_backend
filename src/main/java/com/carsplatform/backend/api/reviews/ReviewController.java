@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
@@ -30,12 +32,13 @@ public class ReviewController {
 
     private final ReviewService service;
 
+
     @GetMapping("/{carId}/average-ratings")
     @Operation(summary = "Get average ratings for a car")
     public ResponseEntity<AverageRatingsResponse> getAverageRatingsForCar(
             @Parameter(description = "ID of the car to get ratings for")
-            @PathVariable UUID carId) {
-
+            @PathVariable UUID carId
+    ) {
         AverageRatingsResponse averageRatings = service.getAverageRatingsForCar(carId);
 
         return ResponseEntity.ok(averageRatings);
@@ -45,8 +48,8 @@ public class ReviewController {
     @Operation(summary = "Get reviews for a car")
     public ResponseEntity<Page<ReviewResponse>> getReviews(
             @PathVariable UUID carId,
-            Pageable pageable) {
-
+            Pageable pageable
+    ) {
         return ResponseEntity.ok(service.getReviewsForCarId(carId, pageable));
     }
 
@@ -56,8 +59,8 @@ public class ReviewController {
     public ResponseEntity<Void> createReview(
             @Parameter(description = "ID of the car") @PathVariable UUID carId,
             @Valid @RequestBody CreateReviewRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         service.createReview(carId, request, userDetails.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -68,8 +71,8 @@ public class ReviewController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> deleteReview(
             @Parameter(description = "ID of the review to delete") @PathVariable UUID reviewId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         service.deleteOwnReview(reviewId, userDetails.getUsername());
 
         return ResponseEntity.noContent().build();

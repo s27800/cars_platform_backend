@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Base class for integration tests.
  */
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

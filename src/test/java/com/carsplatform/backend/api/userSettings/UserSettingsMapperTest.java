@@ -32,19 +32,13 @@ class UserSettingsMapperTest {
         @Test
         @DisplayName("returns null for null input")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null settings to DTO
             UserSettingsResponse result = userSettingsMapper.toDto(null);
-
-            // Verify results -> returns null
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("maps all fields correctly")
         void toDto_ValidSettings_MapsAllFields() {
-
-            // Create user and settings for testing
             User user = User.builder()
                     .id(UUID.randomUUID())
                     .username("testuser")
@@ -56,10 +50,7 @@ class UserSettingsMapperTest {
                     .theme("dark")
                     .build();
 
-            // Map settings to DTO
             UserSettingsResponse result = userSettingsMapper.toDto(settings);
-
-            // Verify results -> all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(settings.getId());
             assertThat(result.getTheme()).isEqualTo("dark");

@@ -6,6 +6,7 @@ import com.carsplatform.backend.api.cars.Car;
 import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,41 +47,29 @@ class FuelReportRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .username("reporter")
                 .email("reporter@example.com")
                 .build();
 
         entityManager.persist(testUser);
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .build();
 
@@ -92,62 +81,49 @@ class FuelReportRepositoryTest {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Save
         entityManager.flush();
     }
 
 
     @Nested
-    @DisplayName("findByCarIdAndIsApprovedTrue")
-    class FindByCarIdAndIsApprovedTrueTests {
+    @DisplayName("findAllApprovedByCarId")
+    class FindAllApprovedByCarIdTests {
 
         @Test
         @DisplayName("returns only approved reports")
-        void findByCarIdAndIsApprovedTrue_ApprovedExists_ReturnsOnlyApproved() {
-
-            // Set up approved and pending fuel reports
-            FuelReport approved = createFuelReport(new BigDecimal("7.5"), true);
-            FuelReport pending = createFuelReport(new BigDecimal("8.0"), false);
+        void findAllApprovedByCarId_ApprovedExists_ReturnsOnlyApproved() {
+            FuelReport approved = createFuelReport(new BigDecimal("7.5"), ModerationStatus.APPROVED);
+            FuelReport pending = createFuelReport(new BigDecimal("8.0"), ModerationStatus.PENDING);
 
             entityManager.persist(approved);
             entityManager.persist(pending);
 
             entityManager.flush();
 
-            // Find approved reports for car
-            Page<FuelReport> result = fuelReportRepository.findByCarIdAndIsApprovedTrue(
+            Page<FuelReport> result = fuelReportRepository.findAllApprovedByCarId(
                     testCar.getId(), PageRequest.of(0, 10));
-
-            // Verify result -> only approved reports are returned
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getIsApproved()).isTrue();
+            assertThat(result.getContent().get(0).getStatus()).isEqualTo(ModerationStatus.APPROVED);
             assertThat(result.getContent().get(0).getFuelConsumption())
                     .isEqualByComparingTo(new BigDecimal("7.5"));
         }
 
         @Test
         @DisplayName("returns empty when no approved reports")
-        void findByCarIdAndIsApprovedTrue_NoApproved_ReturnsEmpty() {
-
-            // Set up pending fuel report
-            FuelReport pending = createFuelReport(new BigDecimal("8.0"), false);
+        void findAllApprovedByCarId_NoApproved_ReturnsEmpty() {
+            FuelReport pending = createFuelReport(new BigDecimal("8.0"), ModerationStatus.PENDING);
 
             entityManager.persist(pending);
             entityManager.flush();
 
-            // Find approved reports for car
-            Page<FuelReport> result = fuelReportRepository.findByCarIdAndIsApprovedTrue(
+            Page<FuelReport> result = fuelReportRepository.findAllApprovedByCarId(
                     testCar.getId(), PageRequest.of(0, 10));
-
-            // Verify result -> no approved reports are returned
             assertThat(result.getContent()).isEmpty();
         }
 
         @Test
         @DisplayName("returns paginated results")
-        void findByCarIdAndIsApprovedTrue_MultipleReports_ReturnsPaginated() {
-
-            // Set up multiple approved fuel reports
+        void findAllApprovedByCarId_MultipleReports_ReturnsPaginated() {
             for (int i = 0; i < 5; i++) {
                 User user = TestDataFactory.createUser(String.valueOf(i));
 
@@ -157,7 +133,7 @@ class FuelReportRepositoryTest {
                         .user(user)
                         .car(testCar)
                         .fuelConsumption(new BigDecimal("7." + i))
-                        .isApproved(true)
+                        .status(ModerationStatus.APPROVED)
                         .reportDate(LocalDateTime.now())
                         .build();
 
@@ -166,31 +142,23 @@ class FuelReportRepositoryTest {
 
             entityManager.flush();
 
-            // Find approved reports for car
-            Page<FuelReport> result = fuelReportRepository.findByCarIdAndIsApprovedTrue(
+            Page<FuelReport> result = fuelReportRepository.findAllApprovedByCarId(
                     testCar.getId(), PageRequest.of(0, 3));
-
-            // Verify result -> paginated results are returned
             assertThat(result.getContent()).hasSize(3);
             assertThat(result.getTotalElements()).isEqualTo(5);
         }
 
         @Test
         @DisplayName("fetches user eagerly")
-        void findByCarIdAndIsApprovedTrue_WithUser_FetchesUserEagerly() {
-
-            // Set up approved fuel report with user
-            FuelReport report = createFuelReport(new BigDecimal("7.5"), true);
+        void findAllApprovedByCarId_WithUser_FetchesUserEagerly() {
+            FuelReport report = createFuelReport(new BigDecimal("7.5"), ModerationStatus.APPROVED);
 
             entityManager.persist(report);
             entityManager.flush();
             entityManager.clear();
 
-            // Find approved reports for car
-            Page<FuelReport> result = fuelReportRepository.findByCarIdAndIsApprovedTrue(
+            Page<FuelReport> result = fuelReportRepository.findAllApprovedByCarId(
                     testCar.getId(), PageRequest.of(0, 10));
-
-            // Verify result -> user is fetched eagerly
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().get(0).getUser()).isNotNull();
             assertThat(result.getContent().get(0).getUser().getUsername()).isEqualTo("reporter");
@@ -205,9 +173,7 @@ class FuelReportRepositoryTest {
         @Test
         @DisplayName("calculates average correctly")
         void findAverageFuelConsumptionForCarId_MultipleReports_CalculatesAverage() {
-
-            // Set up multiple approved fuel reports
-            FuelReport report1 = createFuelReport(new BigDecimal("7.0"), true);
+            FuelReport report1 = createFuelReport(new BigDecimal("7.0"), ModerationStatus.APPROVED);
 
             User user2 = TestDataFactory.createUser("2");
             entityManager.persist(user2);
@@ -216,7 +182,7 @@ class FuelReportRepositoryTest {
                     .user(user2)
                     .car(testCar)
                     .fuelConsumption(new BigDecimal("9.0"))
-                    .isApproved(true)
+                    .status(ModerationStatus.APPROVED)
                     .reportDate(LocalDateTime.now())
                     .build();
 
@@ -224,10 +190,7 @@ class FuelReportRepositoryTest {
             entityManager.persist(report2);
             entityManager.flush();
 
-            // Find average fuel consumption for car
             Optional<BigDecimal> result = fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId());
-
-            // Verify result -> average consumption is calculated correctly
             assertThat(result).isPresent();
             assertThat(result.get()).isEqualByComparingTo(new BigDecimal("8.0"));
         }
@@ -235,9 +198,7 @@ class FuelReportRepositoryTest {
         @Test
         @DisplayName("ignores non-approved reports")
         void findAverageFuelConsumptionForCarId_WithPending_IgnoresPending() {
-
-            // Set up approved fuel report
-            FuelReport approved = createFuelReport(new BigDecimal("7.0"), true);
+            FuelReport approved = createFuelReport(new BigDecimal("7.0"), ModerationStatus.APPROVED);
 
             User user2 = TestDataFactory.createUser("2");
             entityManager.persist(user2);
@@ -246,7 +207,7 @@ class FuelReportRepositoryTest {
                     .user(user2)
                     .car(testCar)
                     .fuelConsumption(new BigDecimal("15.0"))
-                    .isApproved(false)
+                    .status(ModerationStatus.PENDING)
                     .reportDate(LocalDateTime.now())
                     .build();
 
@@ -254,10 +215,7 @@ class FuelReportRepositoryTest {
             entityManager.persist(pending);
             entityManager.flush();
 
-            // Find average fuel consumption for car
             Optional<BigDecimal> result = fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId());
-
-            // Verify result -> average consumption is calculated correctly
             assertThat(result).isPresent();
             assertThat(result.get()).isEqualByComparingTo(new BigDecimal("7.0"));
         }
@@ -265,28 +223,19 @@ class FuelReportRepositoryTest {
         @Test
         @DisplayName("returns empty when no approved reports")
         void findAverageFuelConsumptionForCarId_NoApproved_ReturnsEmpty() {
-
-            // Set up pending fuel report
-            FuelReport pending = createFuelReport(new BigDecimal("7.0"), false);
+            FuelReport pending = createFuelReport(new BigDecimal("7.0"), ModerationStatus.PENDING);
 
             entityManager.persist(pending);
             entityManager.flush();
 
-            // Find average fuel consumption for car
             Optional<BigDecimal> result = fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId());
-
-            // Verify result -> result is empty
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("returns empty for car with no reports")
         void findAverageFuelConsumptionForCarId_NoReports_ReturnsEmpty() {
-
-            // Find average fuel consumption for car
             Optional<BigDecimal> result = fuelReportRepository.findAverageFuelConsumptionForCarId(testCar.getId());
-
-            // Verify result -> result is empty
             assertThat(result).isEmpty();
         }
     }
@@ -299,16 +248,11 @@ class FuelReportRepositoryTest {
         @Test
         @DisplayName("save persists new fuel report")
         void save_NewReport_PersistsReport() {
+            FuelReport report = createFuelReport(new BigDecimal("8.5"), ModerationStatus.PENDING);
 
-            // Create new fuel report
-            FuelReport report = createFuelReport(new BigDecimal("8.5"), false);
-
-            // Save report
             FuelReport saved = fuelReportRepository.save(report);
 
             entityManager.flush();
-
-            // Verify result -> report is saved
             assertThat(saved.getId()).isNotNull();
 
             FuelReport found = entityManager.find(FuelReport.class, saved.getId());
@@ -319,18 +263,13 @@ class FuelReportRepositoryTest {
         @Test
         @DisplayName("delete removes fuel report")
         void delete_ExistingReport_RemovesReport() {
-
-            // Set up existing fuel report
-            FuelReport report = createFuelReport(new BigDecimal("7.0"), true);
+            FuelReport report = createFuelReport(new BigDecimal("7.0"), ModerationStatus.APPROVED);
 
             entityManager.persist(report);
             entityManager.flush();
 
-            // Delete fuel report
             fuelReportRepository.delete(report);
             entityManager.flush();
-
-            // Verify result -> report is removed
             FuelReport found = entityManager.find(FuelReport.class, report.getId());
 
             assertThat(found).isNull();
@@ -338,15 +277,13 @@ class FuelReportRepositoryTest {
     }
 
 
-    // helper method
-
-    private FuelReport createFuelReport(BigDecimal consumption, boolean isApproved) {
+    private FuelReport createFuelReport(BigDecimal consumption, ModerationStatus status) {
         return FuelReport.builder()
                 .user(testUser)
                 .car(testCar)
                 .fuelConsumption(consumption)
                 .comment("Test fuel report")
-                .isApproved(isApproved)
+                .status(status)
                 .reportDate(LocalDateTime.now())
                 .build();
     }

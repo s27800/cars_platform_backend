@@ -32,8 +32,6 @@ class BrandDetailsMapperTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test brand
         testBrand = Brand.builder()
                 .id(UUID.randomUUID())
                 .name("BMW")
@@ -52,22 +50,14 @@ class BrandDetailsMapperTest {
         @Test
         @DisplayName("should return null when input is null")
         void toDto_NullInput_ReturnsNull() {
-
-            // Map null input
             BrandDetailsResponse result = mapper.toDto(null);
-
-            // Verify result -> null is returned
             assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("should map all basic fields correctly")
         void toDto_ValidBrand_MapsAllBasicFields() {
-
-            // Map valid brand
             BrandDetailsResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> all fields are mapped correctly
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(testBrand.getId());
             assertThat(result.getName()).isEqualTo("BMW");
@@ -79,22 +69,15 @@ class BrandDetailsMapperTest {
         @Test
         @DisplayName("should map empty models list")
         void toDto_BrandWithNoModels_MapsEmptyList() {
-
-            // Set empty models list
             testBrand.setModels(new ArrayList<>());
 
-            // Map brand with empty models list
             BrandDetailsResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> empty list is returned
             assertThat(result.getModels()).isEmpty();
         }
 
         @Test
         @DisplayName("should map models list with items and generationsCount")
         void toDto_BrandWithModels_MapsModelsList() {
-
-            // Create test models and generations for brand
             Model model1 = Model.builder()
                     .id(UUID.randomUUID())
                     .name("3 Series")
@@ -117,10 +100,7 @@ class BrandDetailsMapperTest {
 
             testBrand.setModels(List.of(model1, model2));
 
-            // Map brand with models list
             BrandDetailsResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> models list is mapped correctly with generationsCount
             assertThat(result.getModels()).hasSize(2);
             assertThat(result.getModels().get(0).getId()).isEqualTo(model1.getId());
             assertThat(result.getModels().get(0).getName()).isEqualTo("3 Series");
@@ -133,14 +113,9 @@ class BrandDetailsMapperTest {
         @Test
         @DisplayName("should handle brand with null models list")
         void toDto_BrandWithNullModels_HandlesNullGracefully() {
-
-            // Set null models list
             testBrand.setModels(null);
 
-            // Map brand with null models list
             BrandDetailsResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> empty list is returned
             assertThat(result).isNotNull();
             assertThat(result.getModels()).isEmpty();
         }
@@ -148,14 +123,9 @@ class BrandDetailsMapperTest {
         @Test
         @DisplayName("should handle null foundedYear")
         void toDto_BrandWithNullFoundedYear_MapsCorrectly() {
-
-            // Set null foundedYear
             testBrand.setFoundedYear(null);
 
-            // Map brand with null foundedYear
             BrandDetailsResponse result = mapper.toDto(testBrand);
-
-            // Verify result -> foundedYear is null
             assertThat(result.getFoundedYear()).isNull();
         }
     }

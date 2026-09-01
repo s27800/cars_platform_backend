@@ -8,8 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserModifyRequest {
+
     @Size(max = 100, message = "First name cannot exceed 100 characters")
     private String firstName;
 

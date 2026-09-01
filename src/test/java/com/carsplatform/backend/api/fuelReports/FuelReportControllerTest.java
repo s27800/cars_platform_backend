@@ -9,6 +9,7 @@ import com.carsplatform.backend.api.generations.Generation;
 import com.carsplatform.backend.api.models.Model;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.MockMvcTestBase;
 import com.carsplatform.backend.common.TestDataFactory;
 
@@ -47,36 +48,26 @@ class FuelReportControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .name("3 Series")
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .name("E90")
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .name("320i")
                 .build();
@@ -89,7 +80,6 @@ class FuelReportControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Register user and get token
         String username = "fueluser" + System.currentTimeMillis();
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -109,19 +99,17 @@ class FuelReportControllerTest extends MockMvcTestBase {
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Create approved test fuel report
         testReport = FuelReport.builder()
                 .user(testUser)
                 .car(testCar)
                 .fuelConsumption(new BigDecimal("7.5"))
                 .comment("Normal driving conditions")
-                .isApproved(true)
+                .status(ModerationStatus.APPROVED)
                 .reportDate(LocalDateTime.now())
                 .build();
 
         entityManager.persist(testReport);
 
-        // Save
         entityManager.flush();
     }
 
@@ -133,8 +121,6 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns fuel reports for car (public endpoint)")
         void getFuelReports_ExistingCar_Returns200() throws Exception {
-
-            // Perform GET request and verify response -> returns 200 OK and contains fuel reports
             performGetNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
@@ -144,8 +130,6 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns paginated results")
         void getFuelReports_WithPagination_ReturnsPaginated() throws Exception {
-
-            // Perform GET request with pagination and verify response -> returns paginated results
             performGetNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId() + "?page=0&size=5")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.pageable.pageNumber").value(0))
@@ -155,8 +139,6 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns reports with user info")
         void getFuelReports_ExistingCar_IncludesUserInfo() throws Exception {
-
-            // Perform GET request and verify response -> returns reports with user info
             performGetNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].usernameResponse.username").exists());
@@ -171,8 +153,6 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns average consumption for car (public endpoint)")
         void getAverageConsumption_ExistingCar_Returns200() throws Exception {
-
-            // Perform GET request and verify response -> returns average consumption
             performGetNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId() + "/average-consumption")
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.averageFuelConsumption").exists());
@@ -187,14 +167,11 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("creates fuel report when authenticated")
         void createFuelReport_Authenticated_Returns201() throws Exception {
-
-            // Create fuel report request
             CreateFuelReportRequest request = CreateFuelReportRequest.builder()
                     .fuelConsumption(new BigDecimal("8.5"))
                     .comment("City driving")
                     .build();
 
-            // Perform POST request with authentication and verify response -> returns 201 Created
             performPostWithAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isCreated());
         }
@@ -202,14 +179,11 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void createFuelReport_NotAuthenticated_Returns401() throws Exception {
-
-            // Create fuel report request
             CreateFuelReportRequest request = CreateFuelReportRequest.builder()
                     .fuelConsumption(new BigDecimal("8.5"))
                     .comment("City driving")
                     .build();
 
-            // Perform POST request without authentication and verify response -> returns 401 Unauthorized
             performPostNoAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId(), request)
                     .andExpect(status().isUnauthorized());
         }
@@ -217,13 +191,10 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when fuel consumption is missing")
         void createFuelReport_MissingConsumption_Returns400() throws Exception {
-
-            // Create invalid fuel report request
             CreateFuelReportRequest request = CreateFuelReportRequest.builder()
                     .comment("City driving")
                     .build();
 
-            // Perform POST request with authentication and verify response -> returns 400 Bad Request
             performPostWithAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest());
         }
@@ -231,13 +202,10 @@ class FuelReportControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 400 when fuel consumption is negative")
         void createFuelReport_NegativeConsumption_Returns400() throws Exception {
-
-            // Create invalid fuel report request
             CreateFuelReportRequest request = CreateFuelReportRequest.builder()
                     .fuelConsumption(new BigDecimal("-5.0"))
                     .build();
 
-            // Perform POST request with authentication and verify response -> returns 400 Bad Request
             performPostWithAuth(FUEL_REPORT_BASE_URL + "/" + testCar.getId(), request, userToken)
                     .andExpect(status().isBadRequest());
         }

@@ -4,11 +4,10 @@ import com.carsplatform.backend.api.insideDimensions.dtos.CarInsideDimensionsRes
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+
 
 @Mapper(componentModel = "spring")
 public interface InsideDimensionsMapper {
-    InsideDimensionsMapper INSTANCE = Mappers.getMapper(InsideDimensionsMapper.class);
 
     @Named("toDto")
     CarInsideDimensionsResponse toDto(InsideDimensions insideDimensions);

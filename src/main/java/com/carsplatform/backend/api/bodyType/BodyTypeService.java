@@ -10,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class BodyTypeService {
+
     private final BodyTypeRepository repository;
     private final BodyTypeMapper mapper;
+
 
     @Transactional(readOnly = true)
     public List<CarBodyTypeResponse> getAllBodyTypes() {

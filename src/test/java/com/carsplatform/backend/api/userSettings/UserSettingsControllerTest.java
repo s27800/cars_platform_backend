@@ -27,8 +27,6 @@ class UserSettingsControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Register user and get token
         String uniqueId = UUID.randomUUID().toString().substring(0, 8);
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -56,8 +54,6 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns settings when authenticated")
         void getSettings_Authenticated_Returns200() throws Exception {
-
-            // Perform GET request with authentication and verify results -> 200 OK is returned
             performGetWithAuth(SETTINGS_URL, userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.theme").value("light"))
@@ -67,8 +63,6 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getSettings_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform GET request without authentication and verify response -> returns 401 Unauthorized
             performGetNoAuth(SETTINGS_URL)
                     .andExpect(status().isUnauthorized());
         }
@@ -82,13 +76,10 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("updates theme to dark successfully")
         void updateSettings_ValidRequest_Returns200() throws Exception {
-
-            // Create request
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("dark")
                     .build();
 
-            // Perform PUT request with authentication and verify results -> 200 OK is returned and theme is updated
             performPutWithAuth(SETTINGS_URL, request, userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.theme").value("dark"));
@@ -97,22 +88,17 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("updates theme to light successfully")
         void updateSettings_ThemeLight_Returns200() throws Exception {
-
-            // Create request with dark theme
             UpdateUserSettingsRequest darkRequest = UpdateUserSettingsRequest.builder()
                     .theme("dark")
                     .build();
 
-            // Perform PUT request with authentication and verify results -> 200 OK is returned and theme is updated
             performPutWithAuth(SETTINGS_URL, darkRequest, userToken)
                     .andExpect(status().isOk());
 
-            // Create request with light theme
             UpdateUserSettingsRequest lightRequest = UpdateUserSettingsRequest.builder()
                     .theme("light")
                     .build();
 
-            // Perform PUT request with authentication and verify results -> 200 OK is returned and theme is updated
             performPutWithAuth(SETTINGS_URL, lightRequest, userToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.theme").value("light"));
@@ -122,13 +108,10 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @DisplayName("returns 400 for invalid theme")
         @WithMockUser(username = "testuser")
         void updateSettings_InvalidTheme_Returns400() throws Exception {
-
-            // Create invalid request
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("invalid")
                     .build();
 
-            // Perform PUT request and verify response -> returns 400 Bad Request
             mockMvc.perform(put(SETTINGS_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -139,13 +122,10 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @DisplayName("returns 400 for blank theme")
         @WithMockUser(username = "testuser")
         void updateSettings_BlankTheme_Returns400() throws Exception {
-
-            // Create request with blank theme
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("")
                     .build();
 
-            // Perform PUT request and verify response -> returns 400 Bad Request
             mockMvc.perform(put(SETTINGS_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -155,13 +135,10 @@ class UserSettingsControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void updateSettings_NotAuthenticated_Returns401() throws Exception {
-
-            // Create request with dark theme
             UpdateUserSettingsRequest request = UpdateUserSettingsRequest.builder()
                     .theme("dark")
                     .build();
 
-            // Perform PUT request without authentication and verify response -> returns 401 Unauthorized
             performPutNoAuth(SETTINGS_URL, request)
                     .andExpect(status().isUnauthorized());
         }

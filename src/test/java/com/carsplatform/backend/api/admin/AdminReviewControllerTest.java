@@ -10,6 +10,7 @@ import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.users.User;
 import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.MockMvcTestBase;
+import com.carsplatform.backend.common.ModerationStatus;
 import com.carsplatform.backend.common.TestDataFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,36 +49,26 @@ class AdminReviewControllerTest extends MockMvcTestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .name("BMW")
                 .build();
 
         entityManager.persist(brand);
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .name("3 Series")
                 .build();
 
         entityManager.persist(model);
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .name("E90")
                 .build();
 
         entityManager.persist(generation);
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .name("Sedan")
                 .build();
 
         entityManager.persist(bodyType);
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .name("320i")
                 .build();
@@ -90,7 +81,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         entityManager.persist(testCar.getOutsideDimensions());
         entityManager.persist(testCar);
 
-        // Register regular user and get token
         String username = "reviewuser" + System.currentTimeMillis();
 
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -110,7 +100,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         userToken = objectMapper.readTree(response).get("accessToken").asText();
         testUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Register admin user and get token
         String adminUsername = "adminreview" + System.currentTimeMillis();
 
         RegisterRequest adminRegisterRequest = RegisterRequest.builder()
@@ -130,18 +119,15 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         adminToken = objectMapper.readTree(adminResponse).get("accessToken").asText();
         adminUser = userRepository.findByUsername(adminUsername).orElseThrow();
 
-        // Make the admin user an admin
         adminUser.setIsAdmin(true);
         userRepository.save(adminUser);
 
-        // Create pending review
         pendingReview = TestDataFactory.defaultReview(testUser, testCar)
-                .isApproved(false)
+                .status(ModerationStatus.PENDING)
                 .build();
 
         entityManager.persist(pendingReview);
 
-        // Save
         entityManager.flush();
     }
 
@@ -153,13 +139,11 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns pending reviews when admin is authenticated")
         void getPendingReviews_Admin_ReturnsPendingReviews() throws Exception {
-
-            // Perform GET request with admin authentication and verify response -> returns 200 OK and contains pending review details
             performGetWithAuth(ADMIN_REVIEWS_BASE_URL + "/pending", adminToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isArray())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
-                    .andExpect(jsonPath("$.content[0].isApproved").value(false))
+                    .andExpect(jsonPath("$.content[0].status").value("PENDING"))
                     .andExpect(jsonPath("$.content[0].carInfo").exists())
                     .andExpect(jsonPath("$.content[0].carInfo.brandName").value("BMW"));
         }
@@ -167,8 +151,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when regular user tries to access")
         void getPendingReviews_RegularUser_Returns403() throws Exception {
-
-            // Perform GET request with regular user authentication and verify response -> returns 403 Forbidden
             performGetWithAuth(ADMIN_REVIEWS_BASE_URL + "/pending", userToken)
                     .andExpect(status().isForbidden());
         }
@@ -176,8 +158,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void getPendingReviews_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform GET request without authentication and verify response -> returns 401 Unauthorized
             performGetNoAuth(ADMIN_REVIEWS_BASE_URL + "/pending")
                     .andExpect(status().isUnauthorized());
         }
@@ -191,13 +171,10 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("approves review when admin is authenticated")
         void approveReview_Admin_ApprovesReview() throws Exception {
-
-            // Perform GET request with admin authentication to verify pending review exists and verify response -> returns 200 OK and contains pending review details
             performGetWithAuth(ADMIN_REVIEWS_BASE_URL + "/pending", adminToken)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
 
-            // Perform PATCH request with admin authentication and verify response -> returns 204 No Content
             performPatchWithAuthNoBody(
                     ADMIN_REVIEWS_BASE_URL + "/" + pendingReview.getId() + "/approve?approve=true",
                     adminToken
@@ -207,8 +184,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("rejects review when admin sets approve to false")
         void rejectReview_Admin_RejectsReview() throws Exception {
-
-            // Perform PATCH request with admin authentication and verify response -> returns 204 No Content
             performPatchWithAuthNoBody(
                     ADMIN_REVIEWS_BASE_URL + "/" + pendingReview.getId() + "/approve?approve=false",
                     adminToken
@@ -218,8 +193,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 403 when regular user tries to approve")
         void approveReview_RegularUser_Returns403() throws Exception {
-
-            // Perform PATCH request with regular user authentication and verify response -> returns 403 Forbidden
             performPatchWithAuthNoBody(
                     ADMIN_REVIEWS_BASE_URL + "/" + pendingReview.getId() + "/approve?approve=true",
                     userToken
@@ -229,8 +202,6 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 401 when not authenticated")
         void approveReview_NotAuthenticated_Returns401() throws Exception {
-
-            // Perform PATCH request without authentication and verify response -> returns 401 Unauthorized
             performPatchNoAuthNoBody(ADMIN_REVIEWS_BASE_URL + "/" + pendingReview.getId() + "/approve?approve=true")
                     .andExpect(status().isUnauthorized());
         }
@@ -238,11 +209,8 @@ class AdminReviewControllerTest extends MockMvcTestBase {
         @Test
         @DisplayName("returns 404 when review does not exist")
         void approveReview_ReviewNotFound_Returns404() throws Exception {
-
-            // Use random UUID that doesn't exist
             String nonExistentId = UUID.randomUUID().toString();
 
-            // Perform PATCH request for non-existent review and verify response -> returns 404 Not Found
             performPatchWithAuthNoBody(
                     ADMIN_REVIEWS_BASE_URL + "/" + nonExistentId + "/approve?approve=true",
                     adminToken

@@ -68,38 +68,24 @@ class ReviewServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        // Create test user
         testUser = TestDataFactory.defaultUser()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test brand
         Brand brand = TestDataFactory.defaultBrand()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test model
         Model model = TestDataFactory.defaultModel(brand)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test generation
         Generation generation = TestDataFactory.defaultGeneration(model)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test body type
         BodyType bodyType = TestDataFactory.defaultBodyType()
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test car
         testCar = TestDataFactory.defaultCar(generation, bodyType)
                 .id(UUID.randomUUID())
                 .build();
-
-        // Create test review
         testReview = TestDataFactory.defaultReview(testUser, testCar)
                 .id(UUID.randomUUID())
                 .build();
@@ -113,18 +99,12 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should return average ratings when car exists")
         void getAverageRatingsForCar_CarExists_ReturnsAverageRatings() {
-
-            // Create expected average ratings response
             AverageRatingsResponse expectedResponse = mock(AverageRatingsResponse.class);
 
-            // Mock repository and service calls
             when(carRepository.existsById(testCar.getId())).thenReturn(true);
             when(reviewRepository.findAverageRatingsForCarId(testCar.getId())).thenReturn(expectedResponse);
 
-            // Get average ratings for car
             AverageRatingsResponse result = reviewService.getAverageRatingsForCar(testCar.getId());
-
-            // Verify results -> correct response returned
             assertThat(result).isNotNull();
 
             verify(carRepository).existsById(testCar.getId());
@@ -134,13 +114,10 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when car does not exist")
         void getAverageRatingsForCar_CarNotFound_ThrowsException() {
-
-            // Mock repository
             UUID nonExistentCarId = UUID.randomUUID();
 
             when(carRepository.existsById(nonExistentCarId)).thenReturn(false);
 
-            // Get average ratings for non-existent car and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> reviewService.getAverageRatingsForCar(nonExistentCarId))
                     .isInstanceOf(ResourceNotFoundException.class);
 
@@ -156,8 +133,6 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should return paginated reviews for car")
         void getReviewsForCarId_CarExists_ReturnsReviews() {
-
-            // Create page with specific pagination
             Pageable pageable = PageRequest.of(0, 10);
             Page<Review> reviewPage = new PageImpl<>(List.of(testReview), pageable, 1);
             Page<ReviewResponse> expectedResponse = new PageImpl<>(
@@ -165,14 +140,10 @@ class ReviewServiceTest {
                     pageable, 1
             );
 
-            // Mock repository
             when(reviewRepository.findAllApprovedByCarId(testCar.getId(), pageable)).thenReturn(reviewPage);
             when(reviewMapper.toDtoList(reviewPage)).thenReturn(expectedResponse);
 
-            // Get paginated reviews for car
             Page<ReviewResponse> result = reviewService.getReviewsForCarId(testCar.getId(), pageable);
-
-            // Verify results -> correct response returned
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
 
@@ -189,8 +160,6 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should create review when user and car exist and no previous review exists")
         void createReview_ValidData_CreatesReview() {
-
-            // Create valid request
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Great car, highly recommended!")
                     .engineRating(5)
@@ -207,16 +176,12 @@ class ReviewServiceTest {
 
             Review mappedReview = new Review();
 
-            // Mock repository
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
             when(reviewRepository.existsByCarIdAndUserId(testCar.getId(), testUser.getId())).thenReturn(false);
-            when(createReviewMapper.toDto(request)).thenReturn(mappedReview);
+            when(createReviewMapper.toEntity(request)).thenReturn(mappedReview);
 
-            // Create review
             reviewService.createReview(testCar.getId(), request, "testuser");
-
-            // Verify results -> correct review created
             ArgumentCaptor<Review> reviewCaptor = ArgumentCaptor.forClass(Review.class);
 
             verify(reviewRepository).save(reviewCaptor.capture());
@@ -230,16 +195,12 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when user not found")
         void createReview_UserNotFound_ThrowsException() {
-
-            // Create request
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Great car!")
                     .build();
 
-            // Mock repository
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-            // Create review with non-existent user and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> reviewService.createReview(testCar.getId(), request, "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
@@ -249,19 +210,15 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when car not found")
         void createReview_CarNotFound_ThrowsException() {
-
-            // Create request
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Great car!")
                     .build();
 
-            // Mock repository
             UUID nonExistentCarId = UUID.randomUUID();
 
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(carRepository.findById(nonExistentCarId)).thenReturn(Optional.empty());
 
-            // Create review with non-existent car and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> reviewService.createReview(nonExistentCarId, request, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
@@ -271,18 +228,14 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw ResourceAlreadyExistsException when user already reviewed car")
         void createReview_AlreadyReviewed_ThrowsException() {
-
-            // Create request
             CreateReviewRequest request = CreateReviewRequest.builder()
                     .comment("Another review!")
                     .build();
 
-            // Mock repository
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(carRepository.findById(testCar.getId())).thenReturn(Optional.of(testCar));
             when(reviewRepository.existsByCarIdAndUserId(testCar.getId(), testUser.getId())).thenReturn(true);
 
-            // Create review with already reviewed car and verify result -> ResourceAlreadyExistsException is thrown
             assertThatThrownBy(() -> reviewService.createReview(testCar.getId(), request, "testuser"))
                     .isInstanceOf(ResourceAlreadyExistsException.class);
 
@@ -298,26 +251,18 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should delete review when user owns it")
         void deleteOwnReview_UserOwnsReview_DeletesSuccessfully() {
-
-            // Mock repository
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
 
-            // Delete review
             reviewService.deleteOwnReview(testReview.getId(), "testuser");
-
-            // Verify result -> review is deleted
             verify(reviewRepository).delete(testReview);
         }
 
         @Test
         @DisplayName("should throw ResourceNotFoundException when user not found")
         void deleteOwnReview_UserNotFound_ThrowsException() {
-
-            // Mock repository
             when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-            // Delete review with non-existent user and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> reviewService.deleteOwnReview(testReview.getId(), "unknown"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
@@ -327,14 +272,11 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when review not found")
         void deleteOwnReview_ReviewNotFound_ThrowsException() {
-
-            // Mock repository
             UUID nonExistentReviewId = UUID.randomUUID();
 
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
             when(reviewRepository.findById(nonExistentReviewId)).thenReturn(Optional.empty());
 
-            // Delete non-existent review and verify result -> ResourceNotFoundException is thrown
             assertThatThrownBy(() -> reviewService.deleteOwnReview(nonExistentReviewId, "testuser"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
@@ -344,18 +286,14 @@ class ReviewServiceTest {
         @Test
         @DisplayName("should throw IllegalStateException when user does not own review")
         void deleteOwnReview_UserDoesNotOwnReview_ThrowsException() {
-
-            // Create another user who doesn't own the review
             User anotherUser = TestDataFactory.defaultUser()
                     .id(UUID.randomUUID())
                     .username("anotheruser")
                     .build();
 
-            // Mock repository
             when(userRepository.findByUsername("anotheruser")).thenReturn(Optional.of(anotherUser));
             when(reviewRepository.findById(testReview.getId())).thenReturn(Optional.of(testReview));
 
-            // Delete review owned by another user and verify result -> IllegalStateException is thrown
             assertThatThrownBy(() -> reviewService.deleteOwnReview(testReview.getId(), "anotheruser"))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("You can only delete your own reviews");
