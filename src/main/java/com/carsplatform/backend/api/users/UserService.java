@@ -5,6 +5,7 @@ import com.carsplatform.backend.api.users.dtos.UserModifyRequest;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 import com.carsplatform.backend.common.security.UserPrincipal;
+import com.carsplatform.backend.common.security.crypto.BlindIndexService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final BlindIndexService blindIndexService;
 
 
     @Override
@@ -70,7 +72,7 @@ public class UserService implements UserDetailsService {
 
         if (
                 !currentUser.getEmail().equals(userModifyRequest.getEmail())
-                && userRepository.existsByEmail(userModifyRequest.getEmail())
+                && userRepository.existsByEmailHash(blindIndexService.hash(userModifyRequest.getEmail()))
         )
             throw new ResourceAlreadyExistsException("Email", userModifyRequest.getEmail());
 

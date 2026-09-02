@@ -6,6 +6,7 @@ import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.common.resourceExceptions.ResourceNotFoundException;
 import com.carsplatform.backend.common.security.UserPrincipal;
+import com.carsplatform.backend.common.security.crypto.BlindIndexService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,9 @@ class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private BlindIndexService blindIndexService;
 
     @InjectMocks
     private UserService userService;
@@ -167,7 +171,8 @@ class UserServiceTest {
         void updateUserProfile_NewUniqueEmail_UpdatesSuccessfully() {
             mockSecurityContext("testuser");
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
+            when(blindIndexService.hash("newemail@example.com")).thenReturn("blind-index-of-new-email");
+            when(userRepository.existsByEmailHash("blind-index-of-new-email")).thenReturn(false);
 
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName("UpdatedFirstName")
@@ -176,7 +181,7 @@ class UserServiceTest {
                     .build();
 
             userService.updateUserProfile(request);
-            verify(userRepository).existsByEmail("newemail@example.com");
+            verify(userRepository).existsByEmailHash("blind-index-of-new-email");
             verify(userMapper).updateEntityFromDto(request, testUser);
             verify(userRepository).save(testUser);
         }
@@ -186,7 +191,8 @@ class UserServiceTest {
         void updateUserProfile_DuplicateEmail_ThrowsResourceAlreadyExistsException() {
             mockSecurityContext("testuser");
             when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-            when(userRepository.existsByEmail("duplicate@example.com")).thenReturn(true);
+            when(blindIndexService.hash("duplicate@example.com")).thenReturn("blind-index-of-duplicate-email");
+            when(userRepository.existsByEmailHash("blind-index-of-duplicate-email")).thenReturn(true);
 
             UserModifyRequest request = UserModifyRequest.builder()
                     .firstName("UpdatedFirstName")

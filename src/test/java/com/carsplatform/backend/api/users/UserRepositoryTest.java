@@ -1,6 +1,7 @@
 package com.carsplatform.backend.api.users;
 
 import com.carsplatform.backend.common.TestDataFactory;
+import com.carsplatform.backend.common.security.crypto.BlindIndexService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,9 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BlindIndexService blindIndexService;
 
     private User testUser;
 
@@ -96,20 +100,27 @@ class UserRepositoryTest {
 
 
     @Nested
-    @DisplayName("existsByEmail Tests")
-    class ExistsByEmailTests {
+    @DisplayName("existsByEmailHash Tests")
+    class ExistsByEmailHashTests {
 
         @Test
-        @DisplayName("existsByEmail returns true for existing email")
-        void existsByEmail_ExistingEmail_ReturnsTrue() {
-            boolean exists = userRepository.existsByEmail("test@example.com");
+        @DisplayName("existsByEmailHash returns true for existing email")
+        void existsByEmailHash_ExistingEmail_ReturnsTrue() {
+            boolean exists = userRepository.existsByEmailHash(blindIndexService.hash("test@example.com"));
             assertThat(exists).isTrue();
         }
 
         @Test
-        @DisplayName("existsByEmail returns false for non-existing email")
-        void existsByEmail_NonExistingEmail_ReturnsFalse() {
-            boolean exists = userRepository.existsByEmail("nonexistent@example.com");
+        @DisplayName("existsByEmailHash ignores case and surrounding spaces")
+        void existsByEmailHash_DifferentCase_ReturnsTrue() {
+            boolean exists = userRepository.existsByEmailHash(blindIndexService.hash("  Test@Example.COM  "));
+            assertThat(exists).isTrue();
+        }
+
+        @Test
+        @DisplayName("existsByEmailHash returns false for non-existing email")
+        void existsByEmailHash_NonExistingEmail_ReturnsFalse() {
+            boolean exists = userRepository.existsByEmailHash(blindIndexService.hash("nonexistent@example.com"));
             assertThat(exists).isFalse();
         }
     }
