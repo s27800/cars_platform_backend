@@ -8,6 +8,7 @@ import com.carsplatform.backend.api.users.UserRepository;
 import com.carsplatform.backend.common.TestDataFactory;
 import com.carsplatform.backend.common.resourceExceptions.ResourceAlreadyExistsException;
 import com.carsplatform.backend.common.security.LoginAttemptService;
+import com.carsplatform.backend.common.security.crypto.BlindIndexService;
 import com.carsplatform.backend.common.security.TooManyLoginAttemptsException;
 import com.carsplatform.backend.common.security.UserPrincipal;
 import com.carsplatform.backend.common.security.jwt.JwtTokenProvider;
@@ -56,6 +57,9 @@ class AuthenticationServiceTest {
 
     @Mock
     private LoginAttemptService loginAttemptService;
+
+    @Mock
+    private BlindIndexService blindIndexService;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -173,7 +177,8 @@ class AuthenticationServiceTest {
                     .build();
 
             when(userRepository.existsByUsername("newuser")).thenReturn(false);
-            when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
+            when(blindIndexService.hash("newuser@example.com")).thenReturn("blind-index-of-new-email");
+            when(userRepository.existsByEmailHash("blind-index-of-new-email")).thenReturn(false);
             when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
             User savedUser = User.builder()
@@ -242,7 +247,8 @@ class AuthenticationServiceTest {
                     .build();
 
             when(userRepository.existsByUsername("newuser")).thenReturn(false);
-            when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+            when(blindIndexService.hash("existing@example.com")).thenReturn("blind-index-of-existing-email");
+            when(userRepository.existsByEmailHash("blind-index-of-existing-email")).thenReturn(true);
 
             assertThatThrownBy(() -> authenticationService.registerUser(registerRequest))
                     .isInstanceOf(ResourceAlreadyExistsException.class);

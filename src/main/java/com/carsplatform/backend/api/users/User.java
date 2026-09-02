@@ -5,6 +5,9 @@ import com.carsplatform.backend.api.fuelReports.FuelReport;
 import com.carsplatform.backend.api.reviewLikes.ReviewLike;
 import com.carsplatform.backend.api.reviews.Review;
 import com.carsplatform.backend.api.userSettings.UserSettings;
+import com.carsplatform.backend.common.security.crypto.EncryptedEmailConverter;
+import com.carsplatform.backend.common.security.crypto.EncryptedFirstNameConverter;
+import com.carsplatform.backend.common.security.crypto.EncryptedLastNameConverter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@EntityListeners(UserEmailHashListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,11 +41,17 @@ public class User {
     @Size(max = 50)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, length = 1024)
+    @Convert(converter = EncryptedEmailConverter.class)
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should be valid")
     @Size(max = 100)
     private String email;
+
+    @Column(name = "email_hash", nullable = false, unique = true, length = 64)
+    @JsonIgnore
+    @ToString.Exclude
+    private String emailHash;
 
     @Column(name = "password", nullable = false)
     @NotBlank(message = "Password cannot be blank")
@@ -49,12 +59,14 @@ public class User {
     @JsonIgnore
     private String password;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 1024)
+    @Convert(converter = EncryptedFirstNameConverter.class)
     @NotBlank(message = "First name cannot be blank")
     @Size(max = 100)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 1024)
+    @Convert(converter = EncryptedLastNameConverter.class)
     @NotBlank(message = "Last name cannot be blank")
     @Size(max = 100)
     private String lastName;

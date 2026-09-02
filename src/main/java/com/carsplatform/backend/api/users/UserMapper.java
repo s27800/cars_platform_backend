@@ -15,6 +15,7 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
+    @Mapping(target = "emailHash", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "registrationDate", ignore = true)
     @Mapping(target = "isAdmin", ignore = true)

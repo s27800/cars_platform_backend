@@ -165,6 +165,10 @@ spring.jpa.show-sql=true
 # JWT
 app.jwt.secret=YOUR_SECRET_KEY
 app.jwt.expiration-in-ms=86400000
+
+# Szyfrowanie danych osobowych w spoczynku
+app.encryption.key=BASE64_32_BAJTY
+app.encryption.index-key=BASE64_32_BAJTY_INNE
 ```
 
 ### Zmienne środowiskowe (produkcja)
@@ -176,6 +180,8 @@ app.jwt.expiration-in-ms=86400000
 | `SPRING_DATASOURCE_PASSWORD` | Hasło bazy |
 | `APP_JWT_SECRET` | Klucz JWT (min. 256 bitów) |
 | `APP_JWT_EXPIRATION_IN_MS` | Czas życia tokenu (ms) |
+| `APP_ENCRYPTION_KEY` | Klucz szyfrowania danych osobowych (Base64, dokładnie 32 bajty) |
+| `APP_ENCRYPTION_INDEX_KEY` | Klucz indeksu ślepego adresu e-mail (Base64, 32 bajty, inny niż powyższy) |
 
 ## 📚 Dokumentacja API
 
@@ -220,6 +226,30 @@ curl -X POST http://localhost:8080/api/reviews \
 |------|-------------|
 | `USER` | Przeglądanie, dodawanie recenzji i raportów, polubienia |
 | `ADMIN` | Wszystkie uprawnienia USER + moderacja treści |
+
+### Szyfrowanie danych osobowych w spoczynku
+
+Adres e-mail, imię i nazwisko są zapisywane w bazie wyłącznie jako kryptogram AES-256-GCM,
+z losowym wektorem inicjującym dla każdej wartości. Konwertery JPA szyfrują je przy zapisie
+i odszyfrowują przy odczycie, więc reszta kodu operuje na wartościach jawnych.
+
+Ponieważ ten sam adres szyfruje się za każdym razem inaczej, unikalności nie da się wymusić
+na kolumnie `email`. Służy do tego `email_hash` - deterministyczny HMAC-SHA256 adresu,
+liczony na osobnym kluczu i utrzymywany w zgodzie z adresem przez `UserEmailHashListener`.
+
+Hasło nie jest szyfrowane, tylko haszowane funkcją BCrypt - to operacja jednokierunkowa
+i właściwe rozwiązanie dla danych uwierzytelniających.
+
+Mechanizm chroni dane w razie ujawnienia zrzutu bazy, kopii zapasowej lub wolumenu. Nie
+chroni przed przejęciem samej aplikacji serwerowej, która dysponuje kluczem. **Utrata
+`APP_ENCRYPTION_KEY` oznacza bezpowrotną utratę tych danych** - kopia klucza musi być
+przechowywana niezależnie od kopii bazy.
+
+Klucze pochodzą wyłącznie ze zmiennych środowiskowych. Wyjątkiem jest zestaw
+demonstracyjny w `.env.example`: konta przykładowe w `docker/init/02-test-data.sql` są
+zaszyfrowane właśnie nim, żeby `docker compose up` dawał działający stos z czytelnymi
+danymi. Każde wdrożenie inne niż to demo wymaga wygenerowania własnej pary kluczy -
+wtedy konta przykładowe przestają być odczytywalne i bazę należy postawić od zera.
 
 ### Zabezpieczone zasoby
 
